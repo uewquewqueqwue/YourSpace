@@ -9,12 +9,20 @@ import { setupAuthHandlers } from '@server/handlers/auth'
 import { setupAppsHandlers } from '@server/handlers/apps'
 import { setupCatalogsHandlers } from '@server/handlers/catalogs'
 import { setupVersionsHandlers } from '@server/handlers/versions'
-import 'dotenv/config'
+import dotenv from 'dotenv'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 
 let mainWindow: Electron.BrowserWindow | null = null
 let updater: ReturnType<typeof setupUpdater> | null = null
+
+// Загружаем .env
+if (app.isPackaged) {
+  const envPath = path.join(process.resourcesPath, '.env')
+  dotenv.config({ path: envPath })
+} else {
+  dotenv.config()
+}
 
 ipcMain.on('log', (event, { level, timestamp, message }) => {
   const colors = {

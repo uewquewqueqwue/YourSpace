@@ -55,6 +55,15 @@
     "directories": {
       "output": "dist_electron"
     },
+    "extraResources": [
+      {
+        "from": ".env",
+        "to": ".env",
+        "filter": [
+          "**/*"
+        ]
+      }
+    ],
     "files": [
       "dist/**/*",
       "!dist_electron"
