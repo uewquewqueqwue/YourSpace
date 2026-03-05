@@ -5,6 +5,11 @@ import { createMainWindow, getIconPath } from './windows/mainWindow'
 import { setupAppHandlers } from './handlers/apps'
 import { setupWindowHandlers } from './handlers/window'
 import { setupUpdater } from './updater'
+import { setupAuthHandlers } from '@server/handlers/auth'
+import { setupAppsHandlers } from '@server/handlers/apps'
+import { setupCatalogsHandlers } from '@server/handlers/catalogs'
+import { setupVersionsHandlers } from '@server/handlers/versions'
+import 'dotenv/config'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 
@@ -29,6 +34,10 @@ app.whenReady().then(() => {
   mainWindow = createMainWindow({ preloadPath, iconPath, isDev })
   updater = setupUpdater(mainWindow)
   
+  setupAuthHandlers()
+  setupAppsHandlers()
+  setupCatalogsHandlers()
+  setupVersionsHandlers()
   setupAppHandlers()
   setupWindowHandlers(mainWindow)
   
@@ -44,7 +53,7 @@ app.whenReady().then(() => {
     updater?.installUpdate()
   })
 
-  console.log('\x1b[36m[Main] App ready, window created')
+  console.log('\x1b[36m[Main] App ready, window created\x1b[0m')
 
   if (!isDev) {
     setTimeout(() => {

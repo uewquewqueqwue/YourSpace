@@ -77,8 +77,8 @@ defineExpose({ finish })
       <div class="percentage">{{ Math.floor(progress) }}%</div>
 
       <div class="info-bar">
-        <span>Version 1.0.0</span>
-        <span>© 2026</span>
+        <span>Version 1.1.0</span>
+        <span>© 2026, by Uew</span>
       </div>
     </div>
   </div>

@@ -52,8 +52,12 @@ const handler = (e: KeyboardEvent) => {
   }
 }
 
-onMounted(() => {
-  store.fetchApps()
+onMounted(async () => {
+  const token = localStorage.getItem('token')
+  if (token) {
+    await store.fetchApps(token)
+  }
+  
   window.addEventListener('keydown', handler)
 
   checkScrollbar()
@@ -67,10 +71,8 @@ onMounted(() => {
 
 onUnmounted(() => {
   window.removeEventListener('keydown', handler)
-
   window.removeEventListener('resize', checkScrollbar)
 })
-
 </script>
 
 <style lang="scss" scoped>

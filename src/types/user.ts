@@ -1,24 +1,45 @@
-import { Ref } from 'vue'
-
 export interface User {
   id: string
   email: string
   name: string
-  avatar: string | null
+  avatar?: string | null
   createdAt: Date
   updatedAt: Date
 }
 
-export interface AuthStore {
-  user: Ref<User | null>
-  loading: Ref<boolean>
-  error: Ref<string | null>
-  showLoginModal: Ref<boolean>
-  
-  login: (email: string, password: string) => Promise<void>
-  register: (name: string, email: string, password: string) => Promise<void>
-  logout: () => Promise<void>
-  checkAuth: () => Promise<void>
-  openLogin: () => void
-  closeLogin: () => void
+export interface UserSettings {
+  id: string
+  userId: string
+  autoUpdate: boolean
+  lastSeenVersion?: string | null
+  lastCheckedAt?: Date | null
+  createdAt: Date
+  updatedAt: Date
+}
+
+export interface LoginRequest {
+  email: string
+  password: string
+}
+
+export interface LoginResponse {
+  user: User
+  token: string
+}
+
+export interface RegisterRequest {
+  name: string
+  email: string
+  password: string
+}
+
+export interface RegisterResponse {
+  user: User
+  token: string
+}
+
+export interface UpdateProfileRequest {
+  token: string
+  name: string
+  avatar: string
 }

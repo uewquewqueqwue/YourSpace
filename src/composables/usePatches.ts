@@ -1,8 +1,11 @@
 import { ref } from 'vue'
+import { log } from '@/log/logger'
 
 export interface PatchNote {
   icon: string
-  text: string
+  title: string
+  desc: string
+  category: string
 }
 
 export function usePatches() {
@@ -11,18 +14,19 @@ export function usePatches() {
 
   const fetchPatches = async () => {
     try {
-      const response = await fetch('http://localhost:3000/api/version/latest')
-      const data = await response.json()
+      const data = await window.electronAPI.db.getLatestVersion()
       
       currentVersion.value = data.version
       patchNotes.value = data.patchNotes.map((note: any) => ({
         icon: note.icon,
         title: note.title,
-        desc: note.description,
-        category: note.category
+        desc: note.description || "",
+        category: note.category || "FEATURE"
       }))
+      
+      log('info', 'Patches fetched:', currentVersion.value)
     } catch (error) {
-      console.error('Failed to fetch patches')
+      console.error('Failed to fetch patches:', error)
     }
   }
 

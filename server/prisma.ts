@@ -1,5 +1,5 @@
 import "dotenv/config";
-import { PrismaClient } from "@prisma/client";
+import { PrismaClient } from '../generated/client'
 import { withAccelerate } from "@prisma/extension-accelerate";
 
 const connectionString = process.env.DATABASE_URL

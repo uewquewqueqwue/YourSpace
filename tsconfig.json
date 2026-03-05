@@ -18,7 +18,8 @@
     "baseUrl": ".",
     "paths": {
       "@/*": ["src/*"],
-      "@prisma/client": ["./generated/client"]
+      "@prisma/client": ["./generated/client"],
+      "@server/*": ["./server/*"]
     }
   },
   "include": ["src/**/*", "server/**/*"],

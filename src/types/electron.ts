@@ -1,24 +1,44 @@
-export interface ProcessInfo {
-  displayName: string
-  name: string
-  path: string
-  pid: string
-  rawPath?: string
-}
+import type { 
+  ProcessInfo, 
+  LaunchResult, 
+  ExecResult, 
+  GetAppsOptions 
+} from './apps'
+import type { UpdateInfo, UpdateProgress } from './versions'
+import type { 
+  LoginResponse, 
+  RegisterResponse, 
+  User,
+  UpdateProfileRequest 
+} from './user'
+import type { 
+  UserAppWithDisplay, 
+  CreateAppRequest, 
+  UpdateAppRequest 
+} from './apps'
+import type { CreateVersionRequest, AppVersion } from './versions'
 
-export interface LaunchResult {
-  success: boolean
-  error?: string
-}
+export interface DBApi {
+  // Auth
+  login: (email: string, password: string) => Promise<LoginResponse>
+  register: (name: string, email: string, password: string) => Promise<RegisterResponse>
+  logout: (token: string) => Promise<{ success: boolean }>
+  getMe: (token: string) => Promise<User>
+  updateProfile: (token: string, name: string, avatar: string) => Promise<User>
 
-export interface ExecResult {
-  stdout: string
-  stderr: string
-}
+  // Apps
+  getApps: (token: string) => Promise<UserAppWithDisplay[]>
+  createApp: (token: string, data: Omit<CreateAppRequest, 'token'>) => Promise<UserAppWithDisplay>
+  updateApp: (token: string, id: string, data: Omit<UpdateAppRequest, 'token' | 'id'>) => Promise<UserAppWithDisplay>
+  deleteApp: (token: string, id: string) => Promise<{ success: boolean }>
 
-export interface GetAppsOptions {
-  limit?: number
-  page?: number
+  // Catalogs
+  getCatalogs: (token: string) => Promise<any[]>
+  updateCatalog: (token: string, id: string, data: any) => Promise<any>
+
+  // Versions
+  getLatestVersion: () => Promise<AppVersion>
+  createVersion: (token: string, version: string, patchNotes: any[]) => Promise<AppVersion>
 }
 
 export interface ElectronAPI {
@@ -38,7 +58,7 @@ export interface ElectronAPI {
   execCommand: (command: string) => Promise<ExecResult>
   
   // Lifecycle
-  onAppClosing: (callback: () => void) => void
+  onAppClosing: (callback: () => Promise<void>) => void
   log: (level: string, ...args: any[]) => void
 
   // Auto-updater
@@ -51,23 +71,9 @@ export interface ElectronAPI {
   checkForUpdates: () => void
   downloadUpdate: () => void
   installUpdate: () => void
-}
 
-export interface UpdateInfo {
-  version: string
-  files: Array<{ url: string; size: number }>
-  path: string
-  sha512: string
-  releaseDate: string
-  releaseName?: string
-  releaseNotes?: string
-}
-
-export interface UpdateProgress {
-  bytesPerSecond: number
-  percent: number
-  total: number
-  transferred: number
+  // Database API
+  db: DBApi
 }
 
 declare global {

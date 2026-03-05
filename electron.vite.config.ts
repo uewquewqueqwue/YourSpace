@@ -14,7 +14,8 @@ export default defineConfig({
     },
     resolve: {
       alias: {
-        '@': resolve(__dirname, 'src')
+        '@': resolve(__dirname, 'src'),
+        '@server': resolve(__dirname, 'server'),
       }
     }
   },
@@ -23,13 +24,19 @@ export default defineConfig({
       outDir: 'dist/preload',
       rollupOptions: {
         input: {
-          index: resolve(__dirname, 'src/electron/preload/preload.ts')
+          index: resolve(__dirname, 'src/electron/preload/index.ts')
         },
         output: {
           format: 'cjs',
           entryFileNames: '[name].js'
         }
       },
+    },
+    resolve: {
+      alias: {
+        '@': resolve(__dirname, 'src'),
+        '@server': resolve(__dirname, 'server')
+      }
     }
   },
   renderer: {
@@ -45,7 +52,8 @@ export default defineConfig({
     plugins: [vue()],
     resolve: {
       alias: {
-        '@': resolve(__dirname, 'src')
+        '@': resolve(__dirname, 'src'),
+        '@server': resolve(__dirname, 'server')
       }
     },
     server: {

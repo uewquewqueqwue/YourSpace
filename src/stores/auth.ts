@@ -1,8 +1,7 @@
 import { ref } from 'vue'
 import { useAppsStore } from './apps'
-import type { User, AuthStore } from '@/types/user'
-
-const API_URL = 'http://localhost:3000'
+import type { User } from '@/types/user'
+import type { AuthStore } from "@/types/store"
 
 const user = ref<User | null>(null)
 const loading = ref(false)
@@ -15,22 +14,14 @@ export function useAuth(): AuthStore {
     error.value = null
 
     try {
-      const res = await fetch(`${API_URL}/api/login`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password })
-      })
+      const { user: userData, token } = await window.electronAPI.db.login(email, password)
 
-      const data = await res.json()
-      if (!res.ok) throw new Error(data.error)
-
-      localStorage.setItem('token', data.token)
-      user.value = data.user
+      localStorage.setItem('token', token)
+      user.value = userData
       
       const appsStore = useAppsStore()
-      await appsStore.fetchApps()
-      await appsStore.forceSync()
-      await appsStore.fetchApps()
+      await appsStore.fetchApps(token)
+      await appsStore.forceSync(token)
 
     } catch (err) {
       error.value = err instanceof Error ? err.message : 'Login failed'
@@ -44,22 +35,14 @@ export function useAuth(): AuthStore {
     error.value = null
 
     try {
-      const res = await fetch(`${API_URL}/api/register`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name, email, password })
-      })
+      const { user: userData, token } = await window.electronAPI.db.register(name, email, password)
 
-      const data = await res.json()
-      if (!res.ok) throw new Error(data.error)
-
-      localStorage.setItem('token', data.token)
-      user.value = data.user
+      localStorage.setItem('token', token)
+      user.value = userData
       
       const appsStore = useAppsStore()
-      await appsStore.fetchApps()
-      await appsStore.forceSync()
-      await appsStore.fetchApps()
+      await appsStore.fetchApps(token)
+      await appsStore.forceSync(token)
 
     } catch (err) {
       error.value = err instanceof Error ? err.message : 'Registration failed'
@@ -69,8 +52,18 @@ export function useAuth(): AuthStore {
   }
 
   const logout = async () => {
+    const token = localStorage.getItem('token')
+    if (token) {
+      try {
+        await window.electronAPI.db.logout(token)
+      } catch (err) {
+        console.error('Logout error:', err)
+      }
+    }
+
     const appsStore = useAppsStore()
-    await appsStore.forceSync()
+    await appsStore.forceSync(token || '')
+    
     user.value = null
     localStorage.removeItem('token')
     showLoginModal.value = false
@@ -82,24 +75,29 @@ export function useAuth(): AuthStore {
     if (!token) return
 
     try {
-      const res = await fetch(`${API_URL}/api/me`, {
-        headers: { 'Authorization': `Bearer ${token}` }
-      })
-
-      if (res.status === 401 || res.status === 404) {
-        localStorage.removeItem('token')
-        user.value = null
-        return
-      }
-
-      const userData = await res.json()
+      const userData = await window.electronAPI.db.getMe(token)
       user.value = userData
       
       const appsStore = useAppsStore()
-      await appsStore.fetchApps()
+      await appsStore.fetchApps(token)
 
     } catch {
       localStorage.removeItem('token')
+      user.value = null
+    }
+  }
+
+  const updateProfile = async (name: string, avatar: string) => {
+    const token = localStorage.getItem('token')
+    if (!token) throw new Error('Not authenticated')
+
+    try {
+      const updatedUser = await window.electronAPI.db.updateProfile(token, name, avatar)
+      user.value = updatedUser
+      return updatedUser
+    } catch (err) {
+      error.value = err instanceof Error ? err.message : 'Failed to update profile'
+      throw err
     }
   }
 
@@ -121,6 +119,7 @@ export function useAuth(): AuthStore {
     register,
     logout,
     checkAuth,
+    updateProfile,
     openLogin,
     closeLogin
   }

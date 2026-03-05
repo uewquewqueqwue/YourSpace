@@ -50,7 +50,7 @@ import { marked } from 'marked'
 const props = defineProps<{
   isOpen: boolean
   version: string
-  notes: Array<{ icon: string; title: string; desc?: string; category?: string }>
+  notes: Array<{ icon: string; title: string; desc: string; category: string }>
 }>()
 
 const emit = defineEmits(['close'])
@@ -109,6 +109,7 @@ watch(() => props.isOpen, (val) => {
   max-width: 90vw;
   border-radius: $radius-lg;
   overflow: hidden;
+  padding-right: 5px;
   animation: modalSlide .6s ease;
 
   @include themify() {
@@ -185,7 +186,7 @@ watch(() => props.isOpen, (val) => {
 
 .content {
   padding: 24px;
-  max-height: 50vh;
+  max-height: 70vh;
   overflow-y: auto;
 
   &::-webkit-scrollbar {

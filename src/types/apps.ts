@@ -1,5 +1,3 @@
-import { Ref } from 'vue'
-
 export interface AppCatalog {
   id: string
   name: string
@@ -48,29 +46,41 @@ export interface CreateAppInput {
   customColor?: string
 }
 
-export interface AppsStore {
-  apps: Ref<UserAppWithDisplay[]>
-  quickApps: Ref<UserAppWithDisplay[]>
-  loading: Ref<boolean>
-  error: Ref<string | null>
-  
-  fetchApps: () => Promise<void>
-  addApp: (input: CreateAppInput) => Promise<UserAppWithDisplay | null>
-  removeApp: (id: string) => Promise<boolean>
-  launchApp: (path: string) => Promise<boolean>
-  forceSync: () => Promise<void>
-  
-  addToQuick: (id: string) => boolean
-  removeFromQuick: (id: string) => void
-  isInQuick: (id: string) => boolean
-  
-  getAppById: (id: string) => UserAppWithDisplay | undefined
-  getActiveApps: () => UserAppWithDisplay[]
-  getTotalTimeToday: () => number
-  
-  saveToStorage: () => void
-  reset: () => void
-  logout: () => void
-  startPeriodicSync: () => void
-  stopPeriodicSync: () => void
+export interface CreateAppRequest {
+  token: string
+  path: string
+  catalogName: string
+  customName?: string
+  customColor?: string
+  totalMinutes?: number
+}
+
+export interface UpdateAppRequest {
+  token: string
+  id: string
+  totalMinutes?: number
+  lastUsed?: Date
+}
+
+export interface ProcessInfo {
+  displayName: string
+  name: string
+  path: string
+  pid: string
+  rawPath?: string
+}
+
+export interface LaunchResult {
+  success: boolean
+  error?: string
+}
+
+export interface ExecResult {
+  stdout: string
+  stderr: string
+}
+
+export interface GetAppsOptions {
+  limit?: number
+  page?: number
 }

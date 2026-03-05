@@ -1,4 +1,4 @@
-import { BrowserWindow } from 'electron'
+import { BrowserWindow, app } from 'electron'
 import path from 'path'
 
 interface CreateWindowOptions {
@@ -35,7 +35,8 @@ export function createMainWindow({ preloadPath, iconPath, isDev }: CreateWindowO
   if (isDev) {
     win.loadURL('http://localhost:5173')
   } else {
-    win.loadFile(path.join(__dirname, '../../renderer/index.html'))
+    const indexPath = path.join(app.getAppPath(), 'dist/renderer/index.html')
+    win.loadFile(indexPath)
   }
 
   win.once('ready-to-show', () => {

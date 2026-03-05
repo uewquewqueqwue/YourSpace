@@ -25,6 +25,8 @@
       <Toast v-for="toast in toasts" :key="toast.id" :message="toast.message" :type="toast.type" />
     </TransitionGroup>
   </div>
+
+  <UpdateToast />
 </template>
 
 <script setup lang="ts">
@@ -42,6 +44,7 @@ import AppBar from '@/components/layout/AppBar.vue'
 import StorageIndicator from '@/components/common/StorageIndicator.vue'
 import Toast from '@/components/common/Toast.vue'
 import PatchNotesModal from '@/components/common/PatchNotesModal.vue'
+import UpdateToast from '@/components/common/UpdateToast.vue'
 
 const auth = useAuth()
 const appsStore = useAppsStore()
@@ -93,8 +96,10 @@ onMounted(async () => {
 
   window.electronAPI?.onAppClosing(async () => {
     console.log('App closing, syncing...')
-    if (auth.user.value) {
-      await appsStore.forceSync()
+    const token = localStorage.getItem('token')
+    
+    if (auth.user.value && token) {
+      await appsStore.forceSync(token)
     } else {
       appsStore.saveToStorage()
     }
