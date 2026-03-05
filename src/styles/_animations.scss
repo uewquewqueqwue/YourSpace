@@ -1,0 +1,17 @@
+.no-animations *,
+.no-animations *::before,
+.no-animations *::after {
+  transition: none !important;
+  animation: none !important;
+  transition-delay: 0s !important;
+  transition-duration: 0s !important;
+  animation-duration: 0s !important;
+  animation-delay: 0s !important;
+}
+
+.no-animations [class*="enter"],
+.no-animations [class*="leave"],
+.no-animations [class*="move"] {
+  opacity: 1 !important;
+  transform: none !important;
+}

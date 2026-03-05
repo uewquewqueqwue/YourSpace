@@ -1,0 +1,28 @@
+$themes: (
+  light: (
+    brand-primary: #8B5CF6,
+    brand-dark: #f5f5f5,
+    bg-nav: #ffffff,
+    bg-content: #f8f9fa,
+    bg-card: #ffffff,
+    bg-sidebar: #ffffff,
+    border-color: #e9ecef,
+    border-light-color: #e9ecef,
+    text-primary: #212529,
+    text-secondary: #6c757d,
+    nav-bar-tab: #dfcbff,
+  ),
+  dark: (
+    brand-primary: #8B5CF6,
+    brand-dark: #141418,
+    bg-nav: #111,
+    bg-content: #131313,
+    bg-card: #202020,
+    bg-sidebar: #111,
+    border-color: #222,
+    border-light-color: #333,
+    text-primary: #fff,
+    text-secondary: #666,
+    nav-bar-tab: #25252c,
+  )
+);

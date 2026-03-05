@@ -1,0 +1,30 @@
+@use "sass:map";
+@use "@/styles/themes" as *;
+
+// Sidebar
+$sidebar-width: 400px;
+
+// Border radius
+$radius-sm: 9px;
+$radius-lg: 16px;
+
+$nav-width: 72px;
+$nav-item-size: 40px;
+$nav-border-radius: 12px;
+
+$current-theme: dark;
+
+@mixin themify() {
+  @each $theme-name, $theme-map in $themes {
+    $current-theme: $theme-name !global;
+    
+    [data-theme="#{$theme-name}"] & {
+      @content;
+    }
+  }
+}
+
+@function themed($key) {
+  $theme-map: map.get($themes, $current-theme);
+  @return map.get($theme-map, $key);
+}

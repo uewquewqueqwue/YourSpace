@@ -1,0 +1,99 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client"
+  output   = "../generated"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  name      String
+  password  String
+  avatar    String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  apps      UserApp[]
+}
+
+model AppCatalog {
+  id          String   @id @default(cuid())
+  name        String   @unique
+  displayName String?
+  icon        String?
+  color       String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  userApps UserApp[]
+}
+
+model UserApp {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  catalogId String
+  catalog   AppCatalog @relation(fields: [catalogId], references: [id])
+  
+  path      String
+  customName  String?
+  customColor String?
+  
+  totalMinutes Int        @default(0)
+  lastUsed     DateTime?
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([userId, path])
+}
+
+model AppVersion {
+  id          String   @id @default(cuid())
+  version     String   @unique // например "1.0.1"
+  releaseDate DateTime @default(now())
+  isRequired  Boolean  @default(false)
+  minVersion  String?
+  downloadUrl String?
+  size        Int?
+  changelog   String?
+  
+  patchNotes  PatchNote[]
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model PatchNote {
+  id          String        @id @default(cuid())
+  versionId   String
+  version     AppVersion    @relation(fields: [versionId], references: [id], onDelete: Cascade)
+  
+  icon        String        @default("✨")
+  title       String        
+  description String?       
+  category    PatchCategory @default(FEATURE)
+  order       Int           @default(0)
+  
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+}
+
+enum PatchCategory {
+  FEATURE
+  IMPROVEMENT
+  BUGFIX
+  PERFORMANCE
+  SECURITY
+  OTHER
+}

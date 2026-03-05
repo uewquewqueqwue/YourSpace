@@ -1,0 +1,108 @@
+@use "../theme-mixins" as *;
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.field {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  border: 1px solid;
+  border-radius: 10px;
+  padding: 0 12px;
+  
+  @include themify() {
+    background: themed('brand-dark');
+    border-color: themed('border-color');
+    
+    &:focus-within {
+      border-color: themed('brand-primary');
+    }
+    
+    &.error {
+      border-color: #ef4444;
+      padding: 0 14px;
+    }
+  }
+
+  .icon {
+    @include themify() {
+      color: themed('text-secondary');
+    }
+  }
+
+  input {
+    background: none;
+    border: none;
+    padding: 14px 0;
+    width: 100%;
+    outline: none;
+    
+    @include themify() {
+      color: themed('text-primary');
+      
+      &::placeholder {
+        color: themed('text-secondary');
+      }
+    }
+  }
+
+  .field-error {
+    position: absolute;
+    bottom: -18px;
+    left: 12px;
+    font-size: 11px;
+    color: #ef4444;
+  }
+}
+
+.error {
+  background: rgba(239, 68, 68, 0.1);
+  color: #ef4444;
+  padding: 10px;
+  border-radius: 8px;
+  font-size: 13px;
+  margin-bottom: 8px;
+  text-align: center;
+}
+
+.submit-btn {
+  border: none;
+  border-radius: 10px;
+  padding: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: 0.2s;
+  
+  @include themify() {
+    background: themed('brand-primary');
+    color: white;
+    
+    &:hover:not(:disabled) {
+      opacity: 0.9;
+      transform: translateY(-1px);
+    }
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.spin {
+  animation: spin 1s linear infinite;
+}

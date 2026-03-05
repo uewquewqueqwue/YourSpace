@@ -1,0 +1,89 @@
+{
+  "name": "your-space",
+  "version": "1.1.0",
+  "packageManager": "yarn@4.12.0",
+  "main": "dist/main/index.js",
+  "type": "module",
+  "scripts": {
+    "dev": "concurrently \"yarn server\" \"yarn dev:electron\" --kill-others --success first",
+    "dev:electron": "electron-vite dev",
+    "server": "tsx watch server/index.ts",
+    "build": "electron-vite build",
+    "preview": "electron-vite preview",
+    "dist": "yarn build && electron-builder",
+    "release": "yarn build && electron-builder --publish always"
+  },
+  "dependencies": {
+    "@prisma/client": "^7.4.2",
+    "@prisma/extension-accelerate": "^3.0.1",
+    "bcrypt": "^6.0.0",
+    "cors": "^2.8.6",
+    "dotenv": "^17.3.1",
+    "electron": "^40.6.1",
+    "electron-log": "^5.4.3",
+    "electron-updater": "^6.8.3",
+    "express": "^5.2.1",
+    "jsonwebtoken": "^9.0.3",
+    "lucide-vue-next": "^0.575.0",
+    "marked": "^17.0.4",
+    "node-vibrant": "^4.0.4",
+    "vite": "^7.3.1",
+    "vue": "^3.5.29"
+  },
+  "devDependencies": {
+    "@types/bcrypt": "^6.0.0",
+    "@types/cors": "^2.8.19",
+    "@types/express": "^5.0.6",
+    "@types/jsonwebtoken": "^9.0.10",
+    "@types/node": "^25.3.3",
+    "@vitejs/plugin-vue": "^6.0.4",
+    "concurrently": "^9.2.1",
+    "electron-builder": "26.8.1",
+    "electron-vite": "^5.0.0",
+    "prisma": "^7.4.2",
+    "sass": "^1.97.3",
+    "tsx": "^4.21.0",
+    "typescript": "^5.9.3",
+    "wait-on": "^9.0.4"
+  },
+  "build": {
+    "appId": "com.uewque.yourspace",
+    "productName": "YourSpace",
+    "directories": {
+      "output": "dist_electron"
+    },
+    "files": [
+      "dist/**/*",
+      "!dist_electron"
+    ],
+    "win": {
+      "target": [
+        "nsis",
+        "portable"
+      ],
+      "icon": "public/logo/logo.ico"
+    },
+    "mac": {
+      "target": [
+        "dmg",
+        "zip"
+      ],
+      "category": "public.app-category.productivity",
+      "icon": "public/logo/logo.icns"
+    },
+    "linux": {
+      "target": [
+        "AppImage",
+        "deb"
+      ],
+      "category": "Utility"
+    },
+    "publish": {
+      "provider": "github",
+      "repo": "YourSpace",
+      "owner": "uewquewqueqwue",
+      "releaseType": "release",
+      "vPrefixedTagName": true
+    }
+  }
+}
