@@ -8,16 +8,15 @@
       <NavBar :tab="currentTab" @update:tab="currentTab = $event" />
       <MainView :tab="currentTab" />
       <RightPanel />
-
       <StorageIndicator />
     </div>
   </div>
 
   <PatchNotesModal
-    :is-open="showPatchModal"
+    :is-open="patchModal.showPatchModal.value"
     :version="patches.currentVersion.value"
     :notes="patches.patchNotes.value"
-    @close="markPatchesAsSeen"
+    @close="patchModal.markPatchesAsSeen"
   />
 
   <div class="toast-container">
@@ -30,12 +29,13 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted } from 'vue'
-import { useAuth } from '@/stores/auth'
-import { useAppsStore, initializeAppsStore } from '@/stores/apps'
-import { usePatches } from '@/composables/usePatches'
-import { useSettings } from '@/composables/useSettings'
+import { ref, onMounted } from 'vue'
 import { useToast } from '@/composables/useToast'
+import { useAppInit } from '@/composables/useAppInit'
+import { usePatchModal } from '@/composables/usePatchModal'
+import { useUpdateListener } from '@/composables/useUpdateListener'
+import { initializeAppsStore } from '@/stores/apps'
+import { usePatches } from '@/composables/usePatches'
 import NavBar from '@/components/layout/NavBar.vue'
 import MainView from '@/components/views/MainView.vue'
 import RightPanel from '@/components/layout/RightPanel.vue'
@@ -45,85 +45,26 @@ import StorageIndicator from '@/components/common/StorageIndicator.vue'
 import Toast from '@/components/common/Toast.vue'
 import PatchNotesModal from '@/components/common/PatchNotesModal.vue'
 import UpdateToast from '@/components/common/UpdateToast.vue'
-import { useVersionStore } from '@/stores/version'
-import packageJson from '../package.json'
 
-const auth = useAuth()
-const appsStore = useAppsStore()
+const { toasts } = useToast()
 const patches = usePatches()
+const patchModal = usePatchModal()
+const { init } = useAppInit()
+
 const currentTab = ref('apps')
 const isLoading = ref(true)
 const loaderRef = ref<InstanceType<typeof AppLoader>>()
-const { toasts } = useToast()
-const { applyAll } = useSettings()
-const versionStore = useVersionStore()
-
-
-const PATCH_SEEN_KEY = 'patch_seen_version'
-const showPatchModal = ref(false)
-
-versionStore.setAppVersion(packageJson.version)
-
-const checkPatches = async () => {
-  await patches.fetchPatches()
-  versionStore.setVersion(patches.currentVersion.value)
-  
-  const lastSeen = localStorage.getItem(PATCH_SEEN_KEY)
-  
-  if (patches.currentVersion.value === packageJson.version && 
-      lastSeen !== patches.currentVersion.value) {
-    showPatchModal.value = true
-  }
-}
-
-const markPatchesAsSeen = () => {
-  localStorage.setItem(PATCH_SEEN_KEY, patches.currentVersion.value)
-  showPatchModal.value = false
-}
 
 onMounted(async () => {
-  applyAll()
-
-  await new Promise(resolve => setTimeout(resolve, 1500))
-
-  await auth.checkAuth()
-  await checkPatches()
-
-  if (auth.user.value) {
-    appsStore.startPeriodicSync()
-  }
+  await init()
+  await patchModal.checkPatches()
+  initializeAppsStore()
 
   loaderRef.value?.finish()
-
-  setTimeout(() => {
-    window.electronAPI?.expandWindow()
-  }, 100)
-
-  setTimeout(() => {
-    isLoading.value = false
-  }, 500)
-
-  window.electronAPI?.onAppClosing(async () => {
-    console.log('App closing, syncing...')
-    const token = localStorage.getItem('token')
-    
-    if (auth.user.value && token) {
-      await appsStore.forceSync(token)
-    } else {
-      appsStore.saveToStorage()
-    }
-  })
-
-  window.addEventListener('open-patch-notes', () => {
-    showPatchModal.value = true
-  })
-
-  initializeAppsStore()
+  setTimeout(() => isLoading.value = false, 500)
 })
 
-onUnmounted(() => {
-  window.removeEventListener('open-patch-notes', () => {})
-})
+useUpdateListener()
 </script>
 
 <style>

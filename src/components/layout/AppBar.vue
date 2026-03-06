@@ -14,7 +14,9 @@
         <RefreshCw :size="16" />
       </div>
 
-      <span class="version">v{{ version }}</span>
+      <span class="version">
+        <span class="version-letter">v</span>{{ version }}
+      </span>
     </div>
 
     <div class="bar-title">
@@ -34,21 +36,19 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, computed } from 'vue'
+import { computed } from 'vue'
 import { X, Minus, Square, NotebookText, RefreshCw } from "lucide-vue-next"
-// import { usePatches } from '@/composables/usePatches'
 import { useVersionStore } from '@/stores/version'
 
-defineProps<{ tab: string }>()
+const props = defineProps<{ tab: string }>()
 
 const minimize = () => window.electronAPI?.minimize()
 const maximize = () => window.electronAPI?.maximize()
 const close = () => window.electronAPI?.close()
-// const patches = usePatches()
 
-const updateAvailable = ref(false)
 const versionStore = useVersionStore()
-const version = computed(() => versionStore.currentVersion.value)
+const version = computed(() => versionStore.appVersion.value)
+const updateAvailable = computed(() => versionStore.isUpdateReady.value)
 
 const openPatchNotes = () => {
   window.dispatchEvent(new CustomEvent('open-patch-notes'))
@@ -57,12 +57,6 @@ const openPatchNotes = () => {
 const installUpdate = () => {
   window.electronAPI?.installUpdate()
 }
-
-onMounted(() => {
-  window.electronAPI?.onUpdateDownloaded(() => {
-    updateAvailable.value = true
-  })
-})
 </script>
 
 <style lang="scss" scoped>
@@ -87,6 +81,7 @@ onMounted(() => {
 
   &-left {
     display: flex;
+    align-items: center;
     gap: 8px;
     -webkit-app-region: no-drag;
   }
@@ -157,8 +152,11 @@ onMounted(() => {
     padding: 4px 8px;
     border-radius: 4px;
     @include themify() {
-      // background: themed('border-color');
       color: themed('text-secondary');
+
+      &-letter {
+        color: themed('brand-primary')
+      }
     }
   }
 
