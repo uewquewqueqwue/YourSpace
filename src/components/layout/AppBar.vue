@@ -1,7 +1,7 @@
 <template>
   <div class="bar">
     <div class="bar-left">
-      <div class="update-indicator" @click="openPatchNotes">
+      <div class="update-indicator" @click="$emit('open-patches')">
         <NotebookText :size="16" />
       </div>
 
@@ -38,21 +38,17 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { X, Minus, Square, NotebookText, RefreshCw } from "lucide-vue-next"
-import { useVersionStore } from '@/stores/version'
+import packageJson from '../../../package.json'
 
 const props = defineProps<{ tab: string }>()
+const emit = defineEmits(['open-patches'])
 
 const minimize = () => window.electronAPI?.minimize()
 const maximize = () => window.electronAPI?.maximize()
 const close = () => window.electronAPI?.close()
 
-const versionStore = useVersionStore()
-const version = computed(() => versionStore.appVersion.value)
-const updateAvailable = computed(() => versionStore.isUpdateReady.value)
-
-const openPatchNotes = () => {
-  window.dispatchEvent(new CustomEvent('open-patch-notes'))
-}
+const version = packageJson.version
+const updateAvailable = computed(() => false)
 
 const installUpdate = () => {
   window.electronAPI?.installUpdate()

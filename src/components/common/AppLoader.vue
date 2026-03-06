@@ -36,8 +36,9 @@ const checkingUpdates = ref(false)
 const steps = [
   { max: 20, text: 'Loading modules...', step: 1 },
   { max: 40, text: 'Connecting to services...', step: 1 },
-  { max: 60, text: 'Syncing data...', step: 2 },
-  { max: 80, text: 'Checking for updates...', step: 2 },
+  { max: 50, text: 'Syncing data...', step: 1 },
+  { max: 60, text: 'Checking for updates...', step: 2 },
+  { max: 90, text: 'Checking for updates...', step: 2 },
   { max: 95, text: 'Finalizing...', step: 3 }
 ]
 
@@ -75,7 +76,7 @@ onUnmounted(() => {
 
 const finish = () => {
   const finishInterval = setInterval(() => {
-    if (progress.value < 100) {
+    if (progress.value < 99.9) {
       progress.value += (100 - progress.value) * 0.3
     } else {
       progress.value = 100

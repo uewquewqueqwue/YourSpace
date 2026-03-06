@@ -35,6 +35,7 @@ export function createMainWindow({ preloadPath, iconPath, isDev }: CreateWindowO
 
   if (isDev) {
     win.loadURL('http://localhost:5173')
+    win.title = "Your Space [DEV]"
   } else {
     const indexPath = path.join(app.getAppPath(), 'dist/renderer/index.html')
     win.loadFile(indexPath)

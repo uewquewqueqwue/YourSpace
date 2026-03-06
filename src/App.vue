@@ -2,7 +2,7 @@
   <AppLoader v-if="isLoading" ref="loaderRef" />
 
   <div v-else class="app">
-    <AppBar :tab="currentTab" />
+    <AppBar :tab="currentTab" @open-patches="showPatchModal = true" />
 
     <div class="content">
       <NavBar :tab="currentTab" @update:tab="currentTab = $event" />
@@ -12,12 +12,8 @@
     </div>
   </div>
 
-  <PatchNotesModal
-    :is-open="patchModal.showPatchModal.value"
-    :version="patches.currentVersion.value"
-    :notes="patches.patchNotes.value"
-    @close="patchModal.markPatchesAsSeen"
-  />
+  <PatchNotesModal v-model="showPatchModal" :version="patches.currentVersion.value" :notes="patches.patchNotes.value"
+    @seen="markPatchesAsSeen" />
 
   <div class="toast-container">
     <TransitionGroup name="toast">
@@ -31,11 +27,11 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import { useToast } from '@/composables/useToast'
-import { useAppInit } from '@/composables/useAppInit'
-import { usePatchModal } from '@/composables/usePatchModal'
-import { useUpdateListener } from '@/composables/useUpdateListener'
-import { initializeAppsStore } from '@/stores/apps'
 import { usePatches } from '@/composables/usePatches'
+import { useSettings } from '@/composables/useSettings'
+import { useAuth } from '@/stores/auth'
+import { useAppsStore, initializeAppsStore } from '@/stores/apps'
+import packageJson from '../package.json'
 import NavBar from '@/components/layout/NavBar.vue'
 import MainView from '@/components/views/MainView.vue'
 import RightPanel from '@/components/layout/RightPanel.vue'
@@ -48,23 +44,57 @@ import UpdateToast from '@/components/common/UpdateToast.vue'
 
 const { toasts } = useToast()
 const patches = usePatches()
-const patchModal = usePatchModal()
-const { init } = useAppInit()
+const { applyAll } = useSettings()
+const auth = useAuth()
+const appsStore = useAppsStore()
 
 const currentTab = ref('apps')
 const isLoading = ref(true)
 const loaderRef = ref<InstanceType<typeof AppLoader>>()
+const showPatchModal = ref(false)
+const PATCH_SEEN_KEY = 'patch_seen_version'
+
+const checkPatches = async () => {
+  await patches.fetchPatches()
+
+  const lastSeen = localStorage.getItem(PATCH_SEEN_KEY)
+  if (patches.currentVersion.value === packageJson.version &&
+    lastSeen !== patches.currentVersion.value) {
+    showPatchModal.value = true
+  }
+}
+
+const markPatchesAsSeen = () => {
+  localStorage.setItem(PATCH_SEEN_KEY, patches.currentVersion.value)
+}
 
 onMounted(async () => {
-  await init()
-  await patchModal.checkPatches()
+  applyAll()
+
+  await auth.checkAuth()
+  await checkPatches()
+
+  if (auth.user.value) {
+    appsStore.startPeriodicSync()
+  }
+
   initializeAppsStore()
 
   loaderRef.value?.finish()
-  setTimeout(() => isLoading.value = false, 500)
-})
+  setTimeout(() => {
+    isLoading.value = false
+    window.electronAPI?.expandWindow()
+  }, 500)
 
-useUpdateListener()
+  window.electronAPI?.onAppClosing(async () => {
+    const token = localStorage.getItem('token')
+    if (auth.user.value && token) {
+      await appsStore.forceSync(token)
+    } else {
+      appsStore.saveToStorage()
+    }
+  })
+})
 </script>
 
 <style>
@@ -117,5 +147,31 @@ input:focus-visible,
 a:focus-visible {
   outline: 2px solid #8B5CF6 !important;
   outline-offset: 2px;
+}
+
+.toast-container {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  z-index: 1000001;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  pointer-events: none;
+}
+
+.toast-enter-active,
+.toast-leave-active {
+  transition: all 0.3s ease;
+}
+
+.toast-enter-from {
+  opacity: 0;
+  transform: translateX(30px);
+}
+
+.toast-leave-to {
+  opacity: 0;
+  transform: translateX(30px);
 }
 </style>
