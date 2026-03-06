@@ -46,6 +46,7 @@ import Toast from '@/components/common/Toast.vue'
 import PatchNotesModal from '@/components/common/PatchNotesModal.vue'
 import UpdateToast from '@/components/common/UpdateToast.vue'
 import { useVersionStore } from '@/stores/version'
+import packageJson from '../package.json'
 
 const auth = useAuth()
 const appsStore = useAppsStore()
@@ -57,15 +58,20 @@ const { toasts } = useToast()
 const { applyAll } = useSettings()
 const versionStore = useVersionStore()
 
+
 const PATCH_SEEN_KEY = 'patch_seen_version'
 const showPatchModal = ref(false)
+
+versionStore.setAppVersion(packageJson.version)
 
 const checkPatches = async () => {
   await patches.fetchPatches()
   versionStore.setVersion(patches.currentVersion.value)
   
   const lastSeen = localStorage.getItem(PATCH_SEEN_KEY)
-  if (lastSeen !== patches.currentVersion.value) {
+  
+  if (patches.currentVersion.value === packageJson.version && 
+      lastSeen !== patches.currentVersion.value) {
     showPatchModal.value = true
   }
 }
