@@ -34,19 +34,21 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, computed } from 'vue'
 import { X, Minus, Square, NotebookText, RefreshCw } from "lucide-vue-next"
-import { usePatches } from '@/composables/usePatches'
+// import { usePatches } from '@/composables/usePatches'
+import { useVersionStore } from '@/stores/version'
 
 defineProps<{ tab: string }>()
 
 const minimize = () => window.electronAPI?.minimize()
 const maximize = () => window.electronAPI?.maximize()
 const close = () => window.electronAPI?.close()
-const patches = usePatches()
+// const patches = usePatches()
 
-const version = ref('1.1.1')
 const updateAvailable = ref(false)
+const versionStore = useVersionStore()
+const version = computed(() => versionStore.currentVersion.value)
 
 const openPatchNotes = () => {
   window.dispatchEvent(new CustomEvent('open-patch-notes'))
@@ -57,8 +59,6 @@ const installUpdate = () => {
 }
 
 onMounted(() => {
-  version.value = patches.currentVersion.value
-  
   window.electronAPI?.onUpdateDownloaded(() => {
     updateAvailable.value = true
   })

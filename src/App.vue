@@ -45,6 +45,7 @@ import StorageIndicator from '@/components/common/StorageIndicator.vue'
 import Toast from '@/components/common/Toast.vue'
 import PatchNotesModal from '@/components/common/PatchNotesModal.vue'
 import UpdateToast from '@/components/common/UpdateToast.vue'
+import { useVersionStore } from '@/stores/version'
 
 const auth = useAuth()
 const appsStore = useAppsStore()
@@ -54,12 +55,14 @@ const isLoading = ref(true)
 const loaderRef = ref<InstanceType<typeof AppLoader>>()
 const { toasts } = useToast()
 const { applyAll } = useSettings()
+const versionStore = useVersionStore()
 
 const PATCH_SEEN_KEY = 'patch_seen_version'
 const showPatchModal = ref(false)
 
 const checkPatches = async () => {
   await patches.fetchPatches()
+  versionStore.setVersion(patches.currentVersion.value)
   
   const lastSeen = localStorage.getItem(PATCH_SEEN_KEY)
   if (lastSeen !== patches.currentVersion.value) {

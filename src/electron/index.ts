@@ -60,13 +60,16 @@ app.whenReady().then(() => {
     updater?.installUpdate()
   })
 
-  log.info('Main window created')
-
-  if (!isDev) {
-    setTimeout(() => {
-      updater?.checkForUpdates()
-    }, 3000)
-  }
+  log.info('[Main] Main window created')
+  log.info('[Main] Updater instance:', updater ? 'yes' : 'no')
+  
+  // if (!isDev) {
+  setTimeout(() => {
+    log.info('[Main] Triggering update check...')
+    updater?.checkForUpdates()
+  }, 3000)
+  
+  log.info('[Main] isDev:', isDev)
 })
 
 ipcMain.on('log', (event, { level, timestamp, message }) => {
