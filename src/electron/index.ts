@@ -1,45 +1,64 @@
-import log from 'electron-log'
 import { app, ipcMain } from 'electron'
 import path from 'path'
 import { fileURLToPath } from 'url'
+import fs from 'fs'
+import dotenv from 'dotenv'
+import log from 'electron-log'
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url))
+
+// Настройка логов
+const userDataPath = app.getPath('userData')
+const logsPath = path.join(userDataPath, 'logs')
+if (!fs.existsSync(logsPath)) fs.mkdirSync(logsPath, { recursive: true })
+log.transports.file.resolvePath = () => path.join(logsPath, 'main.log')
+log.info('================================')
+log.info('App starting...')
+
+// Загрузка .env
+try {
+  if (app.isPackaged) {
+    // В проде .env лежит в resources
+    const envPath = path.join(process.resourcesPath, '.env')
+    log.info('📁 Looking for .env at:', envPath)
+    
+    if (fs.existsSync(envPath)) {
+      log.info('✅ .env file exists, size:', fs.statSync(envPath).size)
+      
+      // Читаем и загружаем
+      const envConfig = dotenv.parse(fs.readFileSync(envPath))
+      Object.assign(process.env, envConfig)
+      
+      log.info('✅ DATABASE_URL loaded:', !!process.env.DATABASE_URL)
+      log.info('✅ JWT_SECRET loaded:', !!process.env.JWT_SECRET)
+    } else {
+      log.error('❌ .env NOT found!')
+    }
+  } else {
+    // В деве из корня
+    dotenv.config()
+    log.info('✅ Dev mode, .env loaded from project root')
+  }
+} catch (error) {
+  log.error('❌ Error loading .env:', error)
+}
+
+// Проверка критических переменных
+if (!process.env.DATABASE_URL) {
+  log.error('❌ DATABASE_URL is not defined!')
+  app.quit()
+  process.exit(1)
+}
+
+// Остальные импорты
 import { createMainWindow, getIconPath } from './windows/mainWindow'
 import { setupAppHandlers } from './handlers/apps'
 import { setupWindowHandlers } from './handlers/window'
 import { setupUpdater } from './updater'
-import { setupAuthHandlers } from '@server/handlers/auth'
-import { setupAppsHandlers } from '@server/handlers/apps'
-import { setupCatalogsHandlers } from '@server/handlers/catalogs'
-import { setupVersionsHandlers } from '@server/handlers/versions'
-import dotenv from 'dotenv'
-import fs from 'fs'
-
-log.transports.file.level = 'debug'
-log.transports.console.level = 'debug'
-
-const __dirname = path.dirname(fileURLToPath(import.meta.url))
-
-log.info('App starting...')
-
-if (app.isPackaged) {
-  const envPath = path.join(process.resourcesPath, '.env')
-  log.info('Looking for .env at:', envPath)
-  
-  if (fs.existsSync(envPath)) {
-    log.info('.env file exists, size:', fs.statSync(envPath).size)
-    
-    const content = fs.readFileSync(envPath, 'utf8')
-    const firstLine = content.split('\n')[0]
-    log.info('First line type:', firstLine.startsWith('DATABASE_URL') ? 'DATABASE_URL' : 'other')
-    
-    dotenv.config({ path: envPath })
-    log.info('DATABASE_URL loaded:', !!process.env.DATABASE_URL)
-  } else {
-    log.error('.env NOT found!')
-  }
-} else {
-  dotenv.config()
-  log.info('Dev mode, .env loaded')
-}
+import { setupAuthHandlers } from '../../server/handlers/auth'
+import { setupAppsHandlers } from '../../server/handlers/apps'
+import { setupCatalogsHandlers } from '../../server/handlers/catalogs'
+import { setupVersionsHandlers } from '../../server/handlers/versions'
 
 let mainWindow: Electron.BrowserWindow | null = null
 let updater: ReturnType<typeof setupUpdater> | null = null
