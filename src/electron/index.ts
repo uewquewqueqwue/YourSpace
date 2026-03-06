@@ -1,3 +1,4 @@
+import log from 'electron-log'
 import { app, ipcMain } from 'electron'
 import path from 'path'
 import { fileURLToPath } from 'url'
@@ -10,13 +11,39 @@ import { setupAppsHandlers } from '@server/handlers/apps'
 import { setupCatalogsHandlers } from '@server/handlers/catalogs'
 import { setupVersionsHandlers } from '@server/handlers/versions'
 import dotenv from 'dotenv'
+import fs from 'fs'
+
+log.transports.file.level = 'debug'
+log.transports.console.level = 'debug'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
+
+log.info('App starting...')
+
+if (app.isPackaged) {
+  const envPath = path.join(process.resourcesPath, '.env')
+  log.info('Looking for .env at:', envPath)
+  
+  if (fs.existsSync(envPath)) {
+    log.info('.env file exists, size:', fs.statSync(envPath).size)
+    
+    const content = fs.readFileSync(envPath, 'utf8')
+    const firstLine = content.split('\n')[0]
+    log.info('First line type:', firstLine.startsWith('DATABASE_URL') ? 'DATABASE_URL' : 'other')
+    
+    dotenv.config({ path: envPath })
+    log.info('DATABASE_URL loaded:', !!process.env.DATABASE_URL)
+  } else {
+    log.error('.env NOT found!')
+  }
+} else {
+  dotenv.config()
+  log.info('Dev mode, .env loaded')
+}
 
 let mainWindow: Electron.BrowserWindow | null = null
 let updater: ReturnType<typeof setupUpdater> | null = null
 
-// Загружаем .env
 if (app.isPackaged) {
   const envPath = path.join(process.resourcesPath, '.env')
   dotenv.config({ path: envPath })

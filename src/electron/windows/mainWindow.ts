@@ -18,6 +18,7 @@ export function createMainWindow({ preloadPath, iconPath, isDev }: CreateWindowO
     center: true,
     minWidth: 400,
     minHeight: 300,
+    title: "Your Space",
     icon: iconPath,
     webPreferences: {
       nodeIntegration: false,
