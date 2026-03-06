@@ -118,7 +118,7 @@ marked.setOptions({
 const toast = useToast()
 const showPreview = ref(true)
 const saving = ref(false)
-const currentVersion = ref('1.0.1')
+const currentVersion = ref('1.1.3')
 
 const initialPatches = [
   {
@@ -153,15 +153,13 @@ const saveVersion = async () => {
   }
 
   try {
-    const response = await fetch('http://localhost:3000/api/version', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(versionData)
-    })
+    const result = await window.electronAPI.db.createVersion(
+      versionData.version,
+      versionData.patchNotes
+    )
 
-    if (response.ok) {
+    if (result) {
       toast.success('Version saved successfully! 🎉')
-      // Сбрасываем форму
       currentVersion.value = '1.0.' + (parseInt(currentVersion.value.split('.')[2] || '0') + 1)
       patches.value = [
         {
@@ -171,11 +169,9 @@ const saveVersion = async () => {
           category: 'feature'
         }
       ]
-    } else {
-      toast.error('Failed to save version')
     }
   } catch (error) {
-    toast.error('Network error')
+    toast.error('Failed to save version')
   } finally {
     saving.value = false
   }

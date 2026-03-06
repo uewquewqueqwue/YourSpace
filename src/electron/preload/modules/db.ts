@@ -29,7 +29,7 @@ export function setupDBAPI() {
 
     getLatestVersion: () => 
       ipcRenderer.invoke('versions:getLatest'),
-    createVersion: (token: string, version: string, patchNotes: any[]) => 
-      ipcRenderer.invoke('versions:create', { token, version, patchNotes })
+    createVersion: (version: string, patchNotes: any[]) => 
+      ipcRenderer.invoke('versions:create', { version, patchNotes })
   }
 }

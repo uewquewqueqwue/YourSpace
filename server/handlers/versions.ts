@@ -1,6 +1,5 @@
 import { ipcMain } from 'electron'
 import { prisma } from '../prisma'
-import { authenticate } from '../middleware/auth'
 
 export function setupVersionsHandlers() {
   ipcMain.handle('versions:getLatest', async () => {
@@ -26,9 +25,7 @@ export function setupVersionsHandlers() {
     return latestVersion
   })
 
-  ipcMain.handle('versions:create', async (event, { token, version, patchNotes }) => {
-    const user = await authenticate(token)
-    
+  ipcMain.handle('versions:create', async (event, { version, patchNotes }) => {
     return prisma.appVersion.create({
       data: {
         version,

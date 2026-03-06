@@ -38,7 +38,7 @@ export interface DBApi {
 
   // Versions
   getLatestVersion: () => Promise<AppVersion>
-  createVersion: (token: string, version: string, patchNotes: any[]) => Promise<AppVersion>
+  createVersion: (version: string, patchNotes: any[]) => Promise<AppVersion>
 }
 
 export interface ElectronAPI {
