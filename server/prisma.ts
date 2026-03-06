@@ -1,16 +1,13 @@
-import "dotenv/config";
 import { PrismaClient } from '../generated/client'
 import { withAccelerate } from "@prisma/extension-accelerate";
 
-const connectionString = process.env.DATABASE_URL
-
-if (!connectionString) {
-  throw new Error('DATABASE_URL is not defined in environment variables')
+if (!process.env.DATABASE_URL) {
+  throw new Error('❌ DATABASE_URL is not defined')
 }
 
 const prismaClientSingleton = () => {
   const client = new PrismaClient({
-    accelerateUrl: connectionString,
+    accelerateUrl: process.env.DATABASE_URL,
     log: process.env.NODE_ENV === 'development' ? ['query', 'error', 'warn'] : ['error'],
   });
   
@@ -21,10 +18,8 @@ declare global {
   var prisma: undefined | ReturnType<typeof prismaClientSingleton>;
 }
 
-const prisma = globalThis.prisma ?? prismaClientSingleton();
+export const prisma = globalThis.prisma ?? prismaClientSingleton();
 
 if (process.env.NODE_ENV !== 'production') {
   globalThis.prisma = prisma;
 }
-
-export { prisma };

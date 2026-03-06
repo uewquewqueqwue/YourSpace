@@ -4,44 +4,65 @@
       <div class="update-indicator" @click="openPatchNotes">
         <NotebookText :size="16" />
       </div>
-      
-      <div class="update-indicator" v-if="hasProgramUpdate" @click="showProgramUpdate">
+
+      <div 
+        v-if="updateAvailable" 
+        class="update-indicator update-available" 
+        @click="installUpdate"
+        title="Update available - click to install"
+      >
         <RefreshCw :size="16" />
-        <span class="badge">1</span>
       </div>
+
+      <span class="version">v{{ version }}</span>
     </div>
 
-    <div class="bar-title">Your Space &bull; {{ tab }}</div>
+    <div class="bar-title">
+      <span class="app-name">Your Space</span>
+      <span class="separator">&bull;</span>
+      <span class="tab-name">{{ tab }}</span>
+    </div>
 
-    <div class="window-controls">
-      <button class="minimize" @click="minimize"><Minus /></button>
-      <button class="maximize" @click="maximize"><Square /></button>
-      <button class="close" @click="close"><X /></button>
+    <div class="bar-right">
+      <div class="window-controls">
+        <button class="minimize" @click="minimize"><Minus /></button>
+        <button class="maximize" @click="maximize"><Square /></button>
+        <button class="close" @click="close"><X /></button>
+      </div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
+import { ref, onMounted } from 'vue'
 import { X, Minus, Square, NotebookText, RefreshCw } from "lucide-vue-next"
-import { useToast } from '@/composables/useToast'
+import { usePatches } from '@/composables/usePatches'
 
 defineProps<{ tab: string }>()
 
 const minimize = () => window.electronAPI?.minimize()
 const maximize = () => window.electronAPI?.maximize()
 const close = () => window.electronAPI?.close()
-const toast = useToast()
+const patches = usePatches()
 
-const hasProgramUpdate = false
+const version = ref('1.1.1')
+const updateAvailable = ref(false)
 
 const openPatchNotes = () => {
-  // Триггерим событие, которое поймает App.vue
   window.dispatchEvent(new CustomEvent('open-patch-notes'))
 }
 
-const showProgramUpdate = () => {
-  toast.info('Program updates coming soon')
+const installUpdate = () => {
+  window.electronAPI?.installUpdate()
 }
+
+onMounted(() => {
+  version.value = patches.currentVersion.value
+  
+  window.electronAPI?.onUpdateDownloaded(() => {
+    updateAvailable.value = true
+  })
+})
 </script>
 
 <style lang="scss" scoped>
@@ -70,6 +91,13 @@ const showProgramUpdate = () => {
     -webkit-app-region: no-drag;
   }
 
+  &-right {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    -webkit-app-region: no-drag;
+  }
+
   .update-indicator {
     position: relative;
     width: 28px;
@@ -89,38 +117,52 @@ const showProgramUpdate = () => {
       }
     }
 
-    .badge {
-      position: absolute;
-      top: -2px;
-      right: -2px;
-      min-width: 16px;
-      height: 16px;
-      border-radius: 8px;
-      font-size: 10px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-
+    &.update-available {
       @include themify() {
-        background: themed('brand-primary');
-        color: white;
+        color: #10B981;
+        
+        &:hover {
+          background: rgba(16, 185, 129, 0.2);
+          color: #10B981;
+        }
       }
     }
   }
 
   &-title {
-    font-size: 16px;
-    font-weight: 500;
-    text-align: center;
-    text-transform: capitalize;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    
+    .app-name {
+      font-size: 16px;
+      font-weight: 500;
+      @include themify() { color: themed('text-primary'); }
+    }
+    
+    .separator {
+      @include themify() { color: themed('text-secondary'); }
+    }
+    
+    .tab-name {
+      font-size: 16px;
+      font-weight: 400;
+      text-transform: capitalize;
+      @include themify() { color: themed('text-secondary'); }
+    }
+  }
 
+  .version {
+    font-size: 14px;
+    padding: 4px 8px;
+    border-radius: 4px;
     @include themify() {
+      // background: themed('border-color');
       color: themed('text-secondary');
     }
   }
 
   .window-controls {
-    -webkit-app-region: no-drag;
     display: flex;
     gap: 8px;
 

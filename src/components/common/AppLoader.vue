@@ -1,15 +1,43 @@
+<template>
+  <div class="loading-screen">
+    <div class="loading-container">
+      <div class="logo">
+        <img src="/logo/logo.svg" alt="Your Space">
+        <div class="logo-glow"></div>
+      </div>
+
+      <div class="connection-status">
+        <div class="status-dot" :class="{ connected: connectionStep === 3 }"></div>
+        <span>{{ status }}</span>
+      </div>
+
+      <div class="progress-container">
+        <div class="progress-track"></div>
+        <div class="progress-fill" :style="{ width: progress + '%' }"></div>
+      </div>
+
+      <div class="percentage">{{ Math.floor(progress) }}%</div>
+
+      <div class="info-bar">
+        <span>YourSpace © 2026, by Uew</span>
+      </div>
+    </div>
+  </div>
+</template>
+
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted } from 'vue'
 
 const progress = ref(0)
 const status = ref('Initializing...')
 const connectionStep = ref(1)
+const checkingUpdates = ref(false)
 
 const steps = [
   { max: 20, text: 'Loading modules...', step: 1 },
   { max: 40, text: 'Connecting to services...', step: 1 },
   { max: 60, text: 'Syncing data...', step: 2 },
-  { max: 80, text: 'Almost ready...', step: 2 },
+  { max: 80, text: 'Checking for updates...', step: 2 },
   { max: 95, text: 'Finalizing...', step: 3 }
 ]
 
@@ -24,6 +52,11 @@ onMounted(() => {
       if (progress.value < target) {
         const increment = (target - progress.value) * 0.1 + Math.random() * 0.5
         progress.value = Math.min(target, progress.value + increment)
+        
+        if (progress.value >= 75 && !checkingUpdates.value) {
+          checkingUpdates.value = true
+          window.electronAPI?.checkForUpdates()
+        }
         
         status.value = steps[currentStep].text
         connectionStep.value = steps[currentStep].step
@@ -55,34 +88,6 @@ const finish = () => {
 
 defineExpose({ finish })
 </script>
-
-<template>
-  <div class="loading-screen">
-    <div class="loading-container">
-      <div class="logo">
-        <img src="/logo/logo.svg" alt="Your Space">
-        <div class="logo-glow"></div>
-      </div>
-
-      <div class="connection-status">
-        <div class="status-dot" :class="{ connected: connectionStep === 3 }"></div>
-        <span>{{ status }}</span>
-      </div>
-
-      <div class="progress-container">
-        <div class="progress-track"></div>
-        <div class="progress-fill" :style="{ width: progress + '%' }"></div>
-      </div>
-
-      <div class="percentage">{{ Math.floor(progress) }}%</div>
-
-      <div class="info-bar">
-        <span>Version 1.1.0</span>
-        <span>© 2026, by Uew</span>
-      </div>
-    </div>
-  </div>
-</template>
 
 <style lang="scss" scoped>
 @use '@/styles/theme-mixins' as *;
@@ -216,7 +221,7 @@ defineExpose({ finish })
 
 .info-bar {
   display: flex;
-  justify-content: space-between;
+  justify-content: center;
   font-size: 14px;
   opacity: .5;
   

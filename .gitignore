@@ -52,6 +52,7 @@ Thumbs.db
 
 # Electron
 electron-builder.yml
+electron-builder_.yml
 dist_electron/
 
 # Prisma

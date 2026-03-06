@@ -1,59 +1,38 @@
 <template>
-  <div v-if="updateState.show" class="update-toast" :class="updateState.type">
-    <div class="update-content">
-      <div class="update-icon">
-        <component :is="iconComponent" :size="20" />
-      </div>
-      <div class="update-text">
-        <div class="update-title">{{ updateState.title }}</div>
-        <div class="update-message">{{ updateState.message }}</div>
-        <div v-if="updateState.progress" class="update-progress">
-          <div class="progress-bar" :style="{ width: updateState.progress + '%' }" />
+  <Teleport to="body">
+    <div v-if="show" class="update-toast" :class="type">
+      <div class="update-content">
+        <div class="update-icon">
+          <component :is="iconComponent" :size="20" />
         </div>
-      </div>
-      <div class="update-actions">
-        <button 
-          v-if="updateState.action" 
-          class="update-btn"
-          @click="updateState.action.handler"
-        >
-          {{ updateState.action.label }}
-        </button>
-        <button class="close-btn" @click="updateState.show = false">
+        <div class="update-text">
+          <div class="update-title">{{ title }}</div>
+          <div class="update-message">{{ message }}</div>
+          <div v-if="progress !== undefined" class="update-progress">
+            <div class="progress-bar" :style="{ width: progress + '%' }" />
+          </div>
+        </div>
+        <button class="close-btn" @click="show = false">
           <X :size="16" />
         </button>
       </div>
     </div>
-  </div>
+  </Teleport>
 </template>
 
 <script setup lang="ts">
 import { ref, onMounted, computed } from 'vue'
-import { Download, RefreshCw, CheckCircle, AlertCircle, X } from 'lucide-vue-next'
+import { Download, RefreshCw, CheckCircle, X } from 'lucide-vue-next'
 
-interface UpdateState {
-  show: boolean
-  type: 'info' | 'success' | 'error' | 'progress'
-  title: string
-  message: string
-  progress?: number
-  action?: {
-    label: string
-    handler: () => void
-  }
-}
-
-const updateState = ref<UpdateState>({
-  show: false,
-  type: 'info',
-  title: '',
-  message: ''
-})
+const show = ref(false)
+const type = ref<'info' | 'success' | 'error' | 'progress'>('info')
+const title = ref('')
+const message = ref('')
+const progress = ref<number>()
 
 const iconComponent = computed(() => {
-  switch (updateState.value.type) {
+  switch (type.value) {
     case 'success': return CheckCircle
-    case 'error': return AlertCircle
     case 'progress': return Download
     default: return RefreshCw
   }
@@ -61,79 +40,50 @@ const iconComponent = computed(() => {
 
 onMounted(() => {
   window.electronAPI?.onUpdateChecking(() => {
-    updateState.value = {
-      show: true,
-      type: 'info',
-      title: 'Checking for updates',
-      message: 'Looking for new version...'
-    }
+    
   })
 
   window.electronAPI?.onUpdateAvailable((info) => {
-    updateState.value = {
-      show: true,
-      type: 'info',
-      title: 'Update available',
-      message: `Version ${info.version} is ready to download`,
-      action: {
-        label: 'Download',
-        handler: () => window.electronAPI?.downloadUpdate()
-      }
-    }
-  })
-
-  window.electronAPI?.onUpdateNotAvailable(() => {
-    updateState.value = {
-      show: true,
-      type: 'success',
-      title: 'Up to date',
-      message: 'You have the latest version'
-    }
+    show.value = true
+    type.value = 'info'
+    title.value = 'Update Available'
+    message.value = `Version ${info.version} is ready to download`
+    
     setTimeout(() => {
-      updateState.value.show = false
-    }, 3000)
+      window.electronAPI?.downloadUpdate()
+    }, 2000)
   })
 
-  window.electronAPI?.onUpdateProgress((progress) => {
-    updateState.value = {
-      show: true,
-      type: 'progress',
-      title: 'Downloading update',
-      message: `${Math.round(progress.percent)}% - ${formatBytes(progress.bytesPerSecond)}/s`,
-      progress: progress.percent
-    }
+  window.electronAPI?.onUpdateProgress((progressData) => {
+    show.value = true
+    type.value = 'progress'
+    title.value = 'Downloading Update'
+    message.value = `${Math.round(progressData.percent)}%`
+    progress.value = progressData.percent
   })
 
   window.electronAPI?.onUpdateDownloaded((info) => {
-    updateState.value = {
-      show: true,
-      type: 'success',
-      title: 'Update downloaded',
-      message: `Version ${info.version} is ready to install`,
-      action: {
-        label: 'Install now',
-        handler: () => window.electronAPI?.installUpdate()
-      }
-    }
+    show.value = true
+    type.value = 'success'
+    title.value = 'Update Ready'
+    message.value = `Version ${info.version} will be installed on next restart`
+    progress.value = undefined
+    
+    setTimeout(() => {
+      show.value = false
+    }, 5000)
   })
 
   window.electronAPI?.onUpdateError((error) => {
-    updateState.value = {
-      show: true,
-      type: 'error',
-      title: 'Update failed',
-      message: error
-    }
+    show.value = true
+    type.value = 'error'
+    title.value = 'Update Failed'
+    message.value = error
+    setTimeout(() => {
+      show.value = false
+    }, 3000)
   })
 })
-
-const formatBytes = (bytes: number) => {
-  if (bytes === 0) return '0 B'
-  const k = 1024
-  const sizes = ['B/s', 'KB/s', 'MB/s']
-  const i = Math.floor(Math.log(bytes) / Math.log(k))
-  return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i]
-}
 </script>
 
 <style scoped>
@@ -141,14 +91,20 @@ const formatBytes = (bytes: number) => {
   position: fixed;
   bottom: 20px;
   right: 20px;
-  width: 360px;
+  width: 320px;
   background: #2a2a2a;
   border-radius: 12px;
   padding: 16px;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
   z-index: 1000002;
   animation: slideIn 0.3s ease;
+  border-left: 4px solid;
 }
+
+.update-toast.info { border-left-color: #3B82F6; }
+.update-toast.success { border-left-color: #10B981; }
+.update-toast.error { border-left-color: #EF4444; }
+.update-toast.progress { border-left-color: #8B5CF6; }
 
 .update-content {
   display: flex;
@@ -162,6 +118,7 @@ const formatBytes = (bytes: number) => {
   display: flex;
   align-items: center;
   justify-content: center;
+  flex-shrink: 0;
 }
 
 .info .update-icon { background: #3B82F6; color: white; }
@@ -199,34 +156,27 @@ const formatBytes = (bytes: number) => {
   transition: width 0.3s ease;
 }
 
-.update-actions {
-  display: flex;
-  gap: 8px;
-  align-items: center;
-}
-
-.update-btn {
-  padding: 6px 12px;
-  border: none;
-  border-radius: 6px;
-  background: #8B5CF6;
-  color: white;
-  font-size: 12px;
-  font-weight: 500;
-  cursor: pointer;
-}
-
 .close-btn {
   padding: 6px;
   border: none;
-  border-radius: 6px;
   background: none;
   color: #888;
   cursor: pointer;
+  align-self: flex-start;
 }
 
 .close-btn:hover {
-  background: #333;
   color: #fff;
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateX(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
 }
 </style>

@@ -1,56 +1,10 @@
-import { app, ipcMain } from 'electron'
-import path from 'path'
-import { fileURLToPath } from 'url'
+import { loadEnv } from './preload-env'
+loadEnv()
+
 import fs from 'fs'
-import dotenv from 'dotenv'
-import log from 'electron-log'
-
-const __dirname = path.dirname(fileURLToPath(import.meta.url))
-
-// Настройка логов
-const userDataPath = app.getPath('userData')
-const logsPath = path.join(userDataPath, 'logs')
-if (!fs.existsSync(logsPath)) fs.mkdirSync(logsPath, { recursive: true })
-log.transports.file.resolvePath = () => path.join(logsPath, 'main.log')
-log.info('================================')
-log.info('App starting...')
-
-// Загрузка .env
-try {
-  if (app.isPackaged) {
-    // В проде .env лежит в resources
-    const envPath = path.join(process.resourcesPath, '.env')
-    log.info('📁 Looking for .env at:', envPath)
-    
-    if (fs.existsSync(envPath)) {
-      log.info('✅ .env file exists, size:', fs.statSync(envPath).size)
-      
-      // Читаем и загружаем
-      const envConfig = dotenv.parse(fs.readFileSync(envPath))
-      Object.assign(process.env, envConfig)
-      
-      log.info('✅ DATABASE_URL loaded:', !!process.env.DATABASE_URL)
-      log.info('✅ JWT_SECRET loaded:', !!process.env.JWT_SECRET)
-    } else {
-      log.error('❌ .env NOT found!')
-    }
-  } else {
-    // В деве из корня
-    dotenv.config()
-    log.info('✅ Dev mode, .env loaded from project root')
-  }
-} catch (error) {
-  log.error('❌ Error loading .env:', error)
-}
-
-// Проверка критических переменных
-if (!process.env.DATABASE_URL) {
-  log.error('❌ DATABASE_URL is not defined!')
-  app.quit()
-  process.exit(1)
-}
-
-// Остальные импорты
+import path from 'path'
+import { app, ipcMain } from 'electron'
+import { fileURLToPath } from 'url'
 import { createMainWindow, getIconPath } from './windows/mainWindow'
 import { setupAppHandlers } from './handlers/apps'
 import { setupWindowHandlers } from './handlers/window'
@@ -59,28 +13,27 @@ import { setupAuthHandlers } from '../../server/handlers/auth'
 import { setupAppsHandlers } from '../../server/handlers/apps'
 import { setupCatalogsHandlers } from '../../server/handlers/catalogs'
 import { setupVersionsHandlers } from '../../server/handlers/versions'
+import log from 'electron-log'
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url))
 
 let mainWindow: Electron.BrowserWindow | null = null
 let updater: ReturnType<typeof setupUpdater> | null = null
 
-if (app.isPackaged) {
-  const envPath = path.join(process.resourcesPath, '.env')
-  dotenv.config({ path: envPath })
-} else {
-  dotenv.config()
-}
-
-ipcMain.on('log', (event, { level, timestamp, message }) => {
-  const colors = {
-    info: '\x1b[36m',
-    error: '\x1b[31m',
-    warn: '\x1b[33m'
-  }
-  const reset = '\x1b[0m'
-  console.log(`${colors[level as keyof typeof colors]}[${timestamp}] ${message}${reset}`)
-})
-
 app.whenReady().then(() => {
+  const userDataPath = app.getPath('userData')
+  const logsPath = path.join(userDataPath, 'logs')
+  if (!fs.existsSync(logsPath)) fs.mkdirSync(logsPath, { recursive: true })
+  
+  log.transports.file.resolvePath = () => path.join(logsPath, 'main.log')
+  log.transports.file.level = 'debug'
+  log.transports.console.level = 'debug'
+  
+  log.info('================================')
+  log.info('App started successfully')
+  log.info('DATABASE_URL loaded:', !!process.env.DATABASE_URL)
+  log.info('JWT_SECRET loaded:', !!process.env.JWT_SECRET)
+
   const preloadPath = path.join(__dirname, '../preload/index.js')
   const iconPath = getIconPath(process.platform, __dirname)
   const isDev = process.env.NODE_ENV === 'development'
@@ -107,7 +60,7 @@ app.whenReady().then(() => {
     updater?.installUpdate()
   })
 
-  console.log('\x1b[36m[Main] App ready, window created\x1b[0m')
+  log.info('Main window created')
 
   if (!isDev) {
     setTimeout(() => {
@@ -116,8 +69,24 @@ app.whenReady().then(() => {
   }
 })
 
+ipcMain.on('log', (event, { level, timestamp, message }) => {
+  const colors = {
+    info: '\x1b[36m',
+    error: '\x1b[31m',
+    warn: '\x1b[33m'
+  }
+  const reset = '\x1b[0m'
+  const logMsg = `${colors[level as keyof typeof colors]}[${timestamp}] ${message}${reset}`
+  console.log(logMsg)
+  
+  if (level === 'error') log.error(message)
+  else if (level === 'warn') log.warn(message)
+  else log.info(message)
+})
+
 app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') {
+    log.info('App quitting...')
     app.quit()
     process.exit(0)
   }

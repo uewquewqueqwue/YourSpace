@@ -99,6 +99,7 @@
       "provider": "github",
       "repo": "YourSpace",
       "owner": "uewquewqueqwue",
+      "private": true,
       "releaseType": "release",
       "vPrefixedTagName": true
     }

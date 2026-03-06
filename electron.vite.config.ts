@@ -9,6 +9,7 @@ export default defineConfig({
       rollupOptions: {
         input: {
           index: resolve(__dirname, 'src/electron/index.ts')
+          // index: resolve(__dirname, 'src/electron/index-minimal.ts')
         }
       }
     },
