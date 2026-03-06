@@ -1,116 +1,3 @@
-<!-- ProfilePopup.vue -->
-<script setup lang="ts">
-import { ref, computed } from 'vue'
-import { User, Camera, Check, LogIn } from 'lucide-vue-next'
-import { useAuth } from '@/stores/auth'
-import { useToast } from '@/composables/useToast'
-import { useModal } from '@/composables/useModal'
-
-const auth = useAuth()
-const toast = useToast()
-const user = computed(() => auth.user.value)
-
-const { isOpen, modalRef, close, open } = useModal({
-  onClose: () => {
-    editedName.value = ''
-    previewAvatar.value = ''
-  }
-})
-
-const fileInput = ref<HTMLInputElement | null>(null)
-
-const editedName = ref('')
-const previewAvatar = ref('')
-const originalName = ref('')
-const originalAvatar = ref('')
-
-const API_URL = 'http://localhost:3000'
-
-const hasChanges = computed(() => {
-  return editedName.value !== originalName.value || previewAvatar.value !== ''
-})
-
-const handleTriggerClick = () => {
-  if (!user.value) {
-    auth.openLogin()
-    return
-  }
-  
-  open()
-  editedName.value = user.value.name || ''
-  originalName.value = user.value.name || ''
-  originalAvatar.value = user.value.avatar || ''
-  previewAvatar.value = ''
-}
-
-const triggerFileInput = () => {
-  fileInput.value?.click()
-}
-
-const handleAvatarChange = (event: Event) => {
-  const file = (event.target as HTMLInputElement).files?.[0]
-  if (file) {
-    if (file.size > 10 * 1024 * 1024) {
-      toast.error("Image too large (max 10mb)")
-      return
-    }
-
-    const reader = new FileReader()
-    reader.onload = (e) => {
-      previewAvatar.value = e.target?.result as string
-    }
-    reader.readAsDataURL(file)
-  }
-}
-
-const saveChanges = async () => {
-  if (!user.value) return
-  
-  try {
-    const token = localStorage.getItem('token')
-    const updates: any = {}
-    
-    if (editedName.value !== originalName.value) {
-      updates.name = editedName.value
-    }
-    
-    if (previewAvatar.value) {
-      updates.avatar = previewAvatar.value
-    }
-    
-    if (Object.keys(updates).length === 0) return
-    
-    const response = await fetch(`${API_URL}/api/user/profile`, {
-      method: 'PATCH',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`
-      },
-      body: JSON.stringify(updates)
-    })
-
-    if (!response.ok) {
-      const error = await response.json()
-      throw new Error(error.error || 'Failed to update profile')
-    }
-    
-    const updatedUser = await response.json()
-    
-    auth.user.value = updatedUser
-    
-    originalName.value = updatedUser.name || ''
-    originalAvatar.value = updatedUser.avatar || ''
-    
-    toast.success('Profile updated')
-    close()
-    
-  } catch (error) {
-    console.error('Save error:', error)
-    toast.error('Failed to update profile')
-  }
-}
-</script>
-
 <template>
   <div class="profile-popup">
     <button class="trigger-btn" @click.stop="handleTriggerClick">
@@ -122,7 +9,7 @@ const saveChanges = async () => {
 
     <Teleport to="body">
       <Transition name="popup">
-        <div v-if="isOpen" class="popup-overlay">
+        <div v-if="isOpen" class="popup-overlay" ref="overlayRef">
           <div class="popup" ref="modalRef">
             <div class="popup-header">
               <div class="avatar-wrapper" @click="triggerFileInput">
@@ -173,6 +60,107 @@ const saveChanges = async () => {
     </Teleport>
   </div>
 </template>
+
+<script setup lang="ts">
+import { ref, computed } from 'vue'
+import { User, Camera, Check } from 'lucide-vue-next'
+import { useAuth } from '@/stores/auth'
+import { useToast } from '@/composables/useToast'
+import { useModal } from '@/composables/useModal'
+
+const auth = useAuth()
+const toast = useToast()
+const user = computed(() => auth.user.value)
+
+const { isOpen, close, open } = useModal({
+  onClose: () => {
+    editedName.value = ''
+    previewAvatar.value = ''
+  }
+})
+
+const fileInput = ref<HTMLInputElement | null>(null)
+
+const editedName = ref('')
+const previewAvatar = ref('')
+const originalName = ref('')
+const originalAvatar = ref('')
+
+const hasChanges = computed(() => {
+  return editedName.value !== originalName.value || previewAvatar.value !== ''
+})
+
+const handleTriggerClick = () => {
+  if (!user.value) {
+    auth.openLogin()
+    return
+  }
+  
+  open()
+  editedName.value = user.value.name || ''
+  originalName.value = user.value.name || ''
+  originalAvatar.value = user.value.avatar ?? ''
+  previewAvatar.value = ''
+}
+
+const triggerFileInput = () => {
+  fileInput.value?.click()
+}
+
+const handleAvatarChange = (event: Event) => {
+  const file = (event.target as HTMLInputElement).files?.[0]
+  if (file) {
+    if (file.size > 10 * 1024 * 1024) {
+      toast.error("Image too large (max 10mb)")
+      return
+    }
+
+    const reader = new FileReader()
+    reader.onload = (e) => {
+      previewAvatar.value = e.target?.result as string
+    }
+    reader.readAsDataURL(file)
+  }
+}
+
+const saveChanges = async () => {
+  if (!user.value) return
+  
+  try {
+    const token = localStorage.getItem('token')
+    if (!token) {
+      toast.error('Not authenticated')
+      return
+    }
+    
+    const updates: any = {}
+    
+    if (editedName.value !== originalName.value) {
+      updates.name = editedName.value
+    }
+    
+    if (previewAvatar.value) {
+      updates.avatar = previewAvatar.value
+    }
+    
+    if (Object.keys(updates).length === 0) return
+    
+    const result = await window.electronAPI.db.updateProfile(token, updates.name || '', updates.avatar || '')
+    
+    auth.user.value = result
+    
+    originalName.value = result.name || ''
+    originalAvatar.value = result.avatar ?? ''
+    
+    toast.success('Profile updated')
+    close()
+    
+  } catch (error) {
+    console.error('Save error:', error)
+    toast.error('Failed to update profile')
+  }
+}
+</script>
 
 <style lang="scss" scoped>
 @use '@/styles/theme-mixins' as *;

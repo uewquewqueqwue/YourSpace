@@ -117,6 +117,10 @@ body {
   overflow: hidden;
   background: transparent;
 }
+
+*:focus {
+  outline: none !important;
+}
 </style>
 
 <style lang="scss" scoped>

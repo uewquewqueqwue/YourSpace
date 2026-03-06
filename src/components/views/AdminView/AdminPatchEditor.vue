@@ -118,7 +118,7 @@ marked.setOptions({
 const toast = useToast()
 const showPreview = ref(true)
 const saving = ref(false)
-const currentVersion = ref('1.1.4')
+const currentVersion = ref('1.1.8')
 
 const initialPatches = [
   {

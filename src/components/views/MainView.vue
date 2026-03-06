@@ -3,7 +3,6 @@
     <AppsView v-show="tab === 'apps'" :tab="tab" />
     <InboxView v-show="tab === 'inbox'" />
     <TodoView v-show="tab === 'todo'" />
-    <MusicView v-show="tab === 'music'" />
     <SystemView v-show="tab === 'system'" />
     <SettingsView v-show="tab === 'settings'" />
     <MediaView v-show="tab === 'media'" />
@@ -15,7 +14,6 @@
 import AppsView from '@/components/views/AppsView/AppsView.vue'
 import InboxView from '@/components/views/InboxView/InboxView.vue'
 import TodoView from '@/components/views/TodoView/TodoView.vue'
-import MusicView from '@/components/views/MusicView/MusicView.vue'
 import SystemView from '@/components/views/SystemView/SystemView.vue'
 import SettingsView from '@/components/views/SettingsView/SettingsView.vue'
 import MediaView from '@/components/views/AdminView/MediaView.vue'

@@ -28,14 +28,8 @@
       </div>
 
       <div class="nav-item-wrapper">
-        <div class="nav-item music" :class="{ active: tab === 'music' }" @click="setTab('music')">
-          <div class="now-playing">
-            <div class="bar"></div>
-            <div class="bar"></div>
-            <div class="bar"></div>
-          </div>
-        </div>
-        <span class="tooltip">Music</span>
+        <MusicPopup />
+        <span class="tooltip">Now Playing</span>
       </div>
 
       <div class="nav-item-wrapper">
@@ -49,7 +43,7 @@
     <div class="nav-bottom">
 
       <div class="nav-item-wrapper">
-        <Profile />
+        <ProfilePopup />
         <span class="tooltip">Profile</span>
       </div>
 
@@ -84,7 +78,8 @@
 import { ref } from 'vue'
 import { Mailbox, Grid, Music, Image, Cpu, FileDiff, Settings, ListTodo } from 'lucide-vue-next'
 import AuthModal from '@/components/common/auth/AuthModal.vue'
-import Profile from '@/components/profile/Profile.vue';
+import ProfilePopup from '@/components/views/ProfileView/ProfilePopup.vue';
+import MusicPopup from '@/components/views/MusicView/MusicPopup.vue';
 
 const props = defineProps<{
   tab: string

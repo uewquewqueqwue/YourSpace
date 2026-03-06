@@ -1,41 +1,6 @@
-<script setup lang="ts">
-import { computed, ref, watch } from 'vue'
-import { X } from 'lucide-vue-next'
-import { useAuth } from '@/stores/auth'
-import { useToast } from '@/composables/useToast'
-import { useModal } from '@/composables/useModal'
-import LoginForm from '@/components/common/auth/LoginForm.vue'
-import RegisterForm from '@/components/common/auth/RegisterForm.vue'
-
-const auth = useAuth()
-const isLogin = ref(true)
-const toast = useToast()
-const showModal = computed(() => auth.showLoginModal.value)
-const { modalRef, close } = useModal({
-  onClose: () => auth.closeLogin(),
-  closeOnClickOutside: true,
-  closeOnEscape: true
-})
-
-watch(() => auth.showLoginModal.value, (val) => {
-  if (!val) close()
-})
-
-const switchMode = () => {
-  isLogin.value = !isLogin.value
-  auth.error.value = null
-}
-
-const handleSuccess = () => {
-  toast.success(isLogin.value ? `Welcome back ${auth.user.value?.name}!` : 'Account created!')
-  auth.closeLogin()
-  isLogin.value = true
-}
-</script>
-
 <template>
   <Teleport to="body">
-    <div v-if="showModal" class="modal-overlay" @click.self="auth.closeLogin">
+    <div v-if="showModal" class="modal-overlay" ref="overlayRef" @click.self="auth.closeLogin">
       <div class="modal" ref="modalRef">
         <button class="close-btn" @click="auth.closeLogin">
           <X :size="18" />
@@ -60,11 +25,51 @@ const handleSuccess = () => {
   </Teleport>
 </template>
 
-<style>
-*:focus {
-  outline: none !important;
+<script setup lang="ts">
+import { computed, ref, watch } from 'vue'
+import { X } from 'lucide-vue-next'
+import { useAuth } from '@/stores/auth'
+import { useToast } from '@/composables/useToast'
+import { useModal } from '@/composables/useModal'
+import LoginForm from '@/components/common/auth/LoginForm.vue'
+import RegisterForm from '@/components/common/auth/RegisterForm.vue'
+
+const auth = useAuth()
+const isLogin = ref(true)
+const toast = useToast()
+const showModal = computed(() => auth.showLoginModal.value)
+
+const { modalRef, overlayRef, close } = useModal({
+  onClose: () => auth.closeLogin(),
+  closeOnClickOutside: true,
+  closeOnEscape: true
+})
+
+const handleEscape = (e: KeyboardEvent) => {
+  if (e.key === 'Escape' && showModal.value) {
+    auth.closeLogin()
+  }
 }
-</style>
+
+watch(() => auth.showLoginModal.value, (val) => {
+  if (val) {
+    window.addEventListener('keydown', handleEscape)
+  } else {
+    window.removeEventListener('keydown', handleEscape)
+  }
+})
+
+const switchMode = () => {
+  isLogin.value = !isLogin.value
+  auth.error.value = null
+}
+
+const handleSuccess = () => {
+  toast.success(isLogin.value ? `Welcome back ${auth.user.value?.name}!` : 'Account created!')
+  auth.closeLogin()
+  isLogin.value = true
+}
+</script>
 
 <style lang="scss" scoped>
 @use '@/styles/theme-mixins' as *;

@@ -4,7 +4,7 @@ import { promisify } from 'util'
 import fs from 'fs/promises'
 import path from 'path'
 import { parseWmicLine, isSystemProcess } from '../utils/processHelpers'
-import type { ProcessInfo, LaunchResult, GetAppsOptions } from '@/types/electron'
+import type { ProcessInfo, LaunchResult, GetAppsOptions } from '@/types/apps'
 
 const execAsync = promisify(exec)
 

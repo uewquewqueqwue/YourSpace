@@ -13,6 +13,7 @@ import { setupAuthHandlers } from '../../server/handlers/auth'
 import { setupAppsHandlers } from '../../server/handlers/apps'
 import { setupCatalogsHandlers } from '../../server/handlers/catalogs'
 import { setupVersionsHandlers } from '../../server/handlers/versions'
+import { setupMediaHandlers } from "./handlers/media"
 import log from 'electron-log'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
@@ -47,6 +48,7 @@ app.whenReady().then(() => {
   setupVersionsHandlers()
   setupAppHandlers()
   setupWindowHandlers(mainWindow)
+  setupMediaHandlers()
   
   ipcMain.on('check-for-updates', () => {
     updater?.checkForUpdates()
