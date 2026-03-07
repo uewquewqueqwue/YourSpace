@@ -9,9 +9,9 @@ export interface AppsStore {
   loading: Ref<boolean>
   error: Ref<string | null>
   
-  fetchApps: (token: string) => Promise<void>
-  addApp: (token: string, input: CreateAppInput) => Promise<UserAppWithDisplay | null>
-  removeApp: (token: string, id: string) => Promise<boolean>
+  fetchApps: () => Promise<void>
+  addApp: (input: CreateAppInput) => Promise<UserAppWithDisplay | null>
+  removeApp: (id: string) => Promise<boolean>
   launchApp: (path: string) => Promise<boolean>
   forceSync: (token: string) => Promise<void>
   

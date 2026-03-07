@@ -1,19 +1,14 @@
 import { ref } from 'vue'
-import { useAuth } from './auth'
-import type {
-  UserAppWithDisplay,
-  CreateAppInput,
-  AppSession
-} from '@/types/apps'
+import type { UserAppWithDisplay, CreateAppInput, AppSession } from '@/types/apps'
 import type { AppsStore } from '@/types'
 import { generateColor } from '@/utils/generateColor'
-import { log } from '@/log/logger'
 
 const apps = ref<UserAppWithDisplay[]>([])
 const quickApps = ref<UserAppWithDisplay[]>([])
 const loading = ref(false)
 const error = ref<string | null>(null)
 const pendingChanges = ref(false)
+const catalogs = ref<any[]>([])
 
 const STORAGE_KEY = 'apps_data'
 const QUICK_KEY = 'quick_apps'
@@ -21,27 +16,24 @@ const QUICK_KEY = 'quick_apps'
 let monitoringInterval: NodeJS.Timeout | null = null
 let syncInterval: NodeJS.Timeout | null = null
 
+const getToken = (): string | null => {
+  return localStorage.getItem('token')
+}
+
+const isAuthenticated = (): boolean => {
+  return !!getToken() && !!localStorage.getItem('user')
+}
+
 const loadFromStorage = () => {
   try {
     const saved = localStorage.getItem(STORAGE_KEY)
     if (saved) {
-      const parsed = JSON.parse(saved)
-      apps.value = parsed.map((app: any) => ({
-        ...app,
-        createdAt: new Date(app.createdAt),
-        updatedAt: new Date(app.updatedAt),
-        lastUsed: app.lastUsed ? new Date(app.lastUsed) : null,
-        catalog: {
-          ...app.catalog,
-          createdAt: new Date(app.catalog.createdAt),
-          updatedAt: new Date(app.catalog.updatedAt)
-        },
-        isActive: app.isActive || false,
-        currentSession: app.currentSession ? {
-          ...app.currentSession,
-          startTime: new Date(app.currentSession.startTime)
-        } : null
-      }))
+      apps.value = JSON.parse(saved, (key, value) => {
+        if (key === 'createdAt' || key === 'updatedAt' || key === 'lastUsed' || key === 'startTime' || key === 'endTime') {
+          return value ? new Date(value) : null
+        }
+        return value
+      })
     }
   } catch (e) {
     console.error('Failed to load from storage:', e)
@@ -50,15 +42,10 @@ const loadFromStorage = () => {
 
 const saveToStorage = () => {
   try {
-    const appsToSave = apps.value.map(app => ({
-      ...app,
-      catalog: {
-        ...app.catalog,
-        icon: undefined
-      }
-    }))
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(appsToSave))
-    pendingChanges.value = true
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(apps.value))
+    if (isAuthenticated()) {
+      pendingChanges.value = true
+    }
   } catch (e) {
     console.error('Failed to save to storage:', e)
   }
@@ -88,7 +75,7 @@ const saveQuickToStorage = () => {
 const isProcessRunning = async (exeName: string): Promise<boolean> => {
   if (!exeName) return false
   try {
-    const { stdout } = await window.electronAPI.execCommand(
+    const { stdout } = await window.electronAPI.apps.execCommand(
       `tasklist /fi "IMAGENAME eq ${exeName}" /fo csv /nh`
     )
     return stdout.includes(exeName) && !stdout.includes('Not Found')
@@ -103,12 +90,9 @@ const checkAppStatus = async (app: UserAppWithDisplay) => {
   const now = Date.now()
 
   if (isRunning && !app.isActive) {
-    log('info', `${app.displayName} started`)
-    
     app.isActive = true
     app.lastUsed = new Date()
-    
-    const session: AppSession = {
+    app.currentSession = {
       id: crypto.randomUUID(),
       userAppId: app.id,
       userId: app.userId,
@@ -117,30 +101,19 @@ const checkAppStatus = async (app: UserAppWithDisplay) => {
       duration: null,
       createdAt: new Date()
     }
-    
-    app.currentSession = session
     saveToStorage()
-  }
-  
-  else if (!isRunning && app.isActive && app.currentSession) {
+  } else if (!isRunning && app.isActive && app.currentSession) {
     const duration = Math.floor((now - app.currentSession.startTime.getTime()) / 60000)
-    
     if (duration > 0) {
       app.totalMinutes += duration
     }
-    
     app.isActive = false
     app.currentSession.endTime = new Date()
     app.currentSession.duration = duration
     app.currentSession = null
-    
     saveToStorage()
-  }
-  
-  else if (isRunning && app.isActive && app.currentSession) {
-    const sessionStart = app.currentSession.startTime.getTime()
-    const elapsed = Math.floor((now - sessionStart) / 60000)
-    
+  } else if (isRunning && app.isActive && app.currentSession) {
+    const elapsed = Math.floor((now - app.currentSession.startTime.getTime()) / 60000)
     if (elapsed > (app.currentSession.duration || 0)) {
       app.currentSession.duration = elapsed
       saveToStorage()
@@ -150,20 +123,16 @@ const checkAppStatus = async (app: UserAppWithDisplay) => {
 
 const startMonitoring = () => {
   if (monitoringInterval) return
-
-  const checkAllApps = async () => {
+  monitoringInterval = setInterval(async () => {
     for (const app of apps.value) {
       await checkAppStatus(app)
     }
-  }
-
-  monitoringInterval = setInterval(checkAllApps, 30000)
-  setTimeout(checkAllApps, 1000)
+  }, 30000)
+  setTimeout(() => checkAppStatus(apps.value[0]), 1000)
 }
 
 const syncToServer = async (token: string) => {
-  if (!token) return
-
+  if (!token || !isAuthenticated()) return
   try {
     for (const app of apps.value) {
       if (!app.id.startsWith('local-')) {
@@ -171,35 +140,40 @@ const syncToServer = async (token: string) => {
           totalMinutes: app.totalMinutes,
           lastUsed: app.lastUsed || undefined
         })
-      } else {
-        const newApp = await window.electronAPI.db.createApp(token, {
+      } else if (app.id.startsWith('local-')) {
+        const serverApp = await window.electronAPI.db.createApp(token, {
           path: app.path,
           catalogName: app.displayName,
           customName: app.customName || undefined,
           customColor: app.customColor || undefined,
           totalMinutes: app.totalMinutes
         })
-        
-        app.id = newApp.id
-        app.catalogId = newApp.catalogId
-        app.catalog = newApp.catalog
+        app.id = serverApp.id
+        app.catalogId = serverApp.catalogId
+        app.catalog = serverApp.catalog
         saveToStorage()
       }
     }
+    pendingChanges.value = false
   } catch (err) {
     console.error('Sync failed:', err)
   }
 }
 
-const syncFromServer = async (token: string) => {
-  if (!token) return
+const fetchCatalogs = async () => {
+  try {
+    catalogs.value = await window.electronAPI.db.getCatalogs()
+  } catch (err) {
+    console.error('Failed to fetch catalogs:', err)
+  }
+}
 
+const syncFromServer = async (token: string) => {
+  if (!token || !isAuthenticated()) return
   try {
     const serverApps = await window.electronAPI.db.getApps(token)
-
     for (const serverApp of serverApps) {
       const localApp = apps.value.find(a => a.path === serverApp.path)
-
       if (!localApp) {
         apps.value.push({
           ...serverApp,
@@ -207,12 +181,12 @@ const syncFromServer = async (token: string) => {
           currentSession: null
         })
       } else {
-        localApp.displayName = serverApp.displayName
-        localApp.displayColor = serverApp.displayColor
-        localApp.catalog = serverApp.catalog
+        Object.assign(localApp, serverApp)
+        if (localApp.id.startsWith('local-')) {
+          localApp.id = serverApp.id
+        }
       }
     }
-
     saveToStorage()
   } catch (err) {
     console.error('Sync from server failed:', err)
@@ -222,12 +196,11 @@ const syncFromServer = async (token: string) => {
 const startPeriodicSync = () => {
   if (syncInterval) return
   syncInterval = setInterval(async () => {
-    const auth = useAuth()
-    const token = localStorage.getItem('token')
-    if (auth.user.value && token && pendingChanges.value) {
+    const token = getToken()
+    if (token && isAuthenticated() && pendingChanges.value) {
       await syncToServer(token)
     }
-  }, 5 * 60 * 1000)
+  }, 300000)
 }
 
 const stopPeriodicSync = () => {
@@ -240,49 +213,108 @@ const stopPeriodicSync = () => {
 loadFromStorage()
 loadQuickFromStorage()
 
-export function initializeAppsStore() {
+export async function initializeAppsStore() {
+  await fetchCatalogs()
+  
+  for (const app of apps.value) {
+    const publicCatalog = catalogs.value.find(c => c.name === app.displayName)
+    
+    if (publicCatalog) {
+      app.catalog = publicCatalog
+      app.catalogId = publicCatalog.id
+      app.displayColor = publicCatalog.color || app.displayColor
+    } else {
+      try {
+        const newCatalog = await window.electronAPI.db.createCatalog({
+          name: app.displayName,
+          displayName: app.displayName,
+          color: generateColor(app.displayName)
+        })
+        
+        catalogs.value.push(newCatalog)
+        app.catalog = newCatalog
+        app.catalogId = newCatalog.id
+      } catch (err) {
+        console.error('Failed to create catalog for existing app:', err)
+      }
+    }
+  }
+  
+  saveToStorage()
   startMonitoring()
-  startPeriodicSync()
+  
+  const token = getToken()
+  if (token && isAuthenticated()) {
+    await syncFromServer(token)
+    startPeriodicSync()
+  }
 }
 
 if (typeof window !== 'undefined') {
   window.addEventListener('beforeunload', async () => {
-    const auth = useAuth()
-    const token = localStorage.getItem('token')
-    if (auth.user.value && token && pendingChanges.value) {
+    const token = getToken()
+    if (token && isAuthenticated() && pendingChanges.value) {
       await syncToServer(token)
     }
   })
 }
 
 export function useAppsStore(): AppsStore {
-  const auth = useAuth()
-
-  const fetchApps = async (token?: string) => {
-    const actualToken = token || localStorage.getItem('token')
-    if (!actualToken || !auth.user.value) return
-    
-    loading.value = true
-    error.value = null
-    try {
-      await syncFromServer(actualToken)
-    } catch (err) {
-      error.value = 'Failed to fetch apps'
-    } finally {
-      loading.value = false
+  const fetchApps = async () => {
+    const token = getToken()
+    if (token && isAuthenticated()) {
+      loading.value = true
+      error.value = null
+      try {
+        await syncFromServer(token)
+      } catch {
+        error.value = 'Failed to fetch apps'
+      } finally {
+        loading.value = false
+      }
     }
   }
 
-  const addApp = async (token: string, input: CreateAppInput): Promise<UserAppWithDisplay | null> => {
+  const addApp = async (input: CreateAppInput): Promise<UserAppWithDisplay | null> => {
     if (apps.value.some(a => a.path === input.path)) {
       error.value = 'App already added'
       return null
     }
 
+    const token = getToken()
+    const isAuth = token && isAuthenticated()
+    
+    let catalog = catalogs.value.find(c => c.name === input.catalogName)
+    
+    if (!catalog && isAuth) {
+      try {
+        catalog = await window.electronAPI.db.createCatalog({
+          name: input.catalogName,
+          displayName: input.catalogName,
+          color: generateColor(input.catalogName)
+        })
+        catalogs.value.push(catalog)
+      } catch {
+        catalog = {
+          id: 'local-' + crypto.randomUUID(),
+          name: input.catalogName,
+          displayName: input.catalogName,
+          color: generateColor(input.catalogName)
+        }
+      }
+    } else if (!catalog) {
+      catalog = {
+        id: 'local-' + crypto.randomUUID(),
+        name: input.catalogName,
+        displayName: input.catalogName,
+        color: generateColor(input.catalogName)
+      }
+    }
+
     const newApp: UserAppWithDisplay = {
-      id: 'local-' + crypto.randomUUID(),
-      userId: auth.user.value?.id || 'local',
-      catalogId: 'temp',
+      id: isAuth ? 'local-' + crypto.randomUUID() : 'local-' + crypto.randomUUID(),
+      userId: isAuth ? 'pending' : 'local',
+      catalogId: catalog.id,
       path: input.path,
       customName: input.customName || null,
       customColor: input.customColor || null,
@@ -290,26 +322,18 @@ export function useAppsStore(): AppsStore {
       lastUsed: null,
       createdAt: new Date(),
       updatedAt: new Date(),
-      catalog: {
-        id: 'temp',
-        name: input.catalogName,
-        displayName: input.catalogName,
-        icon: null,
-        color: generateColor(input.catalogName),
-        createdAt: new Date(),
-        updatedAt: new Date()
-      },
-      displayName: input.customName || input.catalogName,
-      displayColor: input.customColor || generateColor(input.catalogName),
+      catalog,
+      displayName: input.customName || catalog.displayName || catalog.name,
+      displayColor: input.customColor || catalog.color,
       isActive: false,
       currentSession: null
     }
 
-    apps.value = [...apps.value, newApp]
+    apps.value.push(newApp)
     saveToStorage()
-    setTimeout(() => checkAppStatus(newApp), 500)
+    checkAppStatus(newApp)
 
-    if (auth.user.value && token) {
+    if (isAuth) {
       try {
         const serverApp = await window.electronAPI.db.createApp(token, {
           path: newApp.path,
@@ -317,60 +341,59 @@ export function useAppsStore(): AppsStore {
           customName: newApp.customName || undefined,
           customColor: newApp.customColor || undefined
         })
-        
-        newApp.id = serverApp.id
-        newApp.catalogId = serverApp.catalogId
-        newApp.catalog = serverApp.catalog
-        newApp.displayName = serverApp.displayName
-        newApp.displayColor = serverApp.displayColor
+        Object.assign(newApp, serverApp)
+        newApp.isActive = false
+        newApp.currentSession = null
         saveToStorage()
       } catch (err) {
         console.error('Failed to sync new app:', err)
       }
     }
-    
+
     return newApp
   }
 
-  const removeApp = async (token: string, id: string): Promise<boolean> => {
-    const app = apps.value.find(a => a.id === id)
-    if (!app) return false
-
-    apps.value = apps.value.filter(a => a.id !== id)
+  const removeApp = async (id: string): Promise<boolean> => {
+    const index = apps.value.findIndex(a => a.id === id)
+    if (index === -1) return false
+    
+    const [app] = apps.value.splice(index, 1)
     quickApps.value = quickApps.value.filter(a => a.id !== id)
     saveToStorage()
     saveQuickToStorage()
-    
-    if (auth.user.value && token && !id.startsWith('local-')) {
+
+    const token = getToken()
+    if (token && isAuthenticated() && !id.startsWith('local-')) {
       try {
         await window.electronAPI.db.deleteApp(token, id)
       } catch (err) {
         console.error('Failed to delete from server:', err)
       }
     }
-    
+
     return true
   }
 
   const launchApp = async (path: string): Promise<boolean> => {
     try {
-      const result = await window.electronAPI.launchApp(path)
+      const result = await window.electronAPI.apps.launchApp(path)
       return result.success
     } catch {
       return false
     }
   }
 
-  const forceSync = async (token: string) => {
-    if (auth.user.value && token) {
-      await syncToServer(token)
+  const forceSync = async (token?: string) => {
+    const t = token || getToken()
+    if (t && isAuthenticated()) {
+      await syncToServer(t)
     }
   }
 
   const addToQuick = (id: string): boolean => {
     const app = apps.value.find(a => a.id === id)
-    if (!app || quickApps.value.find(a => a.id === id)) return false
-    quickApps.value = [...quickApps.value, app]
+    if (!app || quickApps.value.includes(app)) return false
+    quickApps.value.push(app)
     saveQuickToStorage()
     return true
   }
@@ -395,13 +418,8 @@ export function useAppsStore(): AppsStore {
   const getTotalTimeToday = (): number => {
     const today = new Date()
     today.setHours(0, 0, 0, 0)
-    
-    return apps.value.reduce((total, app) => {
-      if (app.lastUsed && app.lastUsed >= today) {
-        return total + app.totalMinutes
-      }
-      return total
-    }, 0)
+    return apps.value.reduce((total, app) => 
+      total + (app.lastUsed && app.lastUsed >= today ? app.totalMinutes : 0), 0)
   }
 
   const reset = () => {
@@ -412,8 +430,8 @@ export function useAppsStore(): AppsStore {
   }
 
   const logout = () => {
-    // Очищаем, но не удаляем локальные данные
-    // TODO: решить что делать с данными при логауте
+    pendingChanges.value = false
+    stopPeriodicSync()
   }
 
   return {

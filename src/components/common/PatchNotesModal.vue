@@ -27,6 +27,7 @@
           <button class="primary-btn" @click="close">
             Got it
           </button>
+          <span>Uew with 💜</span>
         </div>
       </div>
     </div>
@@ -266,10 +267,17 @@ const renderMarkdown = (text: string) => {
 }
 
 .footer {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  align-items: center;
+
   padding: 20px;
   border-top: 1px solid;
 
+  
   @include themify() {
+    color: themed("text-secondary");
     border-top-color: themed('border-color');
   }
 

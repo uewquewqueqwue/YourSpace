@@ -53,10 +53,7 @@ const handler = (e: KeyboardEvent) => {
 }
 
 onMounted(async () => {
-  const token = localStorage.getItem('token')
-  if (token) {
-    await store.fetchApps(token)
-  }
+  await store.fetchApps()
   
   window.addEventListener('keydown', handler)
 

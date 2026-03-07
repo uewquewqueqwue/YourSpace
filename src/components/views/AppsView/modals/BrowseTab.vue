@@ -16,25 +16,32 @@ import { useToast } from '@/composables/useToast'
 
 const emit = defineEmits(['select'])
 
-const { addTracked } = useApps()
+const store = useAppsStore()
 const toast = useToast()
 const fileInput = ref<HTMLInputElement | null>(null)
 
 const browseFile = () => fileInput.value?.click()
 
-const handleFile = (e: Event) => {
+const handleFile = async (e: Event) => {
   const input = e.target as HTMLInputElement
-  const file = input.files?.[0]
+  const file: any = input.files?.[0]
+  
   if (file) {
     const name = file.name.replace('.exe', '')
-    const added = addTracked(name, file.path)
+    
+    const added = await store.addApp({
+      path: file.path,
+      catalogName: name
+    })
     
     if (added) {
       toast.success(`Added ${name}`)
-      emit('select')
+      emit('select', { path: file.path, displayName: name })
     } else {
-      toast.info('Already added')
+      toast.info('Already added or error')
     }
+    
+    input.value = ''
   }
 }
 </script>

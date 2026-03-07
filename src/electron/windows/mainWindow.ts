@@ -3,7 +3,7 @@ import path from 'path'
 
 interface CreateWindowOptions {
   preloadPath: string
-  iconPath: string
+  iconPath: any
   isDev: boolean
 }
 
@@ -49,8 +49,11 @@ export function createMainWindow({ preloadPath, iconPath, isDev }: CreateWindowO
 }
 
 export function getIconPath(platform: string, baseDir: string): string {
-  if (platform === 'win32') {
-    return path.join(baseDir, '../../public/logo/logo.ico')
+  const iconName = platform === 'win32' ? 'logo.ico' : 'logo.png'
+  
+  if (app.isPackaged) {
+    return path.join(process.resourcesPath, iconName)
+  } else {
+    return path.join(baseDir, '../../public/logo', iconName)
   }
-  return path.join(baseDir, '../../public/logo/logo.png')
 }

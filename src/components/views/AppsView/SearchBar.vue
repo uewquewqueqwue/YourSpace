@@ -9,7 +9,6 @@
 <script setup lang="ts">
 import { Search } from 'lucide-vue-next'
 import { useSearch } from '@/composables/useSearch'
-import { log } from '@/log/logger'
 
 const { openSearch } = useSearch()
 </script>

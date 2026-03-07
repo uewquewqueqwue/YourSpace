@@ -4,9 +4,9 @@ import path from 'path'
 const exeDir = path.dirname(process.execPath)
 const logPath = path.join(exeDir, 'debug.log')
 
-function writeDebug(msg: string) {
+export function writeDebug(msg: string) {
   try {
-    fs.appendFileSync(logPath, new Date().toISOString() + ' ' + msg + '\n')
+    fs.appendFileSync(logPath, new Date().toISOString() + ' > ' + msg + '\n')
   } catch (e) {
   }
 }
@@ -16,7 +16,6 @@ writeDebug('execPath: ' + process.execPath)
 writeDebug('resourcesPath: ' + process.resourcesPath)
 writeDebug('cwd: ' + process.cwd())
 
-// Ищем .env
 const paths = [
   path.join(process.resourcesPath || '', '.env'),
   path.join(path.dirname(process.execPath), 'resources', '.env'),

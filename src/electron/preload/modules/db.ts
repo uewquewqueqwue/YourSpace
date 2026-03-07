@@ -22,14 +22,16 @@ export function setupDBAPI() {
     deleteApp: (token: string, id: string) => 
       ipcRenderer.invoke('apps:delete', { token, id }),
 
-    getCatalogs: (token: string) => 
-      ipcRenderer.invoke('catalogs:getAll', token),
-    updateCatalog: (token: string, id: string, data: any) => 
-      ipcRenderer.invoke('catalogs:update', { token, id, ...data }),
+    getCatalogs: () => 
+      ipcRenderer.invoke('catalogs:getAll'),
+    createCatalog: (data: any) => 
+      ipcRenderer.invoke('catalogs:create', { ...data }),
 
     getLatestVersion: () => 
       ipcRenderer.invoke('versions:getLatest'),
     createVersion: (version: string, patchNotes: any[]) => 
-      ipcRenderer.invoke('versions:create', { version, patchNotes })
+      ipcRenderer.invoke('versions:create', { version, patchNotes }),
+    batchUpdateApps: (token: string, updates: any[]) => 
+      ipcRenderer.invoke('apps:batchUpdate', { token, updates }),
   }
 }

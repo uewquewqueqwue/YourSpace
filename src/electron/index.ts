@@ -1,7 +1,6 @@
-import { loadEnv } from './preload-env'
+import { loadEnv, writeDebug } from './preload-env'
 loadEnv()
 
-import fs from 'fs'
 import path from 'path'
 import { app, ipcMain } from 'electron'
 import { fileURLToPath } from 'url'
@@ -14,7 +13,8 @@ import { setupAppsHandlers } from '../../server/handlers/apps'
 import { setupCatalogsHandlers } from '../../server/handlers/catalogs'
 import { setupVersionsHandlers } from '../../server/handlers/versions'
 import { setupMediaHandlers } from "./handlers/media"
-import log from 'electron-log'
+import { setupTray } from './tray'
+import { mainLog } from '@/log/logger'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 
@@ -22,23 +22,13 @@ let mainWindow: Electron.BrowserWindow | null = null
 let updater: ReturnType<typeof setupUpdater> | null = null
 
 app.whenReady().then(() => {
-  const userDataPath = app.getPath('userData')
-  const logsPath = path.join(userDataPath, 'logs')
-  if (!fs.existsSync(logsPath)) fs.mkdirSync(logsPath, { recursive: true })
-  
-  log.transports.file.resolvePath = () => path.join(logsPath, 'main.log')
-  log.transports.file.level = 'debug'
-  log.transports.console.level = 'debug'
-  
-  log.info('================================')
-  log.info('App started successfully')
-  log.info('DATABASE_URL loaded:', !!process.env.DATABASE_URL)
-  log.info('JWT_SECRET loaded:', !!process.env.JWT_SECRET)
+  mainLog.info('================================')
+  mainLog.success('App started successfully')
 
   const preloadPath = path.join(__dirname, '../preload/index.js')
   const iconPath = getIconPath(process.platform, __dirname)
   const isDev = process.env.NODE_ENV === 'development'
-  
+
   mainWindow = createMainWindow({ preloadPath, iconPath, isDev })
   updater = setupUpdater(mainWindow)
   
@@ -49,50 +39,36 @@ app.whenReady().then(() => {
   setupAppHandlers()
   setupWindowHandlers(mainWindow)
   setupMediaHandlers()
-  
+
+  try {
+    setupTray(mainWindow, iconPath, writeDebug)
+  } catch (error) {
+    writeDebug(`Tray creation failed: ${error}`)
+  }
+
   ipcMain.on('check-for-updates', () => {
     updater?.checkForUpdates()
   })
-  
+
   ipcMain.on('download-update', () => {
     updater?.downloadUpdate()
   })
-  
+
   ipcMain.on('install-update', () => {
     updater?.installUpdate()
   })
 
-  log.info('[Main] Main window created')
-  log.info('[Main] Updater instance:', updater ? 'yes' : 'no')
-  
-  // if (!isDev) {
-  setTimeout(() => {
-    log.info('[Main] Triggering update check...')
-    updater?.checkForUpdates()
-  }, 3000)
-  
-  log.info('[Main] isDev:', isDev)
-})
+  ipcMain.on('relaunch-app:mainWindow', () => {
+    app.relaunch()
+    app.exit(0)
+  })
 
-ipcMain.on('log', (event, { level, timestamp, message }) => {
-  const colors = {
-    info: '\x1b[36m',
-    error: '\x1b[31m',
-    warn: '\x1b[33m'
-  }
-  const reset = '\x1b[0m'
-  const logMsg = `${colors[level as keyof typeof colors]}[${timestamp}] ${message}${reset}`
-  console.log(logMsg)
-  
-  if (level === 'error') log.error(message)
-  else if (level === 'warn') log.warn(message)
-  else log.info(message)
-})
+  mainLog.success('Main window created')
+  mainLog.info('Updater instance:', updater ? 'yes' : 'no')
 
-app.on('window-all-closed', () => {
-  if (process.platform !== 'darwin') {
-    log.info('App quitting...')
-    app.quit()
-    process.exit(0)
+  if (!isDev) {
+    setTimeout(() => {
+      updater?.checkForUpdates()
+    }, 3000)
   }
 })

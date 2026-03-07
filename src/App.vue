@@ -72,7 +72,6 @@ onMounted(async () => {
   applyAll()
 
   await auth.checkAuth()
-  await checkPatches()
 
   if (auth.user.value) {
     appsStore.startPeriodicSync()
@@ -83,10 +82,14 @@ onMounted(async () => {
   loaderRef.value?.finish()
   setTimeout(() => {
     isLoading.value = false
-    window.electronAPI?.expandWindow()
+    window.electronAPI?.window.expandWindow()
+
+    setTimeout(async () => {
+      await checkPatches()
+    }, 200)
   }, 500)
 
-  window.electronAPI?.onAppClosing(async () => {
+  window.electronAPI?.window.onAppClosing(async () => {
     const token = localStorage.getItem('token')
     if (auth.user.value && token) {
       await appsStore.forceSync(token)

@@ -17,6 +17,7 @@
       <div class="details">
         <span>{{ formatBytes(used) }} / {{ formatBytes(total) }}</span>
         <span class="apps-count">{{ appsCount }} apps</span>
+        <button class="apps-btn" @click="handleReset">Clear storage</button>
       </div>
     </div>
     
@@ -72,6 +73,13 @@ const formatBytes = (bytes: number): string => {
   const sizes = ['B', 'KB', 'MB']
   const i = Math.floor(Math.log(bytes) / Math.log(k))
   return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i]
+}
+
+const handleReset = () => {
+  store.reset()
+  localStorage.removeItem("patch_seen_version")
+
+  window.electronAPI?.relaunchApp()
 }
 
 onMounted(() => {
@@ -174,6 +182,19 @@ onMounted(() => {
       .apps-count {
         @include themify() {
           color: themed('brand-primary');
+        }
+      }
+
+      .apps-btn {
+        padding: 6px;
+        outline: none;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+
+        @include themify() {
+          background: themed('bg-card');
+          color: themed("text-primary");
         }
       }
     }

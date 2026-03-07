@@ -1,81 +1,95 @@
 import { ipcMain } from 'electron'
 import { prisma } from '../prisma'
 import { authenticate } from '../middleware/auth'
-import { generateColor } from '../../src/utils/generateColor'
 
 export function setupAppsHandlers() {
   ipcMain.handle('apps:getAll', async (event, token) => {
     const user = await authenticate(token)
     
-    const apps = await prisma.userApp.findMany({
+    return prisma.userApp.findMany({
       where: { userId: user.id },
-      include: { catalog: true }
+      select: {
+        id: true,
+        path: true,
+        customName: true,
+        customColor: true,
+        totalMinutes: true,
+        lastUsed: true,
+        catalog: {
+          select: {
+            id: true,
+            name: true,
+            displayName: true,
+            icon: true,
+            color: true
+          }
+        }
+      }
     })
-
-    return apps.map(app => ({
-      ...app,
-      displayName: app.customName || app.catalog.displayName || app.catalog.name,
-      displayColor: app.customColor || app.catalog.color
-    }))
   })
 
-  ipcMain.handle('apps:create', async (event, { token, path, catalogName, customName, customColor, totalMinutes = 0 }) => {
+  ipcMain.handle('apps:create', async (event, { token, path, catalogName, customName, customColor }) => {
     const user = await authenticate(token)
     
-    let catalog = await prisma.appCatalog.findUnique({
-      where: { name: catalogName }
-    })
-    
-    if (!catalog) {
-      catalog = await prisma.appCatalog.create({
+    return prisma.$transaction(async (tx) => {
+      let catalog = await tx.appCatalog.findUnique({
+        where: { name: catalogName }
+      })
+      
+      if (!catalog) {
+        catalog = await tx.appCatalog.create({
+          data: {
+            name: catalogName,
+            displayName: catalogName
+          }
+        })
+      }
+      
+      return tx.userApp.create({
         data: {
-          name: catalogName,
-          displayName: catalogName,
-          color: generateColor(catalogName)
+          userId: user.id,
+          catalogId: catalog.id,
+          path,
+          customName,
+          customColor,
+          lastUsed: new Date()
+        },
+        select: {
+          id: true,
+          path: true,
+          customName: true,
+          customColor: true,
+          totalMinutes: true,
+          lastUsed: true,
+          catalog: {
+            select: {
+              id: true,
+              name: true,
+              displayName: true,
+              icon: true,
+              color: true
+            }
+          }
         }
       })
-    }
-    
-    const userApp = await prisma.userApp.create({
-      data: {
-        userId: user.id,
-        catalogId: catalog.id,
-        path,
-        customName,
-        customColor,
-        totalMinutes,
-        lastUsed: new Date()
-      },
-      include: { catalog: true }
     })
-    
-    return {
-      ...userApp,
-      displayName: userApp.customName || userApp.catalog.displayName || userApp.catalog.name,
-      displayColor: userApp.customColor || userApp.catalog.color
-    }
   })
 
   ipcMain.handle('apps:update', async (event, { token, id, totalMinutes, lastUsed }) => {
     const user = await authenticate(token)
     
-    const userApp = await prisma.userApp.update({
-      where: { 
-        id,
-        userId: user.id 
-      },
+    return prisma.userApp.update({
+      where: { id, userId: user.id },
       data: { 
         totalMinutes,
         lastUsed: lastUsed ? new Date(lastUsed) : undefined
       },
-      include: { catalog: true }
+      select: {
+        id: true,
+        totalMinutes: true,
+        lastUsed: true
+      }
     })
-    
-    return {
-      ...userApp,
-      displayName: userApp.customName || userApp.catalog.displayName || userApp.catalog.name,
-      displayColor: userApp.customColor || userApp.catalog.color
-    }
   })
 
   ipcMain.handle('apps:delete', async (event, { token, id }) => {

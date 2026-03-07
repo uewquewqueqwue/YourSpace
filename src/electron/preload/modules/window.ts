@@ -5,7 +5,7 @@ export function setupWindowAPI() {
     expandWindow: () => ipcRenderer.send('expand-window'),
     minimize: () => ipcRenderer.send('window-minimize'),
     maximize: () => ipcRenderer.send('window-maximize'),
-    close: () => ipcRenderer.send('window-close'),
+    hideTray: () => ipcRenderer.send('window-hide-tray'),
     
     onAppClosing: (callback: () => Promise<void>) => {
       ipcRenderer.on('app-closing', async () => {

@@ -7,8 +7,8 @@ if (!process.env.DATABASE_URL) {
 
 const prismaClientSingleton = () => {
   const client = new PrismaClient({
-    accelerateUrl: process.env.DATABASE_URL,
-    log: process.env.NODE_ENV === 'development' ? ['query', 'error', 'warn'] : ['error'],
+    accelerateUrl: process.env.DATABASE_URL!,
+    log: process.env.NODE_ENV === 'development' ? ['error', 'warn'] : ['error'],
   });
   
   return client.$extends(withAccelerate());

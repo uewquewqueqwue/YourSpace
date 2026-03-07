@@ -95,18 +95,6 @@ const { apps, loading, error, fetchApps, removeApp, launchApp } = store
 
 let timerInterval: NodeJS.Timeout
 
-onMounted(() => {
-  timerInterval = setInterval(() => {
-    currentTime.value = Date.now()
-  }, 1000)
-})
-
-onUnmounted(() => {
-  if (timerInterval) {
-    clearInterval(timerInterval)
-  }
-})
-
 const formatPath = (path: string): string => {
   const parts = path.split('\\')
   return parts.slice(0, 2).join('\\') + '\\...\\' + parts.pop()
@@ -123,7 +111,7 @@ const formatLiveTime = (app: any): string => {
   if (!app.isActive || !app.currentSession) return ''
   
   const startTime = new Date(app.currentSession.startTime).getTime()
-  const now = currentTime.value
+  const now = currentTime.value || Date.now()
   const elapsed = Math.max(0, Math.floor((now - startTime) / 1000))
   
   const hours = Math.floor(elapsed / 3600)
@@ -189,6 +177,20 @@ const addToQuick = (id: string) => {
 const editApp = (app: any) => {
   toast.info('Edit coming soon')
 }
+
+onMounted(() => {
+  currentTime.value = Date.now()
+  
+  timerInterval = setInterval(() => {
+    currentTime.value = Date.now()
+  }, 1000)
+})
+
+onUnmounted(() => {
+  if (timerInterval) {
+    clearInterval(timerInterval)
+  }
+})
 </script>
 
 <style lang="scss" scoped>

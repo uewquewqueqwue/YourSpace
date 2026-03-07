@@ -45,10 +45,7 @@ import { useToast } from '@/composables/useToast'
 import { useModal } from '@/composables/useModal'
 import type { TabType } from '@/types/windowOptions'
 
-const props = defineProps<{ 
-  modelValue: boolean 
-}>()
-
+const props = defineProps<{ modelValue: boolean }>()
 const emit = defineEmits<{
   (e: 'update:modelValue', value: boolean): void
   (e: 'added'): void
@@ -71,11 +68,8 @@ const tabs: Array<{ id: TabType; label: string }> = [
 ]
 
 watch(() => props.modelValue, (val) => {
-  if (val && !modal.isOpen.value) {
-    modal.open()
-  } else if (!val && modal.isOpen.value) {
-    modal.close()
-  }
+  if (val && !modal.isOpen.value) modal.open()
+  else if (!val && modal.isOpen.value) modal.close()
 })
 
 const handleSelect = async (appData: { path: string; displayName: string }) => {
@@ -87,6 +81,7 @@ const handleSelect = async (appData: { path: string; displayName: string }) => {
   if (added) {
     toast.success(`Added ${appData.displayName}`)
     emit('added')
+
     modal.close()
   } else {
     toast.info('Already added or error')
@@ -127,14 +122,8 @@ const handleSelect = async (appData: { path: string; displayName: string }) => {
 }
 
 @keyframes modalAppear {
-  from {
-    opacity: 0;
-    transform: scale(0.95);
-  }
-  to {
-    opacity: 1;
-    transform: scale(1);
-  }
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
 }
 
 .header {
@@ -146,14 +135,11 @@ const handleSelect = async (appData: { path: string; displayName: string }) => {
   
   @include themify() {
     border-bottom-color: themed('border-color');
-  }
-  
-  h3 {
-    font-size: 16px;
-    font-weight: 600;
     
-    @include themify() {
+    h3 {
       color: themed('text-primary');
+      font-size: 16px;
+      font-weight: 600;
     }
   }
 

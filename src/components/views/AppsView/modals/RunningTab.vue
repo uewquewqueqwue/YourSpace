@@ -16,8 +16,10 @@
         class="proc-item" 
         @click="selectApp(proc)"
       >
-        <div class="icon" :style="{ background: getColor(proc.displayName) + '20' }">
-          <span>{{ proc.displayName[0].toUpperCase() }}</span>
+        <div class="icon-container">
+          <div class="icon-fallback" :style="{ background: generateColor(proc.displayName) + '20' }">
+            <span>{{ proc.displayName[0].toUpperCase() }}</span>
+          </div>
         </div>
         <span class="name">{{ proc.displayName }}</span>
         <Plus :size="16" color="#8B5CF6" />
@@ -39,17 +41,10 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
 import { Plus, Sparkle } from 'lucide-vue-next'
-import type { ProcessInfo } from '@/types/electron'
+import type { ProcessInfo } from '@/types/apps'
+import { generateColor } from '@/utils/generateColor'
 
-const emit = defineEmits<{
-  (e: 'select', appData: { path: string; displayName: string }): void
-}>()
-
-const getColor = (name: string): string => {
-  const colors = ['#a259ff', '#22a6f0', '#4ade80', '#f43f5e', '#fb923c', '#8b5cf6', '#ec4899', '#14b8a6']
-  const hash = name.split('').reduce((a, b) => a + b.charCodeAt(0), 0)
-  return colors[hash % colors.length]
-}
+const emit = defineEmits<{ (e: 'select', appData: { path: string; displayName: string }): void }>()
 
 const processes = ref<ProcessInfo[]>([])
 const loading = ref(false)
@@ -59,7 +54,7 @@ const hasMore = ref(true)
 const totalCount = ref(0)
 const scrollContainer = ref<HTMLElement | null>(null)
 
-const PAGE_SIZE = 20
+const PAGE_SIZE = 30
 
 onMounted(async () => {
   await loadTotalCount()
@@ -68,7 +63,7 @@ onMounted(async () => {
 
 const loadTotalCount = async () => {
   try {
-    totalCount.value = await window.electronAPI.getRunningAppsCount()
+    totalCount.value = await window.electronAPI?.apps.getRunningAppsCount()
   } catch (error) {
     console.error('Failed to load count:', error)
   }
@@ -82,7 +77,7 @@ const loadPage = async (page: number) => {
   }
   
   try {
-    const newProcesses = await window.electronAPI.getRunningApps({ 
+    const newProcesses = await window.electronAPI?.apps.getRunningApps({ 
       limit: PAGE_SIZE,
       page 
     })
@@ -93,7 +88,7 @@ const loadPage = async (page: number) => {
       processes.value = [...processes.value, ...newProcesses]
     }
     
-    hasMore.value = processes.value.length < totalCount.value
+    hasMore.value = newProcesses.length === PAGE_SIZE
     currentPage.value = page
     
   } catch (error) {
@@ -168,14 +163,28 @@ const selectApp = (proc: ProcessInfo) => {
     }
   }
 
-  .icon {
+  .icon-container {
+    width: 32px;
+    height: 32px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .app-icon {
+    width: 32px;
+    height: 32px;
+    object-fit: contain;
+  }
+
+  .icon-fallback {
     width: 32px;
     height: 32px;
     border-radius: 8px;
     display: flex;
     align-items: center;
     justify-content: center;
-    flex-shrink: 0;
 
     span {
       font-size: 14px;

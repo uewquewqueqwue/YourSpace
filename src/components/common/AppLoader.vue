@@ -37,7 +37,6 @@ const steps = [
   { max: 20, text: 'Loading modules...', step: 1 },
   { max: 40, text: 'Connecting to services...', step: 1 },
   { max: 50, text: 'Syncing data...', step: 1 },
-  { max: 60, text: 'Checking for updates...', step: 2 },
   { max: 90, text: 'Checking for updates...', step: 2 },
   { max: 95, text: 'Finalizing...', step: 3 }
 ]
@@ -56,7 +55,7 @@ onMounted(() => {
         
         if (progress.value >= 75 && !checkingUpdates.value) {
           checkingUpdates.value = true
-          window.electronAPI?.checkForUpdates()
+          window.electronAPI?.updater.checkForUpdates()
         }
         
         status.value = steps[currentStep].text

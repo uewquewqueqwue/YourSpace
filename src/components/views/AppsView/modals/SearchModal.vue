@@ -6,13 +6,13 @@
           <Search :size="18" class="search-icon" />
           <input
             ref="inputRef"
-            v-model="query"
+            v-model="searchQuery"
             type="text"
             placeholder="Search applications..."
             class="search-input"
             @keydown.up.prevent="navigateUp"
             @keydown.down.prevent="navigateDown"
-            @keydown.enter="filteredApps[selectedIndex] && launchApp(filteredApps[selectedIndex])"
+            @keydown.enter="selectedApp && launchApp(selectedApp)"
           />
           <kbd class="shortcut">ESC</kbd>
         </div>
@@ -41,16 +41,16 @@
           </div>
           
           <div class="results-info">
-            {{ filteredApps.length }} results found
+            {{ filteredApps.length }} results found ({{ searchTime }}ms)
           </div>
         </div>
 
-        <div class="no-results" v-else-if="query">
-          <p>No applications found for "{{ query }}"</p>
+        <div class="no-results" v-else-if="debouncedQuery">
+          <p>No applications found for "{{ debouncedQuery }}"</p>
         </div>
 
         <div class="empty-state" v-else>
-          <Search :size="32" />
+          <Search :size="32" color="#666666" />
           <p>Start typing to search your applications</p>
         </div>
       </div>
@@ -59,27 +59,66 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, watch, nextTick } from 'vue'
-import { Search, Star, Play } from 'lucide-vue-next'
+import { ref, computed, watch, nextTick, shallowRef } from 'vue'
+import { Search, Play } from 'lucide-vue-next'
 import { useAppsStore } from '@/stores/apps'
 import { useToast } from '@/composables/useToast'
 import { useSearch } from '@/composables/useSearch'
+import { debounce } from 'lodash-es'
 
 const store = useAppsStore()
 const toast = useToast()
 const { isOpen, closeSearch } = useSearch()
 
-const query = ref('')
+const searchQuery = ref('')
+const debouncedQuery = ref('')
 const selectedIndex = ref(0)
 const inputRef = ref<HTMLInputElement | null>(null)
+const searchTime = ref(0)
+const searchCache = new Map<string, { results: any[]; timestamp: number }>()
+const CACHE_TTL = 5000 // 5 секунд
 
-const filteredApps = computed(() => {
-  if (!query.value.trim()) return []
-  const search = query.value.toLowerCase().trim()
-  return store.apps.value.filter(app => 
+const filteredApps = shallowRef<any[]>([])
+
+const updateSearch = debounce((query: string) => {
+  if (!query.trim()) {
+    debouncedQuery.value = ''
+    filteredApps.value = []
+    return
+  }
+  
+  const start = performance.now()
+  debouncedQuery.value = query
+  
+  const cached = searchCache.get(query)
+  if (cached && Date.now() - cached.timestamp < CACHE_TTL) {
+    filteredApps.value = cached.results
+    searchTime.value = Math.round(performance.now() - start)
+    return
+  }
+  
+  const search = query.toLowerCase().trim()
+  const results = store.apps.value.filter(app => 
     app.displayName.toLowerCase().includes(search) ||
     app.path.toLowerCase().includes(search)
   )
+  
+  searchCache.set(query, {
+    results,
+    timestamp: Date.now()
+  })
+  
+  filteredApps.value = results
+  searchTime.value = Math.round(performance.now() - start)
+  selectedIndex.value = 0
+}, 300)
+
+watch(searchQuery, (newVal) => {
+  updateSearch(newVal)
+})
+
+const selectedApp = computed(() => {
+  return filteredApps.value[selectedIndex.value]
 })
 
 const formatPath = (path: string): string => {
@@ -107,10 +146,17 @@ const launchApp = async (app: any) => {
   }
 }
 
+watch(() => store.apps.value.length, () => {
+  searchCache.clear()
+})
+
 watch(isOpen, (newVal) => {
   if (newVal) {
-    query.value = ''
+    searchQuery.value = ''
+    debouncedQuery.value = ''
+    filteredApps.value = []
     selectedIndex.value = 0
+    searchCache.clear()
     nextTick(() => inputRef.value?.focus())
   }
 })
@@ -159,7 +205,7 @@ watch(isOpen, (newVal) => {
   
   .search-icon {
     @include themify() {
-      color: themed('text-secondary');
+      color: themed('text-secondary') !important;
     }
   }
   

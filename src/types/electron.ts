@@ -28,17 +28,18 @@ export interface DBApi {
   createApp: (token: string, data: Omit<CreateAppRequest, 'token'>) => Promise<UserAppWithDisplay>
   updateApp: (token: string, id: string, data: Omit<UpdateAppRequest, 'token' | 'id'>) => Promise<UserAppWithDisplay>
   deleteApp: (token: string, id: string) => Promise<{ success: boolean }>
-  getCatalogs: (token: string) => Promise<any[]>
-  updateCatalog: (token: string, id: string, data: any) => Promise<any>
+  getCatalogs: () => Promise<any[]>
+  createCatalog: (data: any) => Promise<any>
   getLatestVersion: () => Promise<AppVersion>
   createVersion: (version: string, patchNotes: any[]) => Promise<AppVersion>
+  batchUpdateApps: (token: string, updates: Array<{ id: string; totalMinutes?: number; lastUsed?: Date }>) => Promise<any>
 }
 
 export interface WindowAPI {
   expandWindow: () => void
   minimize: () => void
   maximize: () => void
-  close: () => void
+  hideTray: () => void
   onAppClosing: (callback: () => Promise<void>) => void
 }
 
@@ -65,41 +66,17 @@ export interface UpdaterAPI {
 
 
 export interface ElectronAPI {
+  window: WindowAPI
 
-  expandWindow: () => void
-  minimize: () => void
-  maximize: () => void
-  close: () => void
+  apps: AppsAPI
 
-
-  getRunningApps: (options?: GetAppsOptions) => Promise<ProcessInfo[]>
-  getRunningAppsCount: () => Promise<number>
-  getRecentApps: () => Promise<Array<{ name: string; path: string; lastAccessed: number }>>
-
-
-  launchApp: (appPath: string) => Promise<LaunchResult>
-  execCommand: (command: string) => Promise<ExecResult>
-
-
-  onAppClosing: (callback: () => Promise<void>) => void
-  log: (level: string, ...args: any[]) => void
-
-
-  onUpdateChecking: (callback: () => void) => void
-  onUpdateAvailable: (callback: (info: UpdateInfo) => void) => void
-  onUpdateNotAvailable: (callback: () => void) => void
-  onUpdateProgress: (callback: (progress: UpdateProgress) => void) => void
-  onUpdateDownloaded: (callback: (info: UpdateInfo) => void) => void
-  onUpdateError: (callback: (error: string) => void) => void
-  checkForUpdates: () => void
-  downloadUpdate: () => void
-  installUpdate: () => void
-
-
+  updater: UpdaterAPI
+    
   media: MediaAPI
-
-
+  
   db: DBApi
+
+  relaunchApp: () => void
 }
 
 declare global {

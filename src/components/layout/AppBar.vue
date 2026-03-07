@@ -29,30 +29,51 @@
       <div class="window-controls">
         <button class="minimize" @click="minimize"><Minus /></button>
         <button class="maximize" @click="maximize"><Square /></button>
-        <button class="close" @click="close"><X /></button>
+        <button class="close" @click="hideTray"><X /></button>
       </div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue'
+import { ref, onMounted } from 'vue'
 import { X, Minus, Square, NotebookText, RefreshCw } from "lucide-vue-next"
 import packageJson from '../../../package.json'
 
 const props = defineProps<{ tab: string }>()
 const emit = defineEmits(['open-patches'])
 
-const minimize = () => window.electronAPI?.minimize()
-const maximize = () => window.electronAPI?.maximize()
-const close = () => window.electronAPI?.close()
-
 const version = packageJson.version
-const updateAvailable = computed(() => false)
+const updateAvailable = ref(false)
+const updateInfo = ref<any>(null)
+
+const minimize = () => window.electronAPI?.window.minimize()
+const maximize = () => window.electronAPI?.window.maximize()
+const hideTray = () => window.electronAPI?.window.hideTray()
 
 const installUpdate = () => {
-  window.electronAPI?.installUpdate()
+  window.electronAPI?.updater.installUpdate()
 }
+
+onMounted(() => {
+  window.electronAPI?.updater.onUpdateAvailable((info) => {
+    updateAvailable.value = true
+    updateInfo.value = info
+  })
+
+  window.electronAPI?.updater.onUpdateNotAvailable(() => {
+    updateAvailable.value = false
+  })
+
+  window.electronAPI?.updater.onUpdateDownloaded(() => {
+
+  })
+
+  window.electronAPI?.updater.onUpdateError((error) => {
+    console.error('Update error:', error)
+    updateAvailable.value = false
+  })
+})
 </script>
 
 <style lang="scss" scoped>

@@ -8,6 +8,14 @@ const loading = ref(false)
 const error = ref<string | null>(null)
 const showLoginModal = ref(false)
 
+const saveUserToStorage = (userData: User | null) => {
+  if (userData) {
+    localStorage.setItem('user', JSON.stringify(userData))
+  } else {
+    localStorage.removeItem('user')
+  }
+}
+
 export function useAuth(): AuthStore {
   const login = async (email: string, password: string) => {
     loading.value = true
@@ -18,9 +26,10 @@ export function useAuth(): AuthStore {
 
       localStorage.setItem('token', token)
       user.value = userData
+      saveUserToStorage(userData)
       
       const appsStore = useAppsStore()
-      await appsStore.fetchApps(token)
+      await appsStore.fetchApps()
       await appsStore.forceSync(token)
 
     } catch (err) {
@@ -39,9 +48,10 @@ export function useAuth(): AuthStore {
 
       localStorage.setItem('token', token)
       user.value = userData
+      saveUserToStorage(userData)
       
       const appsStore = useAppsStore()
-      await appsStore.fetchApps(token)
+      await appsStore.fetchApps()
       await appsStore.forceSync(token)
 
     } catch (err) {
@@ -62,9 +72,10 @@ export function useAuth(): AuthStore {
     }
 
     const appsStore = useAppsStore()
-    await appsStore.forceSync(token || '')
+    appsStore.logout()
     
     user.value = null
+    saveUserToStorage(null)
     localStorage.removeItem('token')
     showLoginModal.value = false
     error.value = null
@@ -72,17 +83,25 @@ export function useAuth(): AuthStore {
 
   const checkAuth = async () => {
     const token = localStorage.getItem('token')
-    if (!token) return
+    if (!token) {
+      const savedUser = localStorage.getItem('user')
+      if (savedUser) {
+        user.value = JSON.parse(savedUser)
+      }
+      return
+    }
 
     try {
       const userData = await window.electronAPI.db.getMe(token)
       user.value = userData
+      saveUserToStorage(userData)
       
       const appsStore = useAppsStore()
-      await appsStore.fetchApps(token)
+      await appsStore.fetchApps()
 
     } catch {
       localStorage.removeItem('token')
+      localStorage.removeItem('user')
       user.value = null
     }
   }
@@ -94,6 +113,7 @@ export function useAuth(): AuthStore {
     try {
       const updatedUser = await window.electronAPI.db.updateProfile(token, name, avatar)
       user.value = updatedUser
+      saveUserToStorage(updatedUser)
       return updatedUser
     } catch (err) {
       error.value = err instanceof Error ? err.message : 'Failed to update profile'

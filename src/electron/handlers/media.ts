@@ -4,6 +4,7 @@ import { promisify } from 'util'
 import fs from 'fs'
 import path from 'path'
 import os from 'os'
+import { mainLog } from '@/log/logger'
 
 const execAsync = promisify(exec)
 
@@ -111,9 +112,8 @@ try {
 }
 
 export function setupMediaHandlers() {
-  console.log('[Media] Setup')
+  mainLog.info('[Media] Setup with polling')
   
-  // Обновление каждые 10 секунд
   setInterval(async () => {
     try {
       const info = await getSpotifyInfo()

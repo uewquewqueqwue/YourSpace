@@ -11,27 +11,27 @@ const execAsync = promisify(exec)
 async function getUniqueProcesses(): Promise<ProcessInfo[]> {
   try {
     const { stdout } = await execAsync('wmic process get Caption,ExecutablePath,ProcessId /format:csv')
-    
+
     const lines = stdout.split('\n')
       .filter(line => line.trim())
       .slice(1)
-    
+
     const allProcesses = lines
       .map(line => parseWmicLine(line))
       .filter((p): p is ProcessInfo => p !== null)
       .filter(p => !isSystemProcess(p))
-    
+
     const seen = new Map<string, ProcessInfo>()
-    
+
     for (const p of allProcesses) {
       if (!seen.has(p.displayName)) {
         seen.set(p.displayName, p)
       }
     }
-    
+
     const uniqueProcesses = Array.from(seen.values())
     uniqueProcesses.sort((a, b) => a.displayName.localeCompare(b.displayName))
-    
+
     return uniqueProcesses
   } catch (error) {
     console.error('Error getting processes:', error)
@@ -52,17 +52,17 @@ async function getRunningAppsCount(): Promise<number> {
 async function getRunningAppsWindows(options?: GetAppsOptions): Promise<ProcessInfo[]> {
   try {
     const uniqueProcesses = await getUniqueProcesses()
-    
+
     if (options?.limit && options?.page) {
       const start = (options.page - 1) * options.limit
       const end = start + options.limit
       return uniqueProcesses.slice(start, end)
     }
-    
+
     if (options?.limit) {
       return uniqueProcesses.slice(0, options.limit)
     }
-    
+
     return uniqueProcesses
   } catch (error) {
     console.error('Error getting processes:', error)
@@ -74,14 +74,14 @@ async function getRecentAppsWindows() {
   try {
     const recentPath = path.join(process.env.USERPROFILE || '', 'Recent')
     const files = await fs.readdir(recentPath).catch(() => [])
-    
+
     const apps = await Promise.all(
       files.slice(0, 10).map(async (file) => {
         const filePath = path.join(recentPath, file)
         try {
           const stats = await fs.stat(filePath)
           if (file.endsWith('.lnk') || file.endsWith('.url')) return null
-          
+
           return {
             name: file,
             path: filePath,
@@ -92,7 +92,7 @@ async function getRecentAppsWindows() {
         }
       })
     )
-    
+
     return apps
       .filter((app): app is NonNullable<typeof app> => app !== null)
       .sort((a, b) => b.lastAccessed - a.lastAccessed)
@@ -119,11 +119,11 @@ async function launchApp(appPath: string): Promise<LaunchResult> {
         shell: false
       })
       child.unref()
-    } 
+    }
     else if (appPath.endsWith('.lnk')) {
-      await execAsync(`start "" "${appPath}"`, { 
+      await execAsync(`start "" "${appPath}"`, {
         shell: 'cmd.exe',
-        windowsHide: true 
+        windowsHide: true
       })
     }
     else {
@@ -135,7 +135,7 @@ async function launchApp(appPath: string): Promise<LaunchResult> {
       })
       child.unref()
     }
-    
+
     return { success: true }
   } catch (error) {
     const err = error as Error

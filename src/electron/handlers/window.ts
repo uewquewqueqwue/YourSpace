@@ -26,30 +26,7 @@ export function setupWindowHandlers(win: BrowserWindow | null) {
     }
   })
 
-  ipcMain.on('window-close', () => {
-    win?.close()
-  })
-
-  win?.on('close', (event) => {
-    console.log('Window closing, hiding and syncing...')
-    event.preventDefault()
-
+  ipcMain.on('window-hide-tray', () => {
     win?.hide()
-
-    win?.webContents.send('app-closing')
-
-    ipcMain.once('sync-complete', () => {
-      console.log('Sync completed, destroying window')
-      win?.destroy()
-    })
-
-    setTimeout(() => {
-      console.log('Sync timeout, forcing destroy')
-      win?.destroy()
-    }, 3000)
-  })
-
-  win?.webContents.on('did-finish-load', () => {
-    console.log('Window loaded, ready for events')
   })
 }

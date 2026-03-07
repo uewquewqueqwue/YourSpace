@@ -39,22 +39,22 @@ const iconComponent = computed(() => {
 })
 
 onMounted(() => {
-  window.electronAPI?.onUpdateChecking(() => {
+  window.electronAPI?.updater.onUpdateChecking(() => {
     
   })
 
-  window.electronAPI?.onUpdateAvailable((info) => {
+  window.electronAPI?.updater.onUpdateAvailable((info) => {
     show.value = true
     type.value = 'info'
     title.value = 'Update Available'
     message.value = `Version ${info.version} is ready to download`
     
     setTimeout(() => {
-      window.electronAPI?.downloadUpdate()
+      window.electronAPI?.updater.downloadUpdate()
     }, 2000)
   })
 
-  window.electronAPI?.onUpdateProgress((progressData) => {
+  window.electronAPI?.updater.onUpdateProgress((progressData) => {
     show.value = true
     type.value = 'progress'
     title.value = 'Downloading Update'
@@ -62,7 +62,7 @@ onMounted(() => {
     progress.value = progressData.percent
   })
 
-  window.electronAPI?.onUpdateDownloaded((info) => {
+  window.electronAPI?.updater.onUpdateDownloaded((info) => {
     show.value = true
     type.value = 'success'
     title.value = 'Update Ready'
@@ -74,7 +74,7 @@ onMounted(() => {
     }, 5000)
   })
 
-  window.electronAPI?.onUpdateError((error) => {
+  window.electronAPI?.updater.onUpdateError((error) => {
     show.value = true
     type.value = 'error'
     title.value = 'Update Failed'
