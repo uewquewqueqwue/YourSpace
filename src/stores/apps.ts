@@ -85,6 +85,13 @@ const isProcessRunning = async (exeName: string): Promise<boolean> => {
 }
 
 const checkAppStatus = async (app: UserAppWithDisplay) => {
+  if (!app) return
+  
+  if (!app.path) {
+    app.hasInvalidPath = true
+    return
+  }
+  
   const exeName = app.path.split('\\').pop() || ''
   const isRunning = await isProcessRunning(exeName)
   const now = Date.now()
@@ -125,7 +132,9 @@ const startMonitoring = () => {
   if (monitoringInterval) return
   monitoringInterval = setInterval(async () => {
     for (const app of apps.value) {
-      await checkAppStatus(app)
+      if (app) {
+        await checkAppStatus(app)
+      }
     }
   }, 30000)
   setTimeout(() => checkAppStatus(apps.value[0]), 1000)
@@ -140,7 +149,7 @@ const syncToServer = async (token: string) => {
           totalMinutes: app.totalMinutes,
           lastUsed: app.lastUsed || undefined
         })
-      } else if (app.id.startsWith('local-')) {
+      } else {
         const serverApp = await window.electronAPI.db.createApp(token, {
           path: app.path,
           catalogName: app.displayName,
@@ -172,8 +181,10 @@ const syncFromServer = async (token: string) => {
   if (!token || !isAuthenticated()) return
   try {
     const serverApps = await window.electronAPI.db.getApps(token)
+    
     for (const serverApp of serverApps) {
       const localApp = apps.value.find(a => a.path === serverApp.path)
+      
       if (!localApp) {
         apps.value.push({
           ...serverApp,
@@ -182,6 +193,8 @@ const syncFromServer = async (token: string) => {
         })
       } else {
         Object.assign(localApp, serverApp)
+        localApp.isActive = localApp.isActive || false
+        localApp.currentSession = localApp.currentSession || null
         if (localApp.id.startsWith('local-')) {
           localApp.id = serverApp.id
         }
@@ -230,7 +243,6 @@ export async function initializeAppsStore() {
           displayName: app.displayName,
           color: generateColor(app.displayName)
         })
-        
         catalogs.value.push(newCatalog)
         app.catalog = newCatalog
         app.catalogId = newCatalog.id
@@ -286,7 +298,7 @@ export function useAppsStore(): AppsStore {
     
     let catalog = catalogs.value.find(c => c.name === input.catalogName)
     
-    if (!catalog && isAuth) {
+    if (!catalog) {
       try {
         catalog = await window.electronAPI.db.createCatalog({
           name: input.catalogName,
@@ -294,20 +306,13 @@ export function useAppsStore(): AppsStore {
           color: generateColor(input.catalogName)
         })
         catalogs.value.push(catalog)
-      } catch {
+      } catch (err) {
         catalog = {
           id: 'local-' + crypto.randomUUID(),
           name: input.catalogName,
           displayName: input.catalogName,
           color: generateColor(input.catalogName)
         }
-      }
-    } else if (!catalog) {
-      catalog = {
-        id: 'local-' + crypto.randomUUID(),
-        name: input.catalogName,
-        displayName: input.catalogName,
-        color: generateColor(input.catalogName)
       }
     }
 
@@ -326,7 +331,8 @@ export function useAppsStore(): AppsStore {
       displayName: input.customName || catalog.displayName || catalog.name,
       displayColor: input.customColor || catalog.color,
       isActive: false,
-      currentSession: null
+      currentSession: null,
+      hasInvalidPath: false
     }
 
     apps.value.push(newApp)

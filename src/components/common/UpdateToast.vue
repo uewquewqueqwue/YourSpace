@@ -51,7 +51,7 @@ onMounted(() => {
     
     setTimeout(() => {
       window.electronAPI?.updater.downloadUpdate()
-    }, 2000)
+    }, 200)
   })
 
   window.electronAPI?.updater.onUpdateProgress((progressData) => {

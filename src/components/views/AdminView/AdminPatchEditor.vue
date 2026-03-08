@@ -118,7 +118,7 @@ marked.setOptions({
 const toast = useToast()
 const showPreview = ref(true)
 const saving = ref(false)
-const currentVersion = ref('1.1.8')
+const currentVersion = ref('1.2.3')
 
 const initialPatches = [
   {
@@ -160,7 +160,7 @@ const saveVersion = async () => {
 
     if (result) {
       toast.success('Version saved successfully! 🎉')
-      currentVersion.value = '1.1.' + (parseInt(currentVersion.value.split('.')[2] || '0') + 1)
+      currentVersion.value = '1.2.' + (parseInt(currentVersion.value.split('.')[2] || '0') + 1)
       patches.value = [
         {
           icon: '✨',

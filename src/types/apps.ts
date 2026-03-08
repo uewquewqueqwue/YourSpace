@@ -37,6 +37,7 @@ export interface UserAppWithDisplay extends UserApp {
   displayColor: string
   isActive: boolean
   currentSession: AppSession | null
+  hasInvalidPath?: boolean
 }
 
 export interface CreateAppInput {

@@ -29,6 +29,8 @@ export function setupDBAPI() {
 
     getLatestVersion: () => 
       ipcRenderer.invoke('versions:getLatest'),
+    getVersionPatches: (version: string) => 
+      ipcRenderer.invoke('versions:getByVersion', version),
     createVersion: (version: string, patchNotes: any[]) => 
       ipcRenderer.invoke('versions:create', { version, patchNotes }),
     batchUpdateApps: (token: string, updates: any[]) => 

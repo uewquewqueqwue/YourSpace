@@ -57,9 +57,13 @@ const installUpdate = () => {
 
 onMounted(() => {
   window.electronAPI?.updater.onUpdateAvailable((info) => {
-    updateAvailable.value = true
     updateInfo.value = info
     checkingComplete.value = true
+  })
+
+  window.electronAPI?.updater.onUpdateDownloaded((info) => {
+    updateAvailable.value = true
+    updateInfo.value = info
   })
 
   window.electronAPI?.updater.onUpdateNotAvailable(() => {

@@ -1,6 +1,6 @@
 {
   "name": "your-space",
-  "version": "1.2.2",
+  "version": "1.2.3",
   "productName": "YourSpace",
   "description": "YourSpace - app launcher and tracker",
   "author": "Uewque",
@@ -14,7 +14,8 @@
     "build": "electron-vite build",
     "preview": "electron-vite preview",
     "dist": "yarn build && electron-builder",
-    "release": "yarn build && electron-builder --publish always"
+    "push": "yarn build && electron-builder --publish always",
+    "release": "env-cmd yarn push"
   },
   "dependencies": {
     "@prisma/client": "^7.4.2",
@@ -48,6 +49,7 @@
     "electron": "^40.6.1",
     "electron-builder": "26.8.1",
     "electron-vite": "^5.0.0",
+    "env-cmd": "^11.0.0",
     "prisma": "^7.4.2",
     "sass": "^1.97.3",
     "tsx": "^4.21.0",
