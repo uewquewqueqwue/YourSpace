@@ -4,28 +4,33 @@ import type { CreateAppInput } from './apps'
 import type { User } from './user'
 
 export interface AppsStore {
-  apps: Ref<UserAppWithDisplay[]>
-  quickApps: Ref<UserAppWithDisplay[]>
-  loading: Ref<boolean>
-  error: Ref<string | null>
-  
+
+  apps: Readonly<Ref<UserAppWithDisplay[]>>
+  quickApps: Readonly<Ref<UserAppWithDisplay[]>>
+  loading: Readonly<Ref<boolean>>
+  error: Readonly<Ref<string | null>>
+
+
   fetchApps: () => Promise<void>
   addApp: (input: CreateAppInput) => Promise<UserAppWithDisplay | null>
   removeApp: (id: string) => Promise<boolean>
   launchApp: (path: string) => Promise<boolean>
-  forceSync: (token: string) => Promise<void>
-  
+  forceSync: (token?: string) => Promise<void>
+
+
   addToQuick: (id: string) => boolean
   removeFromQuick: (id: string) => void
   isInQuick: (id: string) => boolean
-  
+
+
   getAppById: (id: string) => UserAppWithDisplay | undefined
   getActiveApps: () => UserAppWithDisplay[]
   getTotalTimeToday: () => number
-  
-  saveToStorage: () => void
+
+
   reset: () => void
   logout: () => void
+  saveToStorage: () => void
   startPeriodicSync: () => void
   stopPeriodicSync: () => void
 }

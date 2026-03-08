@@ -21,7 +21,7 @@
             <span>{{ safeFirstChar(proc.displayName) }}</span>
           </div>
         </div>
-        <span class="name">{{ proc.displayName }}</span>
+        <span class="name">{{ safeDisplayName(proc.displayName) }}</span>
         <Plus :size="16" color="#8B5CF6" />
       </div>
       
@@ -43,7 +43,7 @@ import { ref, computed, onMounted } from 'vue'
 import { Plus, Sparkle } from 'lucide-vue-next'
 import type { ProcessInfo } from '@/types/apps'
 import { generateColor } from '@/utils/generateColor'
-import { safeFirstChar } from '@/utils/safe'
+import { safeFirstChar, safeDisplayName } from '@/utils/safe'
 
 const emit = defineEmits<{ (e: 'select', appData: { path: string; displayName: string }): void }>()
 

@@ -1,5 +1,5 @@
 <template>
-  <section v-if="store.quickApps.value.length" class="section">
+  <section v-if="hasQuickApps" class="section">
     <h3>Quick Launch</h3>
 
     <TransitionGroup 
@@ -7,13 +7,18 @@
       tag="div" 
       class="quick-grid"
     >
-      <div v-for="app in store.quickApps.value" :key="app.id" class="quick-item" :style="{ background: app.displayColor + '20' }">
+      <div 
+        v-for="app in quickAppsList" 
+        :key="app.id" 
+        class="quick-item" 
+        :style="{ background: app.displayColor + '20' }"
+      >
         <button class="quick-btn" @click="handleLaunch(app)">
           <div class="icon">
             <img 
               v-if="app.catalog?.icon" 
               :src="app.catalog.icon" 
-              :alt="app.displayName"
+              :alt="safeDisplayName(app.displayName)"
               class="app-icon"
             >
             <span v-else>{{ safeFirstChar(app.displayName) }}</span>
@@ -30,27 +35,40 @@
 </template>
 
 <script setup lang="ts">
+import { computed } from 'vue'
 import { X } from 'lucide-vue-next'
 import { useAppsStore } from '@/stores/apps'
 import { useToast } from '@/composables/useToast'
-import { safeFirstChar } from '@/utils/safe'
+import { safeFirstChar, safeDisplayName } from '@/utils/safe'
+import type { UserAppWithDisplay } from '@/types/apps'
 
 const store = useAppsStore()
 const toast = useToast()
 
+// Вычисляемое свойство для безопасного доступа к quickApps
+const quickAppsList = computed<UserAppWithDisplay[]>(() => {
+  // Если quickApps - массив, возвращаем его, иначе пустой массив
+  return Array.isArray(store.quickApps) ? store.quickApps : []
+})
+
+const hasQuickApps = computed<boolean>(() => {
+  return quickAppsList.value.length > 0
+})
+
 const formatName = (name: string): string => {
-  if (name.length > 10) {
-    return name.slice(0, 8) + '...'
+  const safe = safeDisplayName(name)
+  if (safe.length > 10) {
+    return safe.slice(0, 8) + '...'
   }
-  return name
+  return safe
 }
 
-const handleLaunch = async (app: any) => {
+const handleLaunch = async (app: UserAppWithDisplay) => {
   const success = await store.launchApp(app.path)
   if (success) {
-    toast.success(`Launched ${app.displayName}`)
+    toast.success(`Launched ${safeDisplayName(app.displayName)}`)
   } else {
-    toast.error(`Failed to launch ${app.displayName}`)
+    toast.error(`Failed to launch ${safeDisplayName(app.displayName)}`)
   }
 }
 
@@ -125,7 +143,6 @@ const removeFromQuick = (id: string) => {
 
 .quick-btn {
   width: 100%;
-  // border: 1px solid;
   border-radius: $radius-lg;
   padding: 12px 8px;
   display: flex;
@@ -137,8 +154,6 @@ const removeFromQuick = (id: string) => {
   cursor: pointer;
   
   @include themify() {
-    // background: themed('bg-card');
-    // border-color: themed('border-color');
     color: themed('text-secondary');
     
     &:hover {

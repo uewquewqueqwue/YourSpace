@@ -5,7 +5,7 @@ import { authenticate } from '../middleware/auth'
 export function setupAppsHandlers() {
   ipcMain.handle('apps:getAll', async (event, token) => {
     const user = await authenticate(token)
-    
+
     return prisma.userApp.findMany({
       where: { userId: user.id },
       select: {
@@ -30,21 +30,21 @@ export function setupAppsHandlers() {
 
   ipcMain.handle('apps:create', async (event, { token, path, catalogName, customName, customColor }) => {
     const user = await authenticate(token)
-    
+    const exeName = path.split('\\').pop()?.replace('.exe', '') || catalogName
+
     return prisma.$transaction(async (tx) => {
       let catalog = await tx.appCatalog.findUnique({
-        where: { name: catalogName }
+        where: { name: exeName }
       })
-      
+
       if (!catalog) {
         catalog = await tx.appCatalog.create({
           data: {
-            name: catalogName,
-            displayName: catalogName
+            name: exeName,
           }
         })
       }
-      
+
       return tx.userApp.create({
         data: {
           userId: user.id,
@@ -77,10 +77,10 @@ export function setupAppsHandlers() {
 
   ipcMain.handle('apps:update', async (event, { token, id, totalMinutes, lastUsed }) => {
     const user = await authenticate(token)
-    
+
     return prisma.userApp.update({
       where: { id, userId: user.id },
-      data: { 
+      data: {
         totalMinutes,
         lastUsed: lastUsed ? new Date(lastUsed) : undefined
       },
@@ -94,11 +94,11 @@ export function setupAppsHandlers() {
 
   ipcMain.handle('apps:delete', async (event, { token, id }) => {
     const user = await authenticate(token)
-    
+
     await prisma.userApp.delete({
       where: { id, userId: user.id }
     })
-    
+
     return { success: true }
   })
 }

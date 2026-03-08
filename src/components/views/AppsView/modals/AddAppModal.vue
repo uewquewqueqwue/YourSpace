@@ -43,6 +43,7 @@ import BrowseTab from './BrowseTab.vue'
 import { useAppsStore } from '@/stores/apps'
 import { useToast } from '@/composables/useToast'
 import { useModal } from '@/composables/useModal'
+import { safeDisplayName } from '@/utils/safe'
 import type { TabType } from '@/types/windowOptions'
 
 const props = defineProps<{ modelValue: boolean }>()
@@ -75,16 +76,15 @@ watch(() => props.modelValue, (val) => {
 const handleSelect = async (appData: { path: string; displayName: string }) => {
   const added = await store.addApp({
     path: appData.path,
-    catalogName: appData.displayName
+    catalogName: appData.displayName // ← Это сырое имя из exe
   })
   
   if (added) {
-    toast.success(`Added ${appData.displayName}`)
+    toast.success(`Added ${safeDisplayName(appData.displayName)}`)
     emit('added')
-
     modal.close()
   } else {
-    toast.info('Already added or error')
+    toast.error('Already added or error')
   }
 }
 </script>

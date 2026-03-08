@@ -1,3 +1,4 @@
+import type { Ref } from "vue"
 export interface AppCatalog {
   id: string
   name: string
@@ -7,7 +8,6 @@ export interface AppCatalog {
   createdAt: Date
   updatedAt: Date
 }
-
 export interface AppSession {
   id: string
   userAppId: string
@@ -84,4 +84,18 @@ export interface ExecResult {
 export interface GetAppsOptions {
   limit?: number
   page?: number
+}
+
+export function computeDisplayName(
+  customName: string | null,
+  catalogDisplayName: string | null,
+  catalogName: string
+): string {
+  if (customName) return customName
+  if (catalogDisplayName) return catalogDisplayName
+  return catalogName
+}
+
+export function isValidApp(app: UserAppWithDisplay): boolean {
+  return !app.hasInvalidPath && !!app.path
 }

@@ -9,6 +9,7 @@
 
 <script setup lang="ts">
 import { FolderOpen } from 'lucide-vue-next'
+import { safeDisplayName } from '@/utils/safe'
 
 const emit = defineEmits(['select'])
 

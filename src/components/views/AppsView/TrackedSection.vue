@@ -33,7 +33,7 @@
             <img 
               v-if="app.catalog?.icon" 
               :src="app.catalog.icon" 
-              :alt="app.displayName"
+              :alt="safeDisplayName(app.displayName)"
               class="app-icon"
             >
             <span v-else>{{ safeFirstChar(app.displayName) }}</span>
@@ -56,7 +56,7 @@
         </div>
 
         <div class="card-body" @click="handleLaunchApp(app.path, app.displayName)">
-          <h3 :title="app.displayName">{{ app.displayName }}</h3>
+          <h3 :title="app.displayName">{{ safeDisplayName(app.displayName) }}</h3>
           <p class="path" :title="app.path">{{ formatPath(app.path) }}</p>
 
           <div class="stats">
@@ -84,7 +84,7 @@ import { ref, onMounted, onUnmounted } from 'vue'
 import { Plus, Edit, Trash2, Clock, Calendar, Star, ChartCandlestick } from 'lucide-vue-next'
 import { useAppsStore } from '@/stores/apps'
 import { useToast } from '@/composables/useToast'
-import { safeFirstChar } from '@/utils/safe'
+import { safeFirstChar, safeDisplayName, safeString } from '@/utils/safe'
 
 const store = useAppsStore()
 const toast = useToast()
@@ -92,6 +92,7 @@ const currentTime = ref(Date.now())
 
 defineEmits(['add'])
 
+// Убираем .value при доступе к ref'ам из стора
 const { apps, loading, error, fetchApps, removeApp, launchApp } = store
 
 let timerInterval: NodeJS.Timeout
@@ -151,22 +152,24 @@ const formatDate = (date: Date | string): string => {
 }
 
 const handleRemoveApp = async (id: string, name: string) => {
-  if (confirm(`Are you sure you want to remove ${name}?`)) {
+  const safeName = safeDisplayName(name)
+  if (confirm(`Are you sure you want to remove ${safeName}?`)) {
     const success = await removeApp(id)
     if (success) {
-      toast.success(`Removed ${name}`)
+      toast.success(`Removed ${safeName}`)
     } else {
-      toast.error(`Failed to remove ${name}`)
+      toast.error(`Failed to remove ${safeName}`)
     }
   }
 }
 
 const handleLaunchApp = async (path: string, name: string) => {
   const success = await launchApp(path)
+  const safeName = safeDisplayName(name)
   if (success) {
-    toast.success(`Launched ${name}`)
+    toast.success(`Launched ${safeName}`)
   } else {
-    toast.error(`Failed to launch ${name}`)
+    toast.error(`Failed to launch ${safeName}`)
   }
 }
 
@@ -176,7 +179,7 @@ const addToQuick = (id: string) => {
 }
 
 const editApp = (app: any) => {
-  toast.info('Edit coming soon')
+  toast.info(`Edit ${safeDisplayName(app.displayName)} coming soon`)
 }
 
 onMounted(() => {
