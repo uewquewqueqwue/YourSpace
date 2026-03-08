@@ -4,44 +4,28 @@
       <FolderOpen :size="20" />
       Select .exe file
     </button>
-    <input ref="fileInput" type="file" accept=".exe" class="hidden" @change="handleFile">
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
 import { FolderOpen } from 'lucide-vue-next'
-import { useAppsStore } from '@/stores/apps'
-import { useToast } from '@/composables/useToast'
 
 const emit = defineEmits(['select'])
 
-const store = useAppsStore()
-const toast = useToast()
-const fileInput = ref<HTMLInputElement | null>(null)
-
-const browseFile = () => fileInput.value?.click()
-
-const handleFile = async (e: Event) => {
-  const input = e.target as HTMLInputElement
-  const file: any = input.files?.[0]
+const browseFile = async () => {
+  const result = await window.electronAPI?.dialog.showOpenDialog({
+    properties: ['openFile'],
+    filters: [{ name: 'Executable', extensions: ['exe'] }]
+  })
   
-  if (file) {
-    const name = file.name.replace('.exe', '')
+  if (result && !result.canceled && result.filePaths.length > 0) {
+    const filePath = result.filePaths[0]
+    const fileName = filePath.split('\\').pop()?.replace('.exe', '') || ''
     
-    const added = await store.addApp({
-      path: file.path,
-      catalogName: name
+    emit('select', { 
+      path: filePath, 
+      displayName: fileName 
     })
-    
-    if (added) {
-      toast.success(`Added ${name}`)
-      emit('select', { path: file.path, displayName: name })
-    } else {
-      toast.info('Already added or error')
-    }
-    
-    input.value = ''
   }
 }
 </script>
@@ -70,9 +54,5 @@ const handleFile = async (e: Event) => {
       color: themed('brand-primary');
     }
   }
-}
-
-.hidden {
-  display: none;
 }
 </style>

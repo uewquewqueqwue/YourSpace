@@ -46,7 +46,7 @@ const emit = defineEmits(['open-patches'])
 const version = packageJson.version
 const updateAvailable = ref(false)
 const updateInfo = ref<any>(null)
-
+const checkingComplete = ref(false)
 const minimize = () => window.electronAPI?.window.minimize()
 const maximize = () => window.electronAPI?.window.maximize()
 const hideTray = () => window.electronAPI?.window.hideTray()
@@ -59,20 +59,25 @@ onMounted(() => {
   window.electronAPI?.updater.onUpdateAvailable((info) => {
     updateAvailable.value = true
     updateInfo.value = info
+    checkingComplete.value = true
   })
 
   window.electronAPI?.updater.onUpdateNotAvailable(() => {
     updateAvailable.value = false
-  })
-
-  window.electronAPI?.updater.onUpdateDownloaded(() => {
-
+    checkingComplete.value = true
   })
 
   window.electronAPI?.updater.onUpdateError((error) => {
     console.error('Update error:', error)
     updateAvailable.value = false
+    checkingComplete.value = true
   })
+  
+  setTimeout(() => {
+    if (!checkingComplete.value) {
+      checkingComplete.value = true
+    }
+  }, 2000)
 })
 </script>
 

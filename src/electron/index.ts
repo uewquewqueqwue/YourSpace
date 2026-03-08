@@ -2,7 +2,7 @@ import { loadEnv, writeDebug } from './preload-env'
 loadEnv()
 
 import path from 'path'
-import { app, ipcMain } from 'electron'
+import { app, ipcMain, dialog } from 'electron'
 import { fileURLToPath } from 'url'
 import { createMainWindow, getIconPath } from './windows/mainWindow'
 import { setupAppHandlers } from './handlers/apps'
@@ -45,6 +45,10 @@ app.whenReady().then(() => {
   } catch (error) {
     writeDebug(`Tray creation failed: ${error}`)
   }
+
+  ipcMain.handle('dialog:showOpenDialog', async (event, options) => {
+    return dialog.showOpenDialog(options)
+  })
 
   ipcMain.on('check-for-updates', () => {
     updater?.checkForUpdates()

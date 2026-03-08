@@ -1,7 +1,6 @@
 import type { BrowserWindow } from 'electron'
 const { autoUpdater } = require('electron-updater')
 import type { UpdateInfo, ProgressInfo } from 'electron-updater'
-import log from 'electron-log'
 
 export function setupUpdater(mainWindow: BrowserWindow | null) {
   autoUpdater.autoDownload = false

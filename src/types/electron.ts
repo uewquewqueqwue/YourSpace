@@ -31,6 +31,7 @@ export interface DBApi {
   getCatalogs: () => Promise<any[]>
   createCatalog: (data: any) => Promise<any>
   getLatestVersion: () => Promise<AppVersion>
+  getVersionPatches: (version: string) => Promise<AppVersion>
   createVersion: (version: string, patchNotes: any[]) => Promise<AppVersion>
   batchUpdateApps: (token: string, updates: Array<{ id: string; totalMinutes?: number; lastUsed?: Date }>) => Promise<any>
 }
@@ -75,6 +76,10 @@ export interface ElectronAPI {
   media: MediaAPI
   
   db: DBApi
+
+  dialog: {
+    showOpenDialog: (options: any) => Promise<any>
+  }
 
   relaunchApp: () => void
 }

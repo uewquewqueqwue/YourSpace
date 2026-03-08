@@ -25,6 +25,22 @@ export function setupVersionsHandlers() {
     return latestVersion
   })
 
+  ipcMain.handle('versions:getByVersion', async (event, version: string) => {
+    const versionData = await prisma.appVersion.findUnique({
+      where: { version },
+      include: { patchNotes: { orderBy: { order: 'asc' } } }
+    })
+
+    if (!versionData) {
+      return {
+        version,
+        patchNotes: []
+      }
+    }
+
+    return versionData
+  })
+
   ipcMain.handle('versions:create', async (event, { version, patchNotes }) => {
     return prisma.appVersion.create({
       data: {

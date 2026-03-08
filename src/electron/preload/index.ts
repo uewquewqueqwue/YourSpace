@@ -8,7 +8,7 @@ import { setupUpdaterAPI } from './modules/updater'
 contextBridge.exposeInMainWorld('electronAPI', {
   // Window controls
   window: setupWindowAPI(),
-  
+
   // Process monitoring
   apps: setupAppsAPI(),
 
@@ -17,9 +17,13 @@ contextBridge.exposeInMainWorld('electronAPI', {
 
   // Media API
   media: setupMediaAPI(),
-  
+
   // Database API
   db: setupDBAPI(),
-  
+
+  dialog: {
+    showOpenDialog: (options: any) => ipcRenderer.invoke('dialog:showOpenDialog', options)
+  },
+
   relaunchApp: () => ipcRenderer.send('relaunch-app:mainWindow')
 })

@@ -25,13 +25,12 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, computed } from 'vue'
 import { useToast } from '@/composables/useToast'
 import { usePatches } from '@/composables/usePatches'
 import { useSettings } from '@/composables/useSettings'
 import { useAuth } from '@/stores/auth'
 import { useAppsStore, initializeAppsStore } from '@/stores/apps'
-import packageJson from '../package.json'
 import NavBar from '@/components/layout/NavBar.vue'
 import MainView from '@/components/views/MainView.vue'
 import RightPanel from '@/components/layout/RightPanel.vue'
@@ -52,30 +51,27 @@ const currentTab = ref('apps')
 const isLoading = ref(true)
 const loaderRef = ref<InstanceType<typeof AppLoader>>()
 const showPatchModal = ref(false)
+
+const currentVersion = computed(() => patches.currentVersion.value)
 const PATCH_SEEN_KEY = 'patch_seen_version'
 
 const checkPatches = async () => {
   await patches.fetchPatches()
 
   const lastSeen = localStorage.getItem(PATCH_SEEN_KEY)
-  if (patches.currentVersion.value === packageJson.version &&
-    lastSeen !== patches.currentVersion.value) {
+  if (lastSeen !== currentVersion.value) {
     showPatchModal.value = true
   }
 }
 
 const markPatchesAsSeen = () => {
-  localStorage.setItem(PATCH_SEEN_KEY, patches.currentVersion.value)
+  localStorage.setItem(PATCH_SEEN_KEY, currentVersion.value)
 }
 
 onMounted(async () => {
   applyAll()
 
   await auth.checkAuth()
-
-  if (auth.user.value) {
-    appsStore.startPeriodicSync()
-  }
 
   initializeAppsStore()
 

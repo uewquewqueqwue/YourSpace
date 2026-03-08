@@ -35,7 +35,10 @@ export const BLACKLIST = [
   'vmcompute',
   'vmware-usbarbitrator64',
   'vmwsprrdpwks',
-  'wslservice'
+  'wslservice',
+  'LeagueClientUx',
+'LeagueClientUxRender',
+'LeagueCrashHandler64', "RiotClientCrashHandler",
 ]
 
 export function parseWmicLine(line: string): ProcessInfo | null {
@@ -69,7 +72,7 @@ export function isSystemProcess(process: ProcessInfo): boolean {
   const nameLower = process.displayName.toLowerCase()
   const pathLower = process.path.toLowerCase()
 
-  if (BLACKLIST.some(b => nameLower.includes(b) || pathLower.includes(b))) return true
+  if (BLACKLIST.some(b => nameLower.includes(b.toLowerCase()) || pathLower.includes(b.toLowerCase()))) return true
   if (pathLower.includes('\\windows\\')) return true
   if (pathLower.includes('\\windowsapps\\')) return true
   if (pathLower.includes('\\edgewebview\\')) return true
