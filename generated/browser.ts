@@ -42,3 +42,23 @@ export type AppVersion = Prisma.AppVersionModel
  * 
  */
 export type PatchNote = Prisma.PatchNoteModel
+/**
+ * Model TodoFolder
+ * 
+ */
+export type TodoFolder = Prisma.TodoFolderModel
+/**
+ * Model TodoTag
+ * 
+ */
+export type TodoTag = Prisma.TodoTagModel
+/**
+ * Model UserTodo
+ * 
+ */
+export type UserTodo = Prisma.UserTodoModel
+/**
+ * Model UserTodoTag
+ * 
+ */
+export type UserTodoTag = Prisma.UserTodoTagModel

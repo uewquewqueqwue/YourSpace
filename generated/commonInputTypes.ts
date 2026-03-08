@@ -219,6 +219,23 @@ export type EnumPatchCategoryWithAggregatesFilter<$PrismaModel = never> = {
   _max?: Prisma.NestedEnumPatchCategoryFilter<$PrismaModel>
 }
 
+export type EnumToDoPriorityFilter<$PrismaModel = never> = {
+  equals?: $Enums.ToDoPriority | Prisma.EnumToDoPriorityFieldRefInput<$PrismaModel>
+  in?: $Enums.ToDoPriority[] | Prisma.ListEnumToDoPriorityFieldRefInput<$PrismaModel>
+  notIn?: $Enums.ToDoPriority[] | Prisma.ListEnumToDoPriorityFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumToDoPriorityFilter<$PrismaModel> | $Enums.ToDoPriority
+}
+
+export type EnumToDoPriorityWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.ToDoPriority | Prisma.EnumToDoPriorityFieldRefInput<$PrismaModel>
+  in?: $Enums.ToDoPriority[] | Prisma.ListEnumToDoPriorityFieldRefInput<$PrismaModel>
+  notIn?: $Enums.ToDoPriority[] | Prisma.ListEnumToDoPriorityFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumToDoPriorityWithAggregatesFilter<$PrismaModel> | $Enums.ToDoPriority
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumToDoPriorityFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumToDoPriorityFilter<$PrismaModel>
+}
+
 export type NestedStringFilter<$PrismaModel = never> = {
   equals?: string | Prisma.StringFieldRefInput<$PrismaModel>
   in?: string[] | Prisma.ListStringFieldRefInput<$PrismaModel>
@@ -435,6 +452,23 @@ export type NestedEnumPatchCategoryWithAggregatesFilter<$PrismaModel = never> = 
   _count?: Prisma.NestedIntFilter<$PrismaModel>
   _min?: Prisma.NestedEnumPatchCategoryFilter<$PrismaModel>
   _max?: Prisma.NestedEnumPatchCategoryFilter<$PrismaModel>
+}
+
+export type NestedEnumToDoPriorityFilter<$PrismaModel = never> = {
+  equals?: $Enums.ToDoPriority | Prisma.EnumToDoPriorityFieldRefInput<$PrismaModel>
+  in?: $Enums.ToDoPriority[] | Prisma.ListEnumToDoPriorityFieldRefInput<$PrismaModel>
+  notIn?: $Enums.ToDoPriority[] | Prisma.ListEnumToDoPriorityFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumToDoPriorityFilter<$PrismaModel> | $Enums.ToDoPriority
+}
+
+export type NestedEnumToDoPriorityWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.ToDoPriority | Prisma.EnumToDoPriorityFieldRefInput<$PrismaModel>
+  in?: $Enums.ToDoPriority[] | Prisma.ListEnumToDoPriorityFieldRefInput<$PrismaModel>
+  notIn?: $Enums.ToDoPriority[] | Prisma.ListEnumToDoPriorityFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumToDoPriorityWithAggregatesFilter<$PrismaModel> | $Enums.ToDoPriority
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumToDoPriorityFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumToDoPriorityFilter<$PrismaModel>
 }
 
 

@@ -19,6 +19,7 @@
     </div>
 
     <div v-else-if="apps.length === 0" class="empty">
+      <LayoutGrid :size="32" />
       <p>No applications added yet</p>
       <button @click="$emit('add')">
         <Plus :size="16" />
@@ -45,7 +46,7 @@
             <button @click="editApp(app)" class="action-btn">
               <Edit :size="14" />
             </button>
-            <button @click="handleRemoveApp(app.id, app.displayName)" class="action-btn delete">
+            <button @click="handleRemoveApp(app)" class="action-btn delete">
               <Trash2 :size="14" />
             </button>
             <div v-if="app.isActive" class="running-indicator" title="Application is running">
@@ -77,14 +78,25 @@
       </div>
     </div>
   </section>
+
+  <ConfirmDialog
+    v-model="showConfirm"
+    :title="deleteTitle"
+    :message="deleteMessage"
+    type="danger"
+    confirm-text="Remove"
+    @confirm="handleDeleteConfirm"
+  />
 </template>
 
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted } from 'vue'
-import { Plus, Edit, Trash2, Clock, Calendar, Star, ChartCandlestick } from 'lucide-vue-next'
+import { Plus, Edit, Trash2, Clock, Calendar, Star, ChartCandlestick, LayoutGrid } from 'lucide-vue-next'
 import { useAppsStore } from '@/stores/apps'
 import { useToast } from '@/composables/useToast'
-import { safeFirstChar, safeDisplayName, safeString } from '@/utils/safe'
+import { safeFirstChar, safeDisplayName } from '@/utils/safe'
+import { useConfirmDelete } from '@/composables/useConfirmDelete'
+import ConfirmDialog from '@/components/common/ConfirmDialog.vue'
 
 const store = useAppsStore()
 const toast = useToast()
@@ -92,10 +104,16 @@ const currentTime = ref(Date.now())
 
 defineEmits(['add'])
 
-// Убираем .value при доступе к ref'ам из стора
 const { apps, loading, error, fetchApps, removeApp, launchApp } = store
 
 let timerInterval: NodeJS.Timeout
+const { 
+  showConfirm, 
+  confirmDelete, 
+  handleDeleteConfirm, 
+  deleteTitle, 
+  deleteMessage 
+} = useConfirmDelete((id) => removeApp(id))
 
 const formatPath = (path: string): string => {
   const parts = path.split('\\')
@@ -151,16 +169,8 @@ const formatDate = (date: Date | string): string => {
   return d.toLocaleDateString()
 }
 
-const handleRemoveApp = async (id: string, name: string) => {
-  const safeName = safeDisplayName(name)
-  if (confirm(`Are you sure you want to remove ${safeName}?`)) {
-    const success = await removeApp(id)
-    if (success) {
-      toast.success(`Removed ${safeName}`)
-    } else {
-      toast.error(`Failed to remove ${safeName}`)
-    }
-  }
+const handleRemoveApp = (app: any) => {
+  confirmDelete(app, `This will remove ${app.displayName} from your list`)
 }
 
 const handleLaunchApp = async (path: string, name: string) => {

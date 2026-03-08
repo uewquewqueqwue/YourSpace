@@ -23,6 +23,9 @@ model User {
   updatedAt DateTime @updatedAt
   
   apps      UserApp[]
+  todoFolders TodoFolder[]
+  todoTags    TodoTag[]
+  todoItems   UserTodo[]
 }
 
 model AppCatalog {
@@ -60,7 +63,7 @@ model UserApp {
 
 model AppVersion {
   id          String   @id @default(cuid())
-  version     String   @unique // например "1.0.1"
+  version     String   @unique
   releaseDate DateTime @default(now())
   isRequired  Boolean  @default(false)
   minVersion  String?
@@ -96,4 +99,81 @@ enum PatchCategory {
   PERFORMANCE
   SECURITY
   OTHER
+}
+
+// TODOLIST
+
+model TodoFolder {
+  id          String   @id @default(cuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  name        String
+  icon        String?
+  color       String?
+  position    Int
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  todos       UserTodo[]
+  
+  @@unique([userId, name])
+}
+
+model TodoTag {
+  id          String   @id @default(cuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  name        String
+  color       String?
+  position    Int
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  todos       UserTodoTag[]
+  
+  @@unique([userId, name])
+}
+
+model UserTodo {
+  id          String   @id @default(cuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  folderId    String?
+  folder      TodoFolder? @relation(fields: [folderId], references: [id], onDelete: SetNull)
+  
+  title       String
+  description String?
+  priority    ToDoPriority @default(MEDIUM)
+  dueDate     DateTime?
+  completed   Boolean  @default(false)
+  completedAt DateTime?
+  position    Int
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  tags        UserTodoTag[]
+}
+
+model UserTodoTag {
+  id        String   @id @default(cuid())
+  todoId    String
+  todo      UserTodo @relation(fields: [todoId], references: [id], onDelete: Cascade)
+  tagId     String
+  tag       TodoTag  @relation(fields: [tagId], references: [id], onDelete: Cascade)
+  
+  createdAt DateTime @default(now())
+
+  @@unique([todoId, tagId])
+}
+
+enum ToDoPriority {
+  LOW
+  MEDIUM
+  HIGH
 }

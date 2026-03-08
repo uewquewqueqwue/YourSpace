@@ -15,6 +15,15 @@ import type {
   CreateAppRequest,
   UpdateAppRequest
 } from './apps'
+import type {
+  CreateTodoRequest,
+  UserTodo,
+  UpdateTodoRequest,
+  TodoFolder,
+  CreateFolderRequest,
+  TodoTag,
+  CreateTagRequest
+} from "./todo"
 import type { AppVersion } from './versions'
 import type { MediaAPI } from './media'
 
@@ -65,6 +74,28 @@ export interface UpdaterAPI {
   installUpdate: () => void
 }
 
+export interface ToDoAPI {
+  getAll: (token: string) => Promise<UserTodo[]>
+  create: (token: string, data: CreateTodoRequest) => Promise<UserTodo>
+  update: (token: string, id: string, data: UpdateTodoRequest) => Promise<UserTodo>
+  delete: (token: string, id: string) => Promise<{ success: boolean }>
+  reorder: (token: string, items: { id: string; position: number }[]) => Promise<UserTodo[]>
+  
+  folders: {
+    getAll: (token: string) => Promise<TodoFolder[]>
+    create: (token: string, data: CreateFolderRequest) => Promise<TodoFolder>
+    update: (token: string, id: string, data: Partial<TodoFolder>) => Promise<TodoFolder>
+    delete: (token: string, id: string) => Promise<{ success: boolean }>
+  }
+  
+  tags: {
+    getAll: (token: string) => Promise<TodoTag[]>
+    create: (token: string, data: CreateTagRequest) => Promise<TodoTag>
+    update: (token: string, id: string, data: Partial<TodoTag>) => Promise<TodoTag>
+    delete: (token: string, id: string) => Promise<{ success: boolean }>
+  }
+}
+
 
 export interface ElectronAPI {
   window: WindowAPI
@@ -76,6 +107,8 @@ export interface ElectronAPI {
   media: MediaAPI
   
   db: DBApi
+
+  todos: ToDoAPI
 
   dialog: {
     showOpenDialog: (options: any) => Promise<any>

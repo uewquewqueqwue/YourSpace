@@ -6,7 +6,7 @@
 
       <div class="nav-item-wrapper">
         <div class="nav-item" :class="{ active: tab === 'apps' }" @click="setTab('apps')">
-          <Grid />
+          <LayoutGrid />
         </div>
         <span class="tooltip">Apps</span>
       </div>
@@ -76,7 +76,7 @@
 
 <script setup lang="ts">
 import { ref } from 'vue'
-import { Mailbox, Grid, Music, Image, Cpu, FileDiff, Settings, ListTodo } from 'lucide-vue-next'
+import { Mailbox, LayoutGrid, Music, Image, Cpu, FileDiff, Settings, ListTodo } from 'lucide-vue-next'
 import AuthModal from '@/components/common/auth/AuthModal.vue'
 import ProfilePopup from '@/components/views/ProfileView/ProfilePopup.vue';
 import MusicPopup from '@/components/views/MusicView/MusicPopup.vue';

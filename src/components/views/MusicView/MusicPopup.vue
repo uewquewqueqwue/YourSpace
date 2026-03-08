@@ -84,6 +84,7 @@ const track = ref<TrackInfo>({
 })
 
 const { isOpen, open, close } = useModal()
+let progressInterval: ReturnType<typeof setInterval> | null = null
 
 const waveformBars = [4,8,12,18,24,28,32,34,32,28,24,18,12,8,4,8,12,18,24,28,32,34,32,28,24,18,12,8,4]
 
@@ -107,9 +108,13 @@ const displayTitle = computed(() => {
 const updateTrack = (data: any) => {
   if (!data) return
   
+  const isNewTrack = track.value.title !== data.title
+  
   track.value = {
     ...data,
-    progress: data.duration ? data.position / data.duration : 0
+    position: isNewTrack ? 0 : data.position || 0,
+    progress: isNewTrack ? 0 : (data.position || 0) / (data.duration || 1),
+    duration: data.duration || 0
   }
 }
 
@@ -123,9 +128,17 @@ onMounted(() => {
   window.electronAPI.media.getTrack().then((data) => {
     updateTrack(data)
   })
+
+  progressInterval = setInterval(() => {
+    if (track.value.isPlaying && track.value.duration > 0) {
+      track.value.position = Math.min(track.value.position + 1, track.value.duration)
+      track.value.progress = track.value.position / track.value.duration
+    }
+  }, 1000)
 })
 
 onUnmounted(() => {
+  if (progressInterval) clearInterval(progressInterval)
   window.electronAPI.media.unsubscribe()
 })
 </script>

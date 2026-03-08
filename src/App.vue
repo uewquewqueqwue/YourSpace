@@ -31,6 +31,7 @@ import { usePatches } from '@/composables/usePatches'
 import { useSettings } from '@/composables/useSettings'
 import { useAuth } from '@/stores/auth'
 import { useAppsStore, initializeAppsStore } from '@/stores/apps'
+import { initializeTodoStore } from '@/stores/todo'
 import NavBar from '@/components/layout/NavBar.vue'
 import MainView from '@/components/views/MainView.vue'
 import RightPanel from '@/components/layout/RightPanel.vue'
@@ -74,6 +75,10 @@ onMounted(async () => {
   await auth.checkAuth()
 
   initializeAppsStore()
+  console.log('✅ Apps store initialized')
+  
+  initializeTodoStore()
+  console.log('✅ Todo store initialized')
 
   loaderRef.value?.finish()
   setTimeout(() => {

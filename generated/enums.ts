@@ -19,3 +19,12 @@ export const PatchCategory = {
 } as const
 
 export type PatchCategory = (typeof PatchCategory)[keyof typeof PatchCategory]
+
+
+export const ToDoPriority = {
+  LOW: 'LOW',
+  MEDIUM: 'MEDIUM',
+  HIGH: 'HIGH'
+} as const
+
+export type ToDoPriority = (typeof ToDoPriority)[keyof typeof ToDoPriority]

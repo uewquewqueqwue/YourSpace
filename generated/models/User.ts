@@ -199,6 +199,9 @@ export type UserWhereInput = {
   createdAt?: Prisma.DateTimeFilter<"User"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"User"> | Date | string
   apps?: Prisma.UserAppListRelationFilter
+  todoFolders?: Prisma.TodoFolderListRelationFilter
+  todoTags?: Prisma.TodoTagListRelationFilter
+  todoItems?: Prisma.UserTodoListRelationFilter
 }
 
 export type UserOrderByWithRelationInput = {
@@ -210,6 +213,9 @@ export type UserOrderByWithRelationInput = {
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   apps?: Prisma.UserAppOrderByRelationAggregateInput
+  todoFolders?: Prisma.TodoFolderOrderByRelationAggregateInput
+  todoTags?: Prisma.TodoTagOrderByRelationAggregateInput
+  todoItems?: Prisma.UserTodoOrderByRelationAggregateInput
 }
 
 export type UserWhereUniqueInput = Prisma.AtLeast<{
@@ -224,6 +230,9 @@ export type UserWhereUniqueInput = Prisma.AtLeast<{
   createdAt?: Prisma.DateTimeFilter<"User"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"User"> | Date | string
   apps?: Prisma.UserAppListRelationFilter
+  todoFolders?: Prisma.TodoFolderListRelationFilter
+  todoTags?: Prisma.TodoTagListRelationFilter
+  todoItems?: Prisma.UserTodoListRelationFilter
 }, "id" | "email">
 
 export type UserOrderByWithAggregationInput = {
@@ -261,6 +270,9 @@ export type UserCreateInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   apps?: Prisma.UserAppCreateNestedManyWithoutUserInput
+  todoFolders?: Prisma.TodoFolderCreateNestedManyWithoutUserInput
+  todoTags?: Prisma.TodoTagCreateNestedManyWithoutUserInput
+  todoItems?: Prisma.UserTodoCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateInput = {
@@ -272,6 +284,9 @@ export type UserUncheckedCreateInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   apps?: Prisma.UserAppUncheckedCreateNestedManyWithoutUserInput
+  todoFolders?: Prisma.TodoFolderUncheckedCreateNestedManyWithoutUserInput
+  todoTags?: Prisma.TodoTagUncheckedCreateNestedManyWithoutUserInput
+  todoItems?: Prisma.UserTodoUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserUpdateInput = {
@@ -283,6 +298,9 @@ export type UserUpdateInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   apps?: Prisma.UserAppUpdateManyWithoutUserNestedInput
+  todoFolders?: Prisma.TodoFolderUpdateManyWithoutUserNestedInput
+  todoTags?: Prisma.TodoTagUpdateManyWithoutUserNestedInput
+  todoItems?: Prisma.UserTodoUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateInput = {
@@ -294,6 +312,9 @@ export type UserUncheckedUpdateInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   apps?: Prisma.UserAppUncheckedUpdateManyWithoutUserNestedInput
+  todoFolders?: Prisma.TodoFolderUncheckedUpdateManyWithoutUserNestedInput
+  todoTags?: Prisma.TodoTagUncheckedUpdateManyWithoutUserNestedInput
+  todoItems?: Prisma.UserTodoUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateManyInput = {
@@ -387,6 +408,48 @@ export type UserUpdateOneRequiredWithoutAppsNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutAppsInput, Prisma.UserUpdateWithoutAppsInput>, Prisma.UserUncheckedUpdateWithoutAppsInput>
 }
 
+export type UserCreateNestedOneWithoutTodoFoldersInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutTodoFoldersInput, Prisma.UserUncheckedCreateWithoutTodoFoldersInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutTodoFoldersInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserUpdateOneRequiredWithoutTodoFoldersNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutTodoFoldersInput, Prisma.UserUncheckedCreateWithoutTodoFoldersInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutTodoFoldersInput
+  upsert?: Prisma.UserUpsertWithoutTodoFoldersInput
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutTodoFoldersInput, Prisma.UserUpdateWithoutTodoFoldersInput>, Prisma.UserUncheckedUpdateWithoutTodoFoldersInput>
+}
+
+export type UserCreateNestedOneWithoutTodoTagsInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutTodoTagsInput, Prisma.UserUncheckedCreateWithoutTodoTagsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutTodoTagsInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserUpdateOneRequiredWithoutTodoTagsNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutTodoTagsInput, Prisma.UserUncheckedCreateWithoutTodoTagsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutTodoTagsInput
+  upsert?: Prisma.UserUpsertWithoutTodoTagsInput
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutTodoTagsInput, Prisma.UserUpdateWithoutTodoTagsInput>, Prisma.UserUncheckedUpdateWithoutTodoTagsInput>
+}
+
+export type UserCreateNestedOneWithoutTodoItemsInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutTodoItemsInput, Prisma.UserUncheckedCreateWithoutTodoItemsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutTodoItemsInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserUpdateOneRequiredWithoutTodoItemsNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutTodoItemsInput, Prisma.UserUncheckedCreateWithoutTodoItemsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutTodoItemsInput
+  upsert?: Prisma.UserUpsertWithoutTodoItemsInput
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutTodoItemsInput, Prisma.UserUpdateWithoutTodoItemsInput>, Prisma.UserUncheckedUpdateWithoutTodoItemsInput>
+}
+
 export type UserCreateWithoutAppsInput = {
   id?: string
   email: string
@@ -395,6 +458,9 @@ export type UserCreateWithoutAppsInput = {
   avatar?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  todoFolders?: Prisma.TodoFolderCreateNestedManyWithoutUserInput
+  todoTags?: Prisma.TodoTagCreateNestedManyWithoutUserInput
+  todoItems?: Prisma.UserTodoCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutAppsInput = {
@@ -405,6 +471,9 @@ export type UserUncheckedCreateWithoutAppsInput = {
   avatar?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  todoFolders?: Prisma.TodoFolderUncheckedCreateNestedManyWithoutUserInput
+  todoTags?: Prisma.TodoTagUncheckedCreateNestedManyWithoutUserInput
+  todoItems?: Prisma.UserTodoUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutAppsInput = {
@@ -431,6 +500,9 @@ export type UserUpdateWithoutAppsInput = {
   avatar?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  todoFolders?: Prisma.TodoFolderUpdateManyWithoutUserNestedInput
+  todoTags?: Prisma.TodoTagUpdateManyWithoutUserNestedInput
+  todoItems?: Prisma.UserTodoUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutAppsInput = {
@@ -441,6 +513,213 @@ export type UserUncheckedUpdateWithoutAppsInput = {
   avatar?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  todoFolders?: Prisma.TodoFolderUncheckedUpdateManyWithoutUserNestedInput
+  todoTags?: Prisma.TodoTagUncheckedUpdateManyWithoutUserNestedInput
+  todoItems?: Prisma.UserTodoUncheckedUpdateManyWithoutUserNestedInput
+}
+
+export type UserCreateWithoutTodoFoldersInput = {
+  id?: string
+  email: string
+  name: string
+  password: string
+  avatar?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  apps?: Prisma.UserAppCreateNestedManyWithoutUserInput
+  todoTags?: Prisma.TodoTagCreateNestedManyWithoutUserInput
+  todoItems?: Prisma.UserTodoCreateNestedManyWithoutUserInput
+}
+
+export type UserUncheckedCreateWithoutTodoFoldersInput = {
+  id?: string
+  email: string
+  name: string
+  password: string
+  avatar?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  apps?: Prisma.UserAppUncheckedCreateNestedManyWithoutUserInput
+  todoTags?: Prisma.TodoTagUncheckedCreateNestedManyWithoutUserInput
+  todoItems?: Prisma.UserTodoUncheckedCreateNestedManyWithoutUserInput
+}
+
+export type UserCreateOrConnectWithoutTodoFoldersInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutTodoFoldersInput, Prisma.UserUncheckedCreateWithoutTodoFoldersInput>
+}
+
+export type UserUpsertWithoutTodoFoldersInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutTodoFoldersInput, Prisma.UserUncheckedUpdateWithoutTodoFoldersInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutTodoFoldersInput, Prisma.UserUncheckedCreateWithoutTodoFoldersInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutTodoFoldersInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutTodoFoldersInput, Prisma.UserUncheckedUpdateWithoutTodoFoldersInput>
+}
+
+export type UserUpdateWithoutTodoFoldersInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  password?: Prisma.StringFieldUpdateOperationsInput | string
+  avatar?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  apps?: Prisma.UserAppUpdateManyWithoutUserNestedInput
+  todoTags?: Prisma.TodoTagUpdateManyWithoutUserNestedInput
+  todoItems?: Prisma.UserTodoUpdateManyWithoutUserNestedInput
+}
+
+export type UserUncheckedUpdateWithoutTodoFoldersInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  password?: Prisma.StringFieldUpdateOperationsInput | string
+  avatar?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  apps?: Prisma.UserAppUncheckedUpdateManyWithoutUserNestedInput
+  todoTags?: Prisma.TodoTagUncheckedUpdateManyWithoutUserNestedInput
+  todoItems?: Prisma.UserTodoUncheckedUpdateManyWithoutUserNestedInput
+}
+
+export type UserCreateWithoutTodoTagsInput = {
+  id?: string
+  email: string
+  name: string
+  password: string
+  avatar?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  apps?: Prisma.UserAppCreateNestedManyWithoutUserInput
+  todoFolders?: Prisma.TodoFolderCreateNestedManyWithoutUserInput
+  todoItems?: Prisma.UserTodoCreateNestedManyWithoutUserInput
+}
+
+export type UserUncheckedCreateWithoutTodoTagsInput = {
+  id?: string
+  email: string
+  name: string
+  password: string
+  avatar?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  apps?: Prisma.UserAppUncheckedCreateNestedManyWithoutUserInput
+  todoFolders?: Prisma.TodoFolderUncheckedCreateNestedManyWithoutUserInput
+  todoItems?: Prisma.UserTodoUncheckedCreateNestedManyWithoutUserInput
+}
+
+export type UserCreateOrConnectWithoutTodoTagsInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutTodoTagsInput, Prisma.UserUncheckedCreateWithoutTodoTagsInput>
+}
+
+export type UserUpsertWithoutTodoTagsInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutTodoTagsInput, Prisma.UserUncheckedUpdateWithoutTodoTagsInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutTodoTagsInput, Prisma.UserUncheckedCreateWithoutTodoTagsInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutTodoTagsInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutTodoTagsInput, Prisma.UserUncheckedUpdateWithoutTodoTagsInput>
+}
+
+export type UserUpdateWithoutTodoTagsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  password?: Prisma.StringFieldUpdateOperationsInput | string
+  avatar?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  apps?: Prisma.UserAppUpdateManyWithoutUserNestedInput
+  todoFolders?: Prisma.TodoFolderUpdateManyWithoutUserNestedInput
+  todoItems?: Prisma.UserTodoUpdateManyWithoutUserNestedInput
+}
+
+export type UserUncheckedUpdateWithoutTodoTagsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  password?: Prisma.StringFieldUpdateOperationsInput | string
+  avatar?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  apps?: Prisma.UserAppUncheckedUpdateManyWithoutUserNestedInput
+  todoFolders?: Prisma.TodoFolderUncheckedUpdateManyWithoutUserNestedInput
+  todoItems?: Prisma.UserTodoUncheckedUpdateManyWithoutUserNestedInput
+}
+
+export type UserCreateWithoutTodoItemsInput = {
+  id?: string
+  email: string
+  name: string
+  password: string
+  avatar?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  apps?: Prisma.UserAppCreateNestedManyWithoutUserInput
+  todoFolders?: Prisma.TodoFolderCreateNestedManyWithoutUserInput
+  todoTags?: Prisma.TodoTagCreateNestedManyWithoutUserInput
+}
+
+export type UserUncheckedCreateWithoutTodoItemsInput = {
+  id?: string
+  email: string
+  name: string
+  password: string
+  avatar?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  apps?: Prisma.UserAppUncheckedCreateNestedManyWithoutUserInput
+  todoFolders?: Prisma.TodoFolderUncheckedCreateNestedManyWithoutUserInput
+  todoTags?: Prisma.TodoTagUncheckedCreateNestedManyWithoutUserInput
+}
+
+export type UserCreateOrConnectWithoutTodoItemsInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutTodoItemsInput, Prisma.UserUncheckedCreateWithoutTodoItemsInput>
+}
+
+export type UserUpsertWithoutTodoItemsInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutTodoItemsInput, Prisma.UserUncheckedUpdateWithoutTodoItemsInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutTodoItemsInput, Prisma.UserUncheckedCreateWithoutTodoItemsInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutTodoItemsInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutTodoItemsInput, Prisma.UserUncheckedUpdateWithoutTodoItemsInput>
+}
+
+export type UserUpdateWithoutTodoItemsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  password?: Prisma.StringFieldUpdateOperationsInput | string
+  avatar?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  apps?: Prisma.UserAppUpdateManyWithoutUserNestedInput
+  todoFolders?: Prisma.TodoFolderUpdateManyWithoutUserNestedInput
+  todoTags?: Prisma.TodoTagUpdateManyWithoutUserNestedInput
+}
+
+export type UserUncheckedUpdateWithoutTodoItemsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  password?: Prisma.StringFieldUpdateOperationsInput | string
+  avatar?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  apps?: Prisma.UserAppUncheckedUpdateManyWithoutUserNestedInput
+  todoFolders?: Prisma.TodoFolderUncheckedUpdateManyWithoutUserNestedInput
+  todoTags?: Prisma.TodoTagUncheckedUpdateManyWithoutUserNestedInput
 }
 
 
@@ -450,10 +729,16 @@ export type UserUncheckedUpdateWithoutAppsInput = {
 
 export type UserCountOutputType = {
   apps: number
+  todoFolders: number
+  todoTags: number
+  todoItems: number
 }
 
 export type UserCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   apps?: boolean | UserCountOutputTypeCountAppsArgs
+  todoFolders?: boolean | UserCountOutputTypeCountTodoFoldersArgs
+  todoTags?: boolean | UserCountOutputTypeCountTodoTagsArgs
+  todoItems?: boolean | UserCountOutputTypeCountTodoItemsArgs
 }
 
 /**
@@ -473,6 +758,27 @@ export type UserCountOutputTypeCountAppsArgs<ExtArgs extends runtime.Types.Exten
   where?: Prisma.UserAppWhereInput
 }
 
+/**
+ * UserCountOutputType without action
+ */
+export type UserCountOutputTypeCountTodoFoldersArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.TodoFolderWhereInput
+}
+
+/**
+ * UserCountOutputType without action
+ */
+export type UserCountOutputTypeCountTodoTagsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.TodoTagWhereInput
+}
+
+/**
+ * UserCountOutputType without action
+ */
+export type UserCountOutputTypeCountTodoItemsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.UserTodoWhereInput
+}
+
 
 export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -483,6 +789,9 @@ export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   createdAt?: boolean
   updatedAt?: boolean
   apps?: boolean | Prisma.User$appsArgs<ExtArgs>
+  todoFolders?: boolean | Prisma.User$todoFoldersArgs<ExtArgs>
+  todoTags?: boolean | Prisma.User$todoTagsArgs<ExtArgs>
+  todoItems?: boolean | Prisma.User$todoItemsArgs<ExtArgs>
   _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["user"]>
 
@@ -519,6 +828,9 @@ export type UserSelectScalar = {
 export type UserOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "email" | "name" | "password" | "avatar" | "createdAt" | "updatedAt", ExtArgs["result"]["user"]>
 export type UserInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   apps?: boolean | Prisma.User$appsArgs<ExtArgs>
+  todoFolders?: boolean | Prisma.User$todoFoldersArgs<ExtArgs>
+  todoTags?: boolean | Prisma.User$todoTagsArgs<ExtArgs>
+  todoItems?: boolean | Prisma.User$todoItemsArgs<ExtArgs>
   _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type UserIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
@@ -528,6 +840,9 @@ export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
   name: "User"
   objects: {
     apps: Prisma.$UserAppPayload<ExtArgs>[]
+    todoFolders: Prisma.$TodoFolderPayload<ExtArgs>[]
+    todoTags: Prisma.$TodoTagPayload<ExtArgs>[]
+    todoItems: Prisma.$UserTodoPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -932,6 +1247,9 @@ readonly fields: UserFieldRefs;
 export interface Prisma__UserClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
   apps<T extends Prisma.User$appsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$appsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$UserAppPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  todoFolders<T extends Prisma.User$todoFoldersArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$todoFoldersArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$TodoFolderPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  todoTags<T extends Prisma.User$todoTagsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$todoTagsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$TodoTagPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  todoItems<T extends Prisma.User$todoItemsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$todoItemsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$UserTodoPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1377,6 +1695,78 @@ export type User$appsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs 
   take?: number
   skip?: number
   distinct?: Prisma.UserAppScalarFieldEnum | Prisma.UserAppScalarFieldEnum[]
+}
+
+/**
+ * User.todoFolders
+ */
+export type User$todoFoldersArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the TodoFolder
+   */
+  select?: Prisma.TodoFolderSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the TodoFolder
+   */
+  omit?: Prisma.TodoFolderOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.TodoFolderInclude<ExtArgs> | null
+  where?: Prisma.TodoFolderWhereInput
+  orderBy?: Prisma.TodoFolderOrderByWithRelationInput | Prisma.TodoFolderOrderByWithRelationInput[]
+  cursor?: Prisma.TodoFolderWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.TodoFolderScalarFieldEnum | Prisma.TodoFolderScalarFieldEnum[]
+}
+
+/**
+ * User.todoTags
+ */
+export type User$todoTagsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the TodoTag
+   */
+  select?: Prisma.TodoTagSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the TodoTag
+   */
+  omit?: Prisma.TodoTagOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.TodoTagInclude<ExtArgs> | null
+  where?: Prisma.TodoTagWhereInput
+  orderBy?: Prisma.TodoTagOrderByWithRelationInput | Prisma.TodoTagOrderByWithRelationInput[]
+  cursor?: Prisma.TodoTagWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.TodoTagScalarFieldEnum | Prisma.TodoTagScalarFieldEnum[]
+}
+
+/**
+ * User.todoItems
+ */
+export type User$todoItemsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the UserTodo
+   */
+  select?: Prisma.UserTodoSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the UserTodo
+   */
+  omit?: Prisma.UserTodoOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.UserTodoInclude<ExtArgs> | null
+  where?: Prisma.UserTodoWhereInput
+  orderBy?: Prisma.UserTodoOrderByWithRelationInput | Prisma.UserTodoOrderByWithRelationInput[]
+  cursor?: Prisma.UserTodoWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.UserTodoScalarFieldEnum | Prisma.UserTodoScalarFieldEnum[]
 }
 
 /**

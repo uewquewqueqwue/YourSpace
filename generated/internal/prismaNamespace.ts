@@ -388,7 +388,11 @@ export const ModelName = {
   AppCatalog: 'AppCatalog',
   UserApp: 'UserApp',
   AppVersion: 'AppVersion',
-  PatchNote: 'PatchNote'
+  PatchNote: 'PatchNote',
+  TodoFolder: 'TodoFolder',
+  TodoTag: 'TodoTag',
+  UserTodo: 'UserTodo',
+  UserTodoTag: 'UserTodoTag'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -404,7 +408,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "user" | "appCatalog" | "userApp" | "appVersion" | "patchNote"
+    modelProps: "user" | "appCatalog" | "userApp" | "appVersion" | "patchNote" | "todoFolder" | "todoTag" | "userTodo" | "userTodoTag"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -778,6 +782,302 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    TodoFolder: {
+      payload: Prisma.$TodoFolderPayload<ExtArgs>
+      fields: Prisma.TodoFolderFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.TodoFolderFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TodoFolderPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.TodoFolderFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TodoFolderPayload>
+        }
+        findFirst: {
+          args: Prisma.TodoFolderFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TodoFolderPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.TodoFolderFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TodoFolderPayload>
+        }
+        findMany: {
+          args: Prisma.TodoFolderFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TodoFolderPayload>[]
+        }
+        create: {
+          args: Prisma.TodoFolderCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TodoFolderPayload>
+        }
+        createMany: {
+          args: Prisma.TodoFolderCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.TodoFolderCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TodoFolderPayload>[]
+        }
+        delete: {
+          args: Prisma.TodoFolderDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TodoFolderPayload>
+        }
+        update: {
+          args: Prisma.TodoFolderUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TodoFolderPayload>
+        }
+        deleteMany: {
+          args: Prisma.TodoFolderDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.TodoFolderUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.TodoFolderUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TodoFolderPayload>[]
+        }
+        upsert: {
+          args: Prisma.TodoFolderUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TodoFolderPayload>
+        }
+        aggregate: {
+          args: Prisma.TodoFolderAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateTodoFolder>
+        }
+        groupBy: {
+          args: Prisma.TodoFolderGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.TodoFolderGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.TodoFolderCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.TodoFolderCountAggregateOutputType> | number
+        }
+      }
+    }
+    TodoTag: {
+      payload: Prisma.$TodoTagPayload<ExtArgs>
+      fields: Prisma.TodoTagFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.TodoTagFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TodoTagPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.TodoTagFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TodoTagPayload>
+        }
+        findFirst: {
+          args: Prisma.TodoTagFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TodoTagPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.TodoTagFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TodoTagPayload>
+        }
+        findMany: {
+          args: Prisma.TodoTagFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TodoTagPayload>[]
+        }
+        create: {
+          args: Prisma.TodoTagCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TodoTagPayload>
+        }
+        createMany: {
+          args: Prisma.TodoTagCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.TodoTagCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TodoTagPayload>[]
+        }
+        delete: {
+          args: Prisma.TodoTagDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TodoTagPayload>
+        }
+        update: {
+          args: Prisma.TodoTagUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TodoTagPayload>
+        }
+        deleteMany: {
+          args: Prisma.TodoTagDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.TodoTagUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.TodoTagUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TodoTagPayload>[]
+        }
+        upsert: {
+          args: Prisma.TodoTagUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TodoTagPayload>
+        }
+        aggregate: {
+          args: Prisma.TodoTagAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateTodoTag>
+        }
+        groupBy: {
+          args: Prisma.TodoTagGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.TodoTagGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.TodoTagCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.TodoTagCountAggregateOutputType> | number
+        }
+      }
+    }
+    UserTodo: {
+      payload: Prisma.$UserTodoPayload<ExtArgs>
+      fields: Prisma.UserTodoFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.UserTodoFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UserTodoPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.UserTodoFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UserTodoPayload>
+        }
+        findFirst: {
+          args: Prisma.UserTodoFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UserTodoPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.UserTodoFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UserTodoPayload>
+        }
+        findMany: {
+          args: Prisma.UserTodoFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UserTodoPayload>[]
+        }
+        create: {
+          args: Prisma.UserTodoCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UserTodoPayload>
+        }
+        createMany: {
+          args: Prisma.UserTodoCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.UserTodoCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UserTodoPayload>[]
+        }
+        delete: {
+          args: Prisma.UserTodoDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UserTodoPayload>
+        }
+        update: {
+          args: Prisma.UserTodoUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UserTodoPayload>
+        }
+        deleteMany: {
+          args: Prisma.UserTodoDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.UserTodoUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.UserTodoUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UserTodoPayload>[]
+        }
+        upsert: {
+          args: Prisma.UserTodoUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UserTodoPayload>
+        }
+        aggregate: {
+          args: Prisma.UserTodoAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateUserTodo>
+        }
+        groupBy: {
+          args: Prisma.UserTodoGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.UserTodoGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.UserTodoCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.UserTodoCountAggregateOutputType> | number
+        }
+      }
+    }
+    UserTodoTag: {
+      payload: Prisma.$UserTodoTagPayload<ExtArgs>
+      fields: Prisma.UserTodoTagFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.UserTodoTagFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UserTodoTagPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.UserTodoTagFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UserTodoTagPayload>
+        }
+        findFirst: {
+          args: Prisma.UserTodoTagFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UserTodoTagPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.UserTodoTagFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UserTodoTagPayload>
+        }
+        findMany: {
+          args: Prisma.UserTodoTagFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UserTodoTagPayload>[]
+        }
+        create: {
+          args: Prisma.UserTodoTagCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UserTodoTagPayload>
+        }
+        createMany: {
+          args: Prisma.UserTodoTagCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.UserTodoTagCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UserTodoTagPayload>[]
+        }
+        delete: {
+          args: Prisma.UserTodoTagDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UserTodoTagPayload>
+        }
+        update: {
+          args: Prisma.UserTodoTagUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UserTodoTagPayload>
+        }
+        deleteMany: {
+          args: Prisma.UserTodoTagDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.UserTodoTagUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.UserTodoTagUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UserTodoTagPayload>[]
+        }
+        upsert: {
+          args: Prisma.UserTodoTagUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UserTodoTagPayload>
+        }
+        aggregate: {
+          args: Prisma.UserTodoTagAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateUserTodoTag>
+        }
+        groupBy: {
+          args: Prisma.UserTodoTagGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.UserTodoTagGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.UserTodoTagCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.UserTodoTagCountAggregateOutputType> | number
+        }
+      }
+    }
   }
 } & {
   other: {
@@ -890,6 +1190,61 @@ export const PatchNoteScalarFieldEnum = {
 export type PatchNoteScalarFieldEnum = (typeof PatchNoteScalarFieldEnum)[keyof typeof PatchNoteScalarFieldEnum]
 
 
+export const TodoFolderScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  name: 'name',
+  icon: 'icon',
+  color: 'color',
+  position: 'position',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type TodoFolderScalarFieldEnum = (typeof TodoFolderScalarFieldEnum)[keyof typeof TodoFolderScalarFieldEnum]
+
+
+export const TodoTagScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  name: 'name',
+  color: 'color',
+  position: 'position',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type TodoTagScalarFieldEnum = (typeof TodoTagScalarFieldEnum)[keyof typeof TodoTagScalarFieldEnum]
+
+
+export const UserTodoScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  folderId: 'folderId',
+  title: 'title',
+  description: 'description',
+  priority: 'priority',
+  dueDate: 'dueDate',
+  completed: 'completed',
+  completedAt: 'completedAt',
+  position: 'position',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type UserTodoScalarFieldEnum = (typeof UserTodoScalarFieldEnum)[keyof typeof UserTodoScalarFieldEnum]
+
+
+export const UserTodoTagScalarFieldEnum = {
+  id: 'id',
+  todoId: 'todoId',
+  tagId: 'tagId',
+  createdAt: 'createdAt'
+} as const
+
+export type UserTodoTagScalarFieldEnum = (typeof UserTodoTagScalarFieldEnum)[keyof typeof UserTodoTagScalarFieldEnum]
+
+
 export const SortOrder = {
   asc: 'asc',
   desc: 'desc'
@@ -980,6 +1335,20 @@ export type EnumPatchCategoryFieldRefInput<$PrismaModel> = FieldRefInputType<$Pr
  * Reference to a field of type 'PatchCategory[]'
  */
 export type ListEnumPatchCategoryFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'PatchCategory[]'>
+    
+
+
+/**
+ * Reference to a field of type 'ToDoPriority'
+ */
+export type EnumToDoPriorityFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'ToDoPriority'>
+    
+
+
+/**
+ * Reference to a field of type 'ToDoPriority[]'
+ */
+export type ListEnumToDoPriorityFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'ToDoPriority[]'>
     
 
 
@@ -1096,6 +1465,10 @@ export type GlobalOmitConfig = {
   userApp?: Prisma.UserAppOmit
   appVersion?: Prisma.AppVersionOmit
   patchNote?: Prisma.PatchNoteOmit
+  todoFolder?: Prisma.TodoFolderOmit
+  todoTag?: Prisma.TodoTagOmit
+  userTodo?: Prisma.UserTodoOmit
+  userTodoTag?: Prisma.UserTodoTagOmit
 }
 
 /* Types for Logging */

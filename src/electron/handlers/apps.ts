@@ -5,21 +5,34 @@ import fs from 'fs/promises'
 import path from 'path'
 import { parseWmicLine, isSystemProcess } from '../utils/processHelpers'
 import type { ProcessInfo, LaunchResult, GetAppsOptions } from '@/types/apps'
+import { writeDebug } from '../preload-env'
 
 const execAsync = promisify(exec)
+
 
 async function getUniqueProcesses(): Promise<ProcessInfo[]> {
   try {
     const { stdout } = await execAsync('wmic process get Caption,ExecutablePath,ProcessId /format:csv')
-
+    
+    writeDebug(`WMIC output sample: ${stdout.substring(0, 500)}`)
+    
     const lines = stdout.split('\n')
       .filter(line => line.trim())
       .slice(1)
 
+    writeDebug(`Raw lines: ${lines.slice(0, 5)}`)
+
     const allProcesses = lines
-      .map(line => parseWmicLine(line))
+      .map(line => {
+        const parsed = parseWmicLine(line)
+        if (!parsed) writeDebug(`Failed to parse line: ${line}`)
+        return parsed
+      })
       .filter((p): p is ProcessInfo => p !== null)
       .filter(p => !isSystemProcess(p))
+
+    writeDebug(`Parsed processes count: ${allProcesses.length}`)
+    writeDebug(`First 5 parsed: ${allProcesses.slice(0, 5)}`)
 
     const seen = new Map<string, ProcessInfo>()
 

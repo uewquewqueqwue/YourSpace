@@ -55,7 +55,11 @@ export const ModelName = {
   AppCatalog: 'AppCatalog',
   UserApp: 'UserApp',
   AppVersion: 'AppVersion',
-  PatchNote: 'PatchNote'
+  PatchNote: 'PatchNote',
+  TodoFolder: 'TodoFolder',
+  TodoTag: 'TodoTag',
+  UserTodo: 'UserTodo',
+  UserTodoTag: 'UserTodoTag'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -145,6 +149,61 @@ export const PatchNoteScalarFieldEnum = {
 } as const
 
 export type PatchNoteScalarFieldEnum = (typeof PatchNoteScalarFieldEnum)[keyof typeof PatchNoteScalarFieldEnum]
+
+
+export const TodoFolderScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  name: 'name',
+  icon: 'icon',
+  color: 'color',
+  position: 'position',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type TodoFolderScalarFieldEnum = (typeof TodoFolderScalarFieldEnum)[keyof typeof TodoFolderScalarFieldEnum]
+
+
+export const TodoTagScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  name: 'name',
+  color: 'color',
+  position: 'position',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type TodoTagScalarFieldEnum = (typeof TodoTagScalarFieldEnum)[keyof typeof TodoTagScalarFieldEnum]
+
+
+export const UserTodoScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  folderId: 'folderId',
+  title: 'title',
+  description: 'description',
+  priority: 'priority',
+  dueDate: 'dueDate',
+  completed: 'completed',
+  completedAt: 'completedAt',
+  position: 'position',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type UserTodoScalarFieldEnum = (typeof UserTodoScalarFieldEnum)[keyof typeof UserTodoScalarFieldEnum]
+
+
+export const UserTodoTagScalarFieldEnum = {
+  id: 'id',
+  todoId: 'todoId',
+  tagId: 'tagId',
+  createdAt: 'createdAt'
+} as const
+
+export type UserTodoTagScalarFieldEnum = (typeof UserTodoTagScalarFieldEnum)[keyof typeof UserTodoTagScalarFieldEnum]
 
 
 export const SortOrder = {
