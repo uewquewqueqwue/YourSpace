@@ -2,6 +2,7 @@ import { ref } from 'vue'
 import type { UserAppWithDisplay, CreateAppInput, AppSession } from '@/types/apps'
 import type { AppsStore } from '@/types'
 import { generateColor } from '@/utils/generateColor'
+import { safeDisplayName } from '@/utils/safe'
 
 const apps = ref<UserAppWithDisplay[]>([])
 const quickApps = ref<UserAppWithDisplay[]>([])
@@ -328,7 +329,7 @@ export function useAppsStore(): AppsStore {
       createdAt: new Date(),
       updatedAt: new Date(),
       catalog,
-      displayName: input.customName || catalog.displayName || catalog.name,
+      displayName: safeDisplayName(input.customName || catalog.displayName || catalog.name),
       displayColor: input.customColor || catalog.color,
       isActive: false,
       currentSession: null,

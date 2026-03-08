@@ -18,7 +18,7 @@
       >
         <div class="icon-container">
           <div class="icon-fallback" :style="{ background: generateColor(proc.displayName) + '20' }">
-            <span>{{ proc.displayName[0].toUpperCase() }}</span>
+            <span>{{ safeFirstChar(proc.displayName) }}</span>
           </div>
         </div>
         <span class="name">{{ proc.displayName }}</span>
@@ -43,6 +43,7 @@ import { ref, computed, onMounted } from 'vue'
 import { Plus, Sparkle } from 'lucide-vue-next'
 import type { ProcessInfo } from '@/types/apps'
 import { generateColor } from '@/utils/generateColor'
+import { safeFirstChar } from '@/utils/safe'
 
 const emit = defineEmits<{ (e: 'select', appData: { path: string; displayName: string }): void }>()
 

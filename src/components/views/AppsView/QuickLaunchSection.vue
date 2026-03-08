@@ -16,7 +16,7 @@
               :alt="app.displayName"
               class="app-icon"
             >
-            <span v-else>{{ app.displayName[0].toUpperCase() }}</span>
+            <span v-else>{{ safeFirstChar(app.displayName) }}</span>
           </div>
           <span class="name" :title="app.displayName">{{ formatName(app.displayName) }}</span>
         </button>
@@ -33,6 +33,7 @@
 import { X } from 'lucide-vue-next'
 import { useAppsStore } from '@/stores/apps'
 import { useToast } from '@/composables/useToast'
+import { safeFirstChar } from '@/utils/safe'
 
 const store = useAppsStore()
 const toast = useToast()

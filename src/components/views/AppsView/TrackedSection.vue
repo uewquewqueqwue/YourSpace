@@ -36,7 +36,7 @@
               :alt="app.displayName"
               class="app-icon"
             >
-            <span v-else>{{ app.displayName[0].toUpperCase() }}</span>
+            <span v-else>{{ safeFirstChar(app.displayName) }}</span>
           </div>
           <div class="actions">
             <button v-if="!store.isInQuick(app.id)" @click="addToQuick(app.id)" class="action-btn quick" title="Add to quick launch">
@@ -84,6 +84,7 @@ import { ref, onMounted, onUnmounted } from 'vue'
 import { Plus, Edit, Trash2, Clock, Calendar, Star, ChartCandlestick } from 'lucide-vue-next'
 import { useAppsStore } from '@/stores/apps'
 import { useToast } from '@/composables/useToast'
+import { safeFirstChar } from '@/utils/safe'
 
 const store = useAppsStore()
 const toast = useToast()
