@@ -2,12 +2,7 @@
   <div class="settings-view">
     <div class="header">
       <h1>Settings</h1>
-      <button 
-        v-if="hasChanges" 
-        class="save-btn" 
-        @click="saveSettings" 
-        :disabled="isSaving"
-      >
+      <button v-if="hasChanges" class="save-btn" @click="saveSettings" :disabled="isSaving">
         <Save :size="16" />
         {{ isSaving ? 'Saving...' : 'Save changes' }}
       </button>
@@ -134,33 +129,83 @@
                 </div>
               </div>
             </div>
-            <button class="info-btn" @click.stop="auth.openLogin" >
+            <button class="info-btn" @click.stop="auth.openLogin">
               <LogIn :size="16" />
               Login
             </button>
           </template>
+
         </div>
+
+        <div v-else-if="activeSection === 'system'" class="settings-section">
+          <h2>System</h2>
+
+          <div class="setting-group">
+            <div class="setting-item">
+              <div class="setting-info">
+                <h3>Check for Updates</h3>
+                <p>Manually check if new version is available</p>
+              </div>
+              <button class="update-btn" @click="checkForUpdates" :disabled="isChecking">
+                <RefreshCw :size="16" :class="{ spinning: isChecking }" />
+                {{ isChecking ? 'Checking...' : 'Check' }}
+              </button>
+            </div>
+
+            <div class="setting-item" v-if="updateInfo">
+              <div class="setting-info">
+                <h3>Update Available v{{ updateInfo.version }}</h3>
+                <p>New version is ready to download</p>
+                <div v-if="isDownloading" class="download-progress">
+                  <div class="progress-bar" :style="{ width: downloadProgress + '%' }" />
+                  <span>{{ Math.round(downloadProgress) }}%</span>
+                </div>
+              </div>
+              <button class="download-btn" @click="startDownload" :disabled="isDownloading">
+                <Download :size="16" />
+                {{ isDownloading ? 'Downloading...' : 'Download Now' }}
+              </button>
+            </div>
+
+            <div class="setting-item" v-else>
+              <div class="setting-info">
+                <h3>Current Version</h3>
+                <p>You are using version {{ currentVersion }}</p>
+              </div>
+              <div class="version-badge">{{ currentVersion }}</div>
+            </div>
+
+          </div>
+        </div>
+
       </div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, watch } from 'vue'
+import { ref, watch, onMounted } from 'vue'
 import {
   User, Bell, Moon, Sun, Lock, Palette,
-  Monitor, LogOut, LogIn,
-  ChevronRight, Save
+  Monitor, LogOut, LogIn, RefreshCw,
+  ChevronRight, Save, Download
 } from 'lucide-vue-next'
 import { useAuth } from '@/stores/auth'
 import { useSettings } from '@/composables/useSettings'
 import { useToast } from '@/composables/useToast'
+import { version } from '../../../../package.json'
 
 const { settings } = useSettings()
 const isSaving = ref(false)
 const activeSection = ref('appearance')
 const auth = useAuth()
 const toast = useToast()
+
+const currentVersion = ref(version)
+const isChecking = ref(false)
+const isDownloading = ref(false)
+const updateInfo = ref<any>(null)
+const downloadProgress = ref(0)
 
 const originalSettings = ref(JSON.parse(JSON.stringify(settings.value)))
 const hasChanges = ref(false)
@@ -172,18 +217,48 @@ watch(settings, () => {
 const saveSettings = async () => {
   isSaving.value = true
   await new Promise(r => setTimeout(r, 500))
-  
+
   originalSettings.value = JSON.parse(JSON.stringify(settings.value))
   hasChanges.value = false
-  
+
   toast.success("Settings saved successfully")
   isSaving.value = false
 }
 
+const checkForUpdates = () => {
+  isChecking.value = true
+  window.electronAPI?.updater.checkForUpdates()
+  setTimeout(() => isChecking.value = false, 2000)
+}
+
+const startDownload = () => {
+  isDownloading.value = true
+  window.electronAPI?.updater.downloadUpdate()
+}
+
+const onProgress = (progress: any) => {
+  downloadProgress.value = progress.percent
+  if (progress.percent >= 100) {
+    setTimeout(() => {
+      isDownloading.value = false
+      downloadProgress.value = 0
+    }, 1000)
+  }
+}
 const handleLogout = () => {
   auth.logout()
   toast.success('Logged out successfully')
 }
+
+onMounted(() => {
+  window.electronAPI?.updater.onUpdateAvailable((info) => {
+    updateInfo.value = info
+  })
+  
+  window.electronAPI?.updater.onUpdateNotAvailable(() => {
+    updateInfo.value = null
+  })
+})
 </script>
 
 <style lang="scss" scoped>
@@ -193,7 +268,7 @@ const handleLogout = () => {
   height: 100%;
   display: flex;
   flex-direction: column;
-  
+
   @include themify() {
     background: themed('bg-content');
   }
@@ -205,10 +280,10 @@ const handleLogout = () => {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  
+
   @include themify() {
     border-bottom-color: themed('border-color');
-    
+
     h1 {
       font-size: 20px;
       font-weight: 500;
@@ -225,7 +300,7 @@ const handleLogout = () => {
     gap: 8px;
     cursor: pointer;
     font-size: 13px;
-    
+
     @include themify() {
       background: themed('brand-primary');
       color: white;
@@ -244,6 +319,102 @@ const handleLogout = () => {
   overflow: hidden;
 }
 
+.update-btn,
+.download-btn {
+  padding: 8px 16px;
+  border: none;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  font-size: 13px;
+}
+
+.update-btn {
+  @include themify() {
+    background: themed('bg-content');
+    color: themed('text-primary');
+    border: 1px solid themed('border-color');
+
+    &:hover:not(:disabled) {
+      border-color: themed('brand-primary');
+    }
+  }
+}
+
+.download-btn {
+  @include themify() {
+    background: themed('brand-primary');
+    color: white;
+
+    &:hover:not(:disabled) {
+      opacity: 0.9;
+    }
+  }
+}
+
+.update-btn:disabled,
+.download-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.download-progress {
+  margin-top: 8px;
+  height: 4px;
+  width: 200px;
+  background: #333;
+  border-radius: 2px;
+  position: relative;
+}
+
+.progress-bar {
+  height: 100%;
+
+  @include themify() {
+    background: themed("brand-primary");
+  }
+
+  border-radius: 2px;
+  transition: width .3s ease;
+}
+
+.download-progress span {
+  position: absolute;
+  right: 0;
+  top: -18px;
+  font-size: 11px;
+  color: #aaa;
+}
+
+.spinning {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.version-badge {
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 500;
+
+  @include themify() {
+    background: themed('bg-content');
+    color: themed('text-secondary');
+    border: 1px solid themed('border-color');
+  }
+}
+
 .settings-nav {
   width: 240px;
   display: flex;
@@ -251,7 +422,7 @@ const handleLogout = () => {
   gap: 5px;
   border-right: 1px solid;
   padding: 16px 8px;
-  
+
   @include themify() {
     background: themed('bg-content');
     border-right-color: themed('border-color');
@@ -265,15 +436,15 @@ const handleLogout = () => {
     cursor: pointer;
     transition: .2s;
     border-radius: 9px;
-    
+
     @include themify() {
       color: themed('text-secondary');
-      
+
       &:hover {
         background: themed('nav-bar-tab');
         color: themed('text-primary');
       }
-  
+
       &.active {
         background: themed('nav-bar-tab');
         color: white;
@@ -298,7 +469,7 @@ const handleLogout = () => {
     font-size: 18px;
     font-weight: 500;
     margin-bottom: 24px;
-    
+
     @include themify() {
       color: themed('text-primary');
     }
@@ -309,7 +480,7 @@ const handleLogout = () => {
   border-radius: $radius-lg;
   border: 1px solid;
   overflow: hidden;
-  
+
   @include themify() {
     background: themed('bg-card');
     border-color: themed('border-color');
@@ -322,7 +493,7 @@ const handleLogout = () => {
   align-items: center;
   justify-content: space-between;
   border-bottom: 1px solid;
-  
+
   @include themify() {
     border-bottom-color: themed('border-light-color');
   }
@@ -336,7 +507,7 @@ const handleLogout = () => {
       font-size: 14px;
       font-weight: 500;
       margin-bottom: 4px;
-      
+
       @include themify() {
         color: themed('text-primary');
       }
@@ -344,7 +515,7 @@ const handleLogout = () => {
 
     p {
       font-size: 12px;
-      
+
       @include themify() {
         color: themed('text-secondary');
       }
@@ -365,12 +536,12 @@ const handleLogout = () => {
     align-items: center;
     gap: 6px;
     font-size: 12px;
-    
+
     @include themify() {
       background: themed('bg-nav');
       border-color: themed('border-color');
       color: themed('text-secondary');
-  
+
       &.active {
         background: themed('brand-primary');
         color: white;
@@ -402,7 +573,7 @@ const handleLogout = () => {
     bottom: 0;
     transition: 0.2s;
     border-radius: 24px;
-    
+
     @include themify() {
       background-color: themed('brand-dark');
     }
@@ -420,13 +591,13 @@ const handleLogout = () => {
     }
   }
 
-  input:checked + .switch-slider {
+  input:checked+.switch-slider {
     @include themify() {
       background-color: themed('brand-primary');
     }
   }
 
-  input:checked + .switch-slider:before {
+  input:checked+.switch-slider:before {
     transform: translateX(20px);
   }
 }
@@ -436,7 +607,7 @@ const handleLogout = () => {
   border: 1px solid;
   padding: 20px;
   margin-bottom: 24px;
-  
+
   @include themify() {
     background: themed('bg-card');
     border-color: themed('border-color');
@@ -451,7 +622,7 @@ const handleLogout = () => {
       display: flex;
       align-items: center;
       justify-content: center;
-      
+
       & img {
         width: 64px;
         height: 64px;

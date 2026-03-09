@@ -2,64 +2,70 @@ import { ipcMain } from 'electron'
 import { exec, spawn } from 'child_process'
 import { promisify } from 'util'
 import fs from 'fs/promises'
-import path from 'path'
-import { parseWmicLine, isSystemProcess } from '../utils/processHelpers'
+import { isSystemProcess } from '../utils/processHelpers'
 import type { ProcessInfo, LaunchResult, GetAppsOptions } from '@/types/apps'
 import { writeDebug } from '../preload-env'
 
 const execAsync = promisify(exec)
 
 
+let processesCache: ProcessInfo[] = []
+
 async function getUniqueProcesses(): Promise<ProcessInfo[]> {
+  writeDebug("get Apps called")
   try {
-    const { stdout } = await execAsync('wmic process get Caption,ExecutablePath,ProcessId /format:csv')
+    const psCommand = `
+      Get-Process | 
+      Where-Object { $_.Path } |
+      Select-Object Name, Path, Id |
+      ConvertTo-Json
+    `
     
-    writeDebug(`WMIC output sample: ${stdout.substring(0, 500)}`)
+    const { stdout } = await execAsync(
+      `powershell -Command "${psCommand.replace(/"/g, '\\"').replace(/\n/g, ' ')}"`
+    )
     
-    const lines = stdout.split('\n')
-      .filter(line => line.trim())
-      .slice(1)
-
-    writeDebug(`Raw lines: ${lines.slice(0, 5)}`)
-
-    const allProcesses = lines
-      .map(line => {
-        const parsed = parseWmicLine(line)
-        if (!parsed) writeDebug(`Failed to parse line: ${line}`)
-        return parsed
-      })
-      .filter((p): p is ProcessInfo => p !== null)
-      .filter(p => !isSystemProcess(p))
-
-    writeDebug(`Parsed processes count: ${allProcesses.length}`)
-    writeDebug(`First 5 parsed: ${allProcesses.slice(0, 5)}`)
-
-    const seen = new Map<string, ProcessInfo>()
-
-    for (const p of allProcesses) {
-      if (!seen.has(p.displayName)) {
-        seen.set(p.displayName, p)
-      }
+    if (!stdout || stdout.trim() === '' || stdout.trim() === 'null') {
+      processesCache = []
+      return []
     }
-
-    const uniqueProcesses = Array.from(seen.values())
-    uniqueProcesses.sort((a, b) => a.displayName.localeCompare(b.displayName))
-
-    return uniqueProcesses
+    
+    const processes = JSON.parse(stdout)
+    const processesArray = Array.isArray(processes) ? processes : [processes]
+    
+    const uniqueMap = new Map<string, ProcessInfo>()
+    
+    processesArray.forEach((p: any) => {
+      const displayName = p.Name
+      
+      if (!uniqueMap.has(displayName)) {
+        uniqueMap.set(displayName, {
+          displayName: displayName,
+          name: p.Name + '.exe',
+          path: p.Path || '',
+          pid: p.Id.toString(),
+          rawPath: p.Path || ''
+        })
+      }
+    })
+    
+    const uniqueProcesses = Array.from(uniqueMap.values())
+    processesCache = uniqueProcesses.filter(p => !isSystemProcess(p))
+    return processesCache
+    
   } catch (error) {
-    console.error('Error getting processes:', error)
+    console.error('Error with Get-Process:', error)
+    writeDebug(`Error with Get-Process: ${error}`)
+    processesCache = []
     return []
   }
 }
 
 async function getRunningAppsCount(): Promise<number> {
-  try {
-    const processes = await getUniqueProcesses()
-    return processes.length
-  } catch (error) {
-    console.error('Error getting processes count:', error)
-    return 0
+  if (processesCache.length === 0) {
+    await getUniqueProcesses()
   }
+  return processesCache.length
 }
 
 async function getRunningAppsWindows(options?: GetAppsOptions): Promise<ProcessInfo[]> {
@@ -79,39 +85,6 @@ async function getRunningAppsWindows(options?: GetAppsOptions): Promise<ProcessI
     return uniqueProcesses
   } catch (error) {
     console.error('Error getting processes:', error)
-    return []
-  }
-}
-
-async function getRecentAppsWindows() {
-  try {
-    const recentPath = path.join(process.env.USERPROFILE || '', 'Recent')
-    const files = await fs.readdir(recentPath).catch(() => [])
-
-    const apps = await Promise.all(
-      files.slice(0, 10).map(async (file) => {
-        const filePath = path.join(recentPath, file)
-        try {
-          const stats = await fs.stat(filePath)
-          if (file.endsWith('.lnk') || file.endsWith('.url')) return null
-
-          return {
-            name: file,
-            path: filePath,
-            lastAccessed: stats.atimeMs
-          }
-        } catch {
-          return null
-        }
-      })
-    )
-
-    return apps
-      .filter((app): app is NonNullable<typeof app> => app !== null)
-      .sort((a, b) => b.lastAccessed - a.lastAccessed)
-      .slice(0, 6)
-  } catch (error) {
-    console.error('Error getting recent apps:', error)
     return []
   }
 }
@@ -170,13 +143,6 @@ export function setupAppHandlers() {
       return await getRunningAppsCount()
     }
     return 0
-  })
-
-  ipcMain.handle('get-recent-apps', async () => {
-    if (process.platform === 'win32') {
-      return await getRecentAppsWindows()
-    }
-    return []
   })
 
   ipcMain.handle('launch-app', async (event, appPath: string) => {

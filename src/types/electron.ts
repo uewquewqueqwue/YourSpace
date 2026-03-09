@@ -56,7 +56,6 @@ export interface WindowAPI {
 export interface AppsAPI {
   getRunningApps: (options?: GetAppsOptions) => Promise<ProcessInfo[]>
   getRunningAppsCount: () => Promise<number>
-  getRecentApps: () => Promise<Array<{ name: string; path: string; lastAccessed: number }>>
   launchApp: (appPath: string) => Promise<LaunchResult>
   execCommand: (command: string) => Promise<ExecResult>
 }

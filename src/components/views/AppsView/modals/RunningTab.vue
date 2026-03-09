@@ -62,15 +62,7 @@ onMounted(async () => {
   await loadPage(1)
 })
 
-const loadTotalCount = async () => {
-  try {
-    totalCount.value = await window.electronAPI?.apps.getRunningAppsCount()
-  } catch (error) {
-    console.error('Failed to load count:', error)
-  }
-}
-
-const loadPage = async (page: number) => {
+const loadPage = async (page: number, cachedProcesses?: ProcessInfo[]) => {
   if (page === 1) {
     loading.value = true
   } else {
@@ -78,25 +70,51 @@ const loadPage = async (page: number) => {
   }
   
   try {
-    const newProcesses = await window.electronAPI?.apps.getRunningApps({ 
-      limit: PAGE_SIZE,
-      page 
-    })
-    
-    if (page === 1) {
-      processes.value = newProcesses
+    if (cachedProcesses) {
+      const start = (page - 1) * PAGE_SIZE
+      const end = start + PAGE_SIZE
+      const pageProcesses = cachedProcesses.slice(start, end)
+      
+      if (page === 1) {
+        processes.value = pageProcesses
+      } else {
+        processes.value = [...processes.value, ...pageProcesses]
+      }
+      
+      hasMore.value = end < cachedProcesses.length
+      currentPage.value = page
     } else {
-      processes.value = [...processes.value, ...newProcesses]
+      const newProcesses = await window.electronAPI?.apps.getRunningApps({ 
+        limit: PAGE_SIZE,
+        page 
+      })
+      
+      if (page === 1) {
+        processes.value = newProcesses
+      } else {
+        processes.value = [...processes.value, ...newProcesses]
+      }
+      
+      hasMore.value = newProcesses.length === PAGE_SIZE
+      currentPage.value = page
     }
-    
-    hasMore.value = newProcesses.length === PAGE_SIZE
-    currentPage.value = page
     
   } catch (error) {
     console.error('Failed to load processes:', error)
   } finally {
     loading.value = false
     loadingMore.value = false
+  }
+}
+
+const loadTotalCount = async () => {
+  try {
+    const allProcesses = await window.electronAPI?.apps.getRunningApps({ limit: 1000 })
+    totalCount.value = allProcesses.length
+    
+    await loadPage(1, allProcesses)
+  } catch (error) {
+    console.error('Failed to load count:', error)
   }
 }
 
