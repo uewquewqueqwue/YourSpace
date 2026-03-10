@@ -83,7 +83,7 @@ const track = ref<TrackInfo>({
   progress: 0
 })
 
-const { isOpen, open, close } = useModal()
+const { isOpen, open, close, modalRef, overlayRef } = useModal()
 let progressInterval: ReturnType<typeof setInterval> | null = null
 
 const waveformBars = [4,8,12,18,24,28,32,34,32,28,24,18,12,8,4,8,12,18,24,28,32,34,32,28,24,18,12,8,4]

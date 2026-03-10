@@ -1,7 +1,9 @@
 import { ref } from 'vue'
-import { useAppsStore } from './apps'
 import type { User } from '@/types/user'
 import type { AuthStore } from "@/types/store"
+import { useAppsStore } from './apps'
+import { useTodoStore } from './todo'
+
 
 const user = ref<User | null>(null)
 const loading = ref(false)
@@ -27,10 +29,12 @@ export function useAuth(): AuthStore {
       localStorage.setItem('token', token)
       user.value = userData
       saveUserToStorage(userData)
-      
+
       const appsStore = useAppsStore()
       await appsStore.fetchApps()
-      await appsStore.forceSync(token)
+
+      const todoStore = useTodoStore()
+      await todoStore.fetchTodos()
 
     } catch (err) {
       error.value = err instanceof Error ? err.message : 'Login failed'
@@ -49,10 +53,12 @@ export function useAuth(): AuthStore {
       localStorage.setItem('token', token)
       user.value = userData
       saveUserToStorage(userData)
-      
+
       const appsStore = useAppsStore()
       await appsStore.fetchApps()
-      await appsStore.forceSync(token)
+
+      const todoStore = useTodoStore()
+      await todoStore.fetchTodos()
 
     } catch (err) {
       error.value = err instanceof Error ? err.message : 'Registration failed'
@@ -73,7 +79,7 @@ export function useAuth(): AuthStore {
 
     const appsStore = useAppsStore()
     appsStore.logout()
-    
+
     user.value = null
     saveUserToStorage(null)
     localStorage.removeItem('token')
@@ -95,7 +101,7 @@ export function useAuth(): AuthStore {
       const userData = await window.electronAPI.db.getMe(token)
       user.value = userData
       saveUserToStorage(userData)
-      
+
       const appsStore = useAppsStore()
       await appsStore.fetchApps()
 
@@ -106,12 +112,11 @@ export function useAuth(): AuthStore {
     }
   }
 
-  const updateProfile = async (name: string, avatar: string) => {
-    const token = localStorage.getItem('token')
+  const updateProfile = async (token: string, updates: { name?: string; avatar?: string }) => {
     if (!token) throw new Error('Not authenticated')
 
     try {
-      const updatedUser = await window.electronAPI.db.updateProfile(token, name, avatar)
+      const updatedUser = await window.electronAPI.db.updateProfile(token, updates)
       user.value = updatedUser
       saveUserToStorage(updatedUser)
       return updatedUser

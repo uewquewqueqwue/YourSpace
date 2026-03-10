@@ -22,9 +22,15 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url))
 let mainWindow: Electron.BrowserWindow | null = null
 let updater: ReturnType<typeof setupUpdater> | null = null
 
-if (!app.requestSingleInstanceLock) {
+if (!app.requestSingleInstanceLock()) {
   app.quit()
 } else {
+  app.on('second-instance', (event, commandLine, workingDirectory) => {
+    if (mainWindow) {
+      if (mainWindow.isMinimized()) mainWindow.restore()
+      mainWindow.focus()
+    }
+  })
 
   app.whenReady().then(() => {
     mainLog.info('================================')

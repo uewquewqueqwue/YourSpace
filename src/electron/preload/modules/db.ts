@@ -10,8 +10,8 @@ export function setupDBAPI() {
       ipcRenderer.invoke('auth:logout', token),
     getMe: (token: string) => 
       ipcRenderer.invoke('auth:me', token),
-    updateProfile: (token: string, name: string, avatar: string) => 
-      ipcRenderer.invoke('auth:updateProfile', { token, name, avatar }),
+    updateProfile: (token: string, updates: any) => 
+      ipcRenderer.invoke('auth:updateProfile', { token, ...updates }),
 
     getApps: (token: string) => 
       ipcRenderer.invoke('apps:getAll', token),

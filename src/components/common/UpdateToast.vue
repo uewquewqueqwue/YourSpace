@@ -51,6 +51,10 @@ onMounted(() => {
     
     setTimeout(() => {
       window.electronAPI?.updater.downloadUpdate()
+
+      setTimeout(() => {
+        show.value = false
+      }, 500)
     }, 200)
   })
 

@@ -40,6 +40,8 @@ export interface RegisterResponse {
 
 export interface UpdateProfileRequest {
   token: string
-  name: string
-  avatar: string
+  updated: {
+    name?: string
+    avatar?: string
+  }
 }

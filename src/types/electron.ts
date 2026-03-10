@@ -17,12 +17,14 @@ import type {
 } from './apps'
 import type {
   CreateTodoRequest,
-  UserTodo,
+  UserTodoResponse,
   UpdateTodoRequest,
-  TodoFolder,
+  TodoTagResponse,
   CreateFolderRequest,
-  TodoTag,
-  CreateTagRequest
+  TodoFolderResponse,
+  CreateTagRequest,
+  UpdateFolderRequest,
+  UpdateTagRequest,
 } from "./todo"
 import type { AppVersion } from './versions'
 import type { MediaAPI } from './media'
@@ -32,7 +34,7 @@ export interface DBApi {
   register: (name: string, email: string, password: string) => Promise<RegisterResponse>
   logout: (token: string) => Promise<{ success: boolean }>
   getMe: (token: string) => Promise<User>
-  updateProfile: (token: string, name: string, avatar: string) => Promise<User>
+  updateProfile: (token: string, data: any) => Promise<User>
   getApps: (token: string) => Promise<UserAppWithDisplay[]>
   createApp: (token: string, data: Omit<CreateAppRequest, 'token'>) => Promise<UserAppWithDisplay>
   updateApp: (token: string, id: string, data: Omit<UpdateAppRequest, 'token' | 'id'>) => Promise<UserAppWithDisplay>
@@ -74,23 +76,23 @@ export interface UpdaterAPI {
 }
 
 export interface ToDoAPI {
-  getAll: (token: string) => Promise<UserTodo[]>
-  create: (token: string, data: CreateTodoRequest) => Promise<UserTodo>
-  update: (token: string, id: string, data: UpdateTodoRequest) => Promise<UserTodo>
+  getAll: (token: string) => Promise<UserTodoResponse[]>
+  create: (token: string, data: CreateTodoRequest) => Promise<UserTodoResponse>
+  update: (token: string, id: string, data: UpdateTodoRequest) => Promise<UserTodoResponse>
   delete: (token: string, id: string) => Promise<{ success: boolean }>
-  reorder: (token: string, items: { id: string; position: number }[]) => Promise<UserTodo[]>
+  reorder: (token: string, items: { id: string; position: number }[]) => Promise<UserTodoResponse[]>
   
   folders: {
-    getAll: (token: string) => Promise<TodoFolder[]>
-    create: (token: string, data: CreateFolderRequest) => Promise<TodoFolder>
-    update: (token: string, id: string, data: Partial<TodoFolder>) => Promise<TodoFolder>
+    getAll: (token: string) => Promise<TodoFolderResponse[]>
+    create: (token: string, data: CreateFolderRequest) => Promise<TodoFolderResponse>
+    update: (token: string, id: string, data: UpdateFolderRequest) => Promise<TodoFolderResponse>
     delete: (token: string, id: string) => Promise<{ success: boolean }>
   }
   
   tags: {
-    getAll: (token: string) => Promise<TodoTag[]>
-    create: (token: string, data: CreateTagRequest) => Promise<TodoTag>
-    update: (token: string, id: string, data: Partial<TodoTag>) => Promise<TodoTag>
+    getAll: (token: string) => Promise<TodoTagResponse[]>
+    create: (token: string, data: CreateTagRequest) => Promise<TodoTagResponse>
+    update: (token: string, id: string, data: UpdateTagRequest) => Promise<TodoTagResponse>
     delete: (token: string, id: string) => Promise<{ success: boolean }>
   }
 }

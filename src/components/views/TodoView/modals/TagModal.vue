@@ -13,21 +13,12 @@
           <div class="modal-body">
             <div class="field">
               <label>Name <span class="required">*</span></label>
-              <input 
-                v-model="form.name" 
-                type="text" 
-                placeholder="urgent, bug, feature..."
-              />
+              <input v-model="form.name" type="text" placeholder="urgent, bug, feature..." />
             </div>
 
             <div class="field">
               <label>Color (hex)</label>
-              <input 
-                v-model="form.color" 
-                type="text" 
-                placeholder="#8B5CF6"
-                @input="validateColor"
-              />
+              <input v-model="form.color" type="text" placeholder="#8B5CF6" @input="validateColor" />
               <div class="color-preview" :style="{ background: validColor }" />
               <div v-if="colorError" class="color-error">
                 Invalid color, using default
@@ -37,25 +28,15 @@
             <div class="field">
               <label>Presets</label>
               <div class="color-presets">
-                <button 
-                  v-for="color in presetColors" 
-                  :key="color"
-                  class="color-btn"
-                  :class="{ active: form.color === color }"
-                  :style="{ background: color }"
-                  @click="setColor(color)"
-                />
+                <button v-for="color in presetColors" :key="color" class="color-btn"
+                  :class="{ active: form.color === color }" :style="{ background: color }" @click="setColor(color)" />
               </div>
             </div>
           </div>
 
           <div class="modal-footer">
             <button class="cancel-btn" @click="close">Cancel</button>
-            <button 
-              class="save-btn" 
-              @click="save"
-              :disabled="!form.name.trim()"
-            >
+            <button class="save-btn" @click="save" :disabled="!form.name.trim()">
               {{ tag ? 'Update' : 'Create' }}
             </button>
           </div>
@@ -67,7 +48,7 @@
 
 <script setup lang="ts">
 import { ref, watch, computed } from 'vue'
-import { X, Trash2 } from 'lucide-vue-next'
+import { X } from 'lucide-vue-next'
 
 const props = defineProps<{
   modelValue: boolean
@@ -98,7 +79,6 @@ const form = ref({
 })
 
 const colorError = ref(false)
-const showDeleteConfirm = ref(false)
 
 const isValidHex = (color: string): boolean => {
   return /^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/.test(color)
@@ -110,7 +90,7 @@ const validateColor = () => {
     colorError.value = false
     return
   }
-  
+
   if (!isValidHex(form.value.color)) {
     colorError.value = true
   } else {
@@ -147,7 +127,7 @@ const save = () => {
   if (!form.value.name.trim()) return
 
   const finalColor = isValidHex(form.value.color) ? form.value.color : BRAND_COLOR
-  
+
   emit('save', {
     name: form.value.name.trim(),
     color: finalColor
@@ -159,18 +139,6 @@ const save = () => {
   }
   colorError.value = false
 
-  close()
-}
-
-const confirmDelete = () => {
-  showDeleteConfirm.value = true
-}
-
-const handleDelete = () => {
-  if (props.tag) {
-    emit('delete', props.tag.id)
-  }
-  showDeleteConfirm.value = false
   close()
 }
 
@@ -202,6 +170,7 @@ const close = () => {
     border: 1px solid themed('border-color');
     box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
   }
+
   border-radius: 20px;
   overflow: hidden;
 }
@@ -216,10 +185,10 @@ const close = () => {
   justify-content: space-between;
   align-items: center;
   border-bottom: 1px solid;
-  
+
   @include themify() {
     border-color: themed('border-color');
-    
+
     h3 {
       color: themed('text-primary');
     }
@@ -236,10 +205,10 @@ const close = () => {
     border-radius: 6px;
     background: none;
     cursor: pointer;
-    
+
     @include themify() {
       color: themed('text-secondary');
-      
+
       &:hover {
         background: themed('nav-bar-tab');
         color: themed('text-primary');
@@ -262,7 +231,7 @@ const close = () => {
     margin-bottom: 6px;
     text-transform: uppercase;
     letter-spacing: 0.5px;
-    
+
     @include themify() {
       color: themed('text-secondary');
     }
@@ -280,16 +249,17 @@ const close = () => {
     border-radius: 10px;
     font-size: 14px;
     background: none;
-    
+
     @include themify() {
-      border-color: themed('border-color');
+      background: themed('brand-dark');
+      border: 1px solid themed('brand-dark');
       color: themed('text-primary');
-      
+
       &:focus {
         outline: none;
-        border-color: themed('brand-primary');
+        border: 1px solid themed('brand-primary');
       }
-      
+
       &::placeholder {
         color: themed('text-secondary');
         opacity: 0.5;
@@ -304,31 +274,9 @@ const close = () => {
   justify-content: flex-end;
   gap: 12px;
   border-top: 1px solid;
-  
+
   @include themify() {
     border-color: themed('border-color');
-  }
-
-  .delete-btn {
-    margin-right: auto;
-    padding: 10px 20px;
-    border: none;
-    border-radius: 10px;
-    font-size: 14px;
-    font-weight: 500;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    
-    @include themify() {
-      background: themed('danger') + '20';
-      color: themed('danger');
-      
-      &:hover:not(:disabled) {
-        background: themed('danger') + '40';
-      }
-    }
   }
 
   button {
@@ -338,7 +286,7 @@ const close = () => {
     font-size: 14px;
     font-weight: 500;
     cursor: pointer;
-    
+
     &:disabled {
       opacity: 0.5;
       cursor: not-allowed;
@@ -347,10 +295,10 @@ const close = () => {
 
   .cancel-btn {
     background: none;
-    
+
     @include themify() {
       color: themed('text-secondary');
-      
+
       &:hover:not(:disabled) {
         background: themed('nav-bar-tab');
       }
@@ -361,7 +309,7 @@ const close = () => {
     @include themify() {
       background: themed('brand-primary');
       color: white;
-      
+
       &:hover:not(:disabled) {
         opacity: 0.9;
       }
@@ -375,7 +323,7 @@ const close = () => {
   border-radius: 8px;
   margin-top: 8px;
   border: 1px solid;
-  
+
   @include themify() {
     border-color: themed('border-color');
   }
@@ -399,12 +347,12 @@ const close = () => {
     border: 2px solid transparent;
     border-radius: 16px;
     cursor: pointer;
-    
+
     @include themify() {
       &:hover {
         transform: scale(1.1);
       }
-      
+
       &.active {
         border-color: themed('text-primary');
       }

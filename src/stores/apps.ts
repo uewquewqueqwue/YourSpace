@@ -90,7 +90,7 @@ const checkAppStatus = async (app: UserAppWithDisplay) => {
     app.hasInvalidPath = true
     return
   }
-  
+
   const exeName = app.path.split('\\').pop() || ''
   const isRunning = await isProcessRunning(exeName)
   const now = Date.now()
@@ -149,7 +149,7 @@ const syncToServer = async (token: string) => {
       } else {
         const serverApp = await window.electronAPI.db.createApp(token, {
           path: app.path,
-          catalogName: app.catalog.name, // ← ВАЖНО: передаем сырое имя, не displayName!
+          catalogName: app.catalog.name,
           customName: app.customName || undefined,
           customColor: app.customColor || undefined,
           totalMinutes: app.totalMinutes
@@ -174,10 +174,6 @@ const fetchCatalogs = async () => {
   }
 }
 
-/**
- * Обновляет displayName у приложения на основе текущих данных
- * Приоритет: customName > catalog.displayName > catalog.name
- */
 const updateAppDisplayName = (app: UserAppWithDisplay): void => {
   if (app.customName) {
     app.displayName = app.customName
@@ -196,35 +192,35 @@ const syncFromServer = async (token: string) => {
   if (!token || !isAuthenticated()) return
   try {
     const serverApps = await window.electronAPI.db.getApps(token)
-    
+
     for (const serverApp of serverApps) {
-      // Ищем по path - это уникальный идентификатор
+
       const localApp = apps.value.find(a => a.path === serverApp.path)
-      
+
       if (!localApp) {
-        // Новое приложение с сервера - создаем локально
+
         const newApp: UserAppWithDisplay = {
           ...serverApp,
           isActive: false,
           currentSession: null,
-          displayName: '', // Временно
+          displayName: '',
           displayColor: serverApp.customColor || serverApp.catalog?.color || generateColor(serverApp.catalog?.name || '')
         }
         updateAppDisplayName(newApp)
         apps.value.push(newApp)
       } else {
-        // Существующее приложение - обновляем только то, что ДОЛЖНЫ
+
         localApp.totalMinutes = serverApp.totalMinutes
         localApp.lastUsed = serverApp.lastUsed
-        
-        // Обновляем каталог, если он изменился
+
+
         if (serverApp.catalog && serverApp.catalog.id !== localApp.catalog?.id) {
           localApp.catalog = serverApp.catalog
           localApp.catalogId = serverApp.catalogId
         }
-        
-        // ВАЖНО: НЕ обновляем customName и customColor - это личное!
-        // ВАЖНО: НЕ обновляем displayName принудительно, только пересчитываем
+
+
+
         updateAppDisplayName(localApp)
       }
     }
@@ -256,31 +252,31 @@ loadQuickFromStorage()
 
 export async function initializeAppsStore() {
   await fetchCatalogs()
-  
-  // Обновляем приложения из актуальных каталогов
+
+
   for (const app of apps.value) {
     if (!app.catalog?.name) continue
-    
+
     const publicCatalog = catalogs.value.find(c => c.name === app.catalog.name)
-    
+
     if (publicCatalog) {
-      // Обновляем ссылку на каталог
+
       app.catalog = publicCatalog
       app.catalogId = publicCatalog.id
-      
-      // Обновляем цвет, если нет кастомного
+
+
       if (!app.customColor && publicCatalog.color) {
         app.displayColor = publicCatalog.color
       }
-      
-      // Пересчитываем displayName на основе актуальных данных
+
+
       updateAppDisplayName(app)
     }
   }
-  
+
   saveToStorage()
   startMonitoring()
-  
+
   const token = getToken()
   if (token && isAuthenticated()) {
     await syncFromServer(token)
@@ -314,7 +310,7 @@ export function useAppsStore(): AppsStore {
   }
 
   const addApp = async (input: CreateAppInput): Promise<UserAppWithDisplay | null> => {
-    // Проверяем по path - это уникальный идентификатор!
+
     if (apps.value.some(a => a.path === input.path)) {
       error.value = 'App already added'
       return null
@@ -322,24 +318,24 @@ export function useAppsStore(): AppsStore {
 
     const token = getToken()
     const isAuth = token && isAuthenticated()
-    
-    // ВАЖНО: берем сырое имя из path!
+
+
     const exeName = input.path.split('\\').pop()?.replace('.exe', '') || ''
-    
-    // Ищем каталог по сырому имени
+
+
     let catalog = catalogs.value.find(c => c.name === exeName)
-    
+
     if (!catalog) {
-      // Создаем новый каталог с сырым именем
+
       try {
         catalog = await window.electronAPI.db.createCatalog({
-          name: exeName, // ← ТОЛЬКО сырое имя!
-          displayName: null, // ← Не заполняем красивое имя!
+          name: exeName,
+          displayName: null,
           color: generateColor(exeName)
         })
         catalogs.value.push(catalog)
       } catch {
-        // Локальный каталог на случай офлайна
+
         catalog = {
           id: 'local-' + crypto.randomUUID(),
           name: exeName,
@@ -352,7 +348,7 @@ export function useAppsStore(): AppsStore {
       }
     }
 
-    // Вычисляем displayName для отображения
+
     const displayName = input.customName || catalog.displayName || catalog.name
 
     const newApp: UserAppWithDisplay = {
@@ -367,7 +363,7 @@ export function useAppsStore(): AppsStore {
       createdAt: new Date(),
       updatedAt: new Date(),
       catalog,
-      displayName, // ← Правильно вычисленное имя для отображения
+      displayName,
       displayColor: input.customColor || catalog.color || generateColor(catalog.name),
       isActive: false,
       currentSession: null,
@@ -378,24 +374,24 @@ export function useAppsStore(): AppsStore {
     saveToStorage()
     checkAppStatus(newApp)
 
-    // Синхронизация с сервером если есть авторизация
+
     if (isAuth) {
       try {
         const serverApp = await window.electronAPI.db.createApp(token, {
           path: newApp.path,
-          catalogName: catalog.name, // ← Передаем сырое имя!
+          catalogName: catalog.name,
           customName: newApp.customName || undefined,
           customColor: newApp.customColor || undefined
         })
-        
-        // Обновляем локальную запись данными с сервера
+
+
         newApp.id = serverApp.id
         newApp.catalogId = serverApp.catalogId
         newApp.catalog = serverApp.catalog
-        
-        // Пересчитываем displayName после обновления каталога
+
+
         updateAppDisplayName(newApp)
-        
+
         saveToStorage()
       } catch (err) {
         console.error('Failed to sync new app:', err)
@@ -408,7 +404,7 @@ export function useAppsStore(): AppsStore {
   const removeApp = async (id: string): Promise<boolean> => {
     const index = apps.value.findIndex(a => a.id === id)
     if (index === -1) return false
-    
+
     const [app] = apps.value.splice(index, 1)
     quickApps.value = quickApps.value.filter(a => a.id !== id)
     saveToStorage()
@@ -470,7 +466,7 @@ export function useAppsStore(): AppsStore {
   const getTotalTimeToday = (): number => {
     const today = new Date()
     today.setHours(0, 0, 0, 0)
-    return apps.value.reduce((total, app) => 
+    return apps.value.reduce((total, app) =>
       total + (app.lastUsed && app.lastUsed >= today ? app.totalMinutes : 0), 0)
   }
 

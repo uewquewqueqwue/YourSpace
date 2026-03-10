@@ -45,7 +45,7 @@ export interface AuthStore {
   register: (name: string, email: string, password: string) => Promise<void>
   logout: () => Promise<void>
   checkAuth: () => Promise<void>
-  updateProfile: (name: string, avatar: string) => Promise<User>
+  updateProfile: (token: string, updates: { name?: string; avatar?: string }) => Promise<User>
   openLogin: () => void
   closeLogin: () => void
 }

@@ -3,7 +3,6 @@
     <img src="/logo/logo.svg" alt="Logo" class="logo">
 
     <div class="nav-items">
-
       <div class="nav-item-wrapper">
         <div class="nav-item" :class="{ active: tab === 'apps' }" @click="setTab('apps')">
           <LayoutGrid />
@@ -22,7 +21,7 @@
       <div class="nav-item-wrapper">
         <div class="nav-item" :class="{ active: tab === 'todo' }" @click="setTab('todo')">
           <ListTodo />
-          <span class="badge" v-if="unreadCount">2</span>
+          <span class="badge" v-if="activeTodoCount > 0">{{ activeTodoCount }}</span>
         </div>
         <span class="tooltip">Todo list</span>
       </div>
@@ -41,7 +40,6 @@
     </div>
 
     <div class="nav-bottom">
-
       <div class="nav-item-wrapper">
         <ProfilePopup />
         <span class="tooltip">Profile</span>
@@ -67,7 +65,6 @@
         </div>
         <span class="tooltip">Patch (Dev)</span>
       </div>
-
     </div>
 
     <AuthModal />
@@ -75,22 +72,28 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
-import { Mailbox, LayoutGrid, Music, Image, Cpu, FileDiff, Settings, ListTodo } from 'lucide-vue-next'
+import { ref, computed } from 'vue'
+import { Mailbox, LayoutGrid, Image, Cpu, FileDiff, Settings, ListTodo } from 'lucide-vue-next'
 import AuthModal from '@/components/common/auth/AuthModal.vue'
 import ProfilePopup from '@/components/views/ProfileView/ProfilePopup.vue';
 import MusicPopup from '@/components/views/MusicView/MusicPopup.vue';
+import { useTodoStore } from '@/stores/todo'
 
 const props = defineProps<{
   tab: string
 }>()
 
-const setTab = (tab: string) => emit('update:tab', tab)
 const emit = defineEmits(['update:tab'])
 const unreadCount = ref(3)
-
 const isDev = import.meta.env.DEV
 
+// Получаем количество активных задач
+const todoStore = useTodoStore()
+const activeTodoCount = computed(() => 
+  todoStore.todos.value?.filter(t => !t.completed).length || 0
+)
+
+const setTab = (tab: string) => emit('update:tab', tab)
 </script>
 
 <style lang="scss" scoped>
@@ -263,12 +266,9 @@ const isDev = import.meta.env.DEV
 }
 
 @keyframes bounce {
-
-  0%,
-  100% {
+  0%, 100% {
     transform: scaleY(0.5);
   }
-
   50% {
     transform: scaleY(1);
   }

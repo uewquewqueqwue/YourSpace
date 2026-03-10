@@ -31,7 +31,7 @@ import { usePatches } from '@/composables/usePatches'
 import { useSettings } from '@/composables/useSettings'
 import { useAuth } from '@/stores/auth'
 import { useAppsStore, initializeAppsStore } from '@/stores/apps'
-import { initializeTodoStore } from '@/stores/todo'
+import { useTodoStore, initializeTodoStore } from '@/stores/todo'
 import NavBar from '@/components/layout/NavBar.vue'
 import MainView from '@/components/views/MainView.vue'
 import RightPanel from '@/components/layout/RightPanel.vue'
@@ -41,12 +41,16 @@ import StorageIndicator from '@/components/common/StorageIndicator.vue'
 import Toast from '@/components/common/Toast.vue'
 import PatchNotesModal from '@/components/common/PatchNotesModal.vue'
 import UpdateToast from '@/components/common/UpdateToast.vue'
+import { useDeadlineNotifications } from './composables/useDeadlineNotifications'
 
 const { toasts } = useToast()
 const patches = usePatches()
 const { applyAll } = useSettings()
 const auth = useAuth()
 const appsStore = useAppsStore()
+const todoStore = useTodoStore()
+
+const deadlineNotifications = useDeadlineNotifications()
 
 const currentTab = ref('apps')
 const isLoading = ref(true)
@@ -75,10 +79,7 @@ onMounted(async () => {
   await auth.checkAuth()
 
   initializeAppsStore()
-  console.log('✅ Apps store initialized')
-  
   initializeTodoStore()
-  console.log('✅ Todo store initialized')
 
   loaderRef.value?.finish()
   setTimeout(() => {
@@ -90,13 +91,19 @@ onMounted(async () => {
     }, 200)
   }, 500)
 
+  deadlineNotifications.startChecking()
+
   window.electronAPI?.window.onAppClosing(async () => {
     const token = localStorage.getItem('token')
     if (auth.user.value && token) {
       await appsStore.forceSync(token)
+      await todoStore.forceSync(token)
     } else {
       appsStore.saveToStorage()
+      todoStore.saveToStorage()
     }
+    
+    deadlineNotifications.stopChecking()
   })
 })
 </script>
@@ -165,7 +172,6 @@ a:focus-visible {
   display: flex;
   flex-direction: column;
   gap: 10px;
-  pointer-events: none;
 }
 
 .toast-enter-active,

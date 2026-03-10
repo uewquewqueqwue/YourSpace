@@ -38,7 +38,6 @@ export type TodoFolderMinAggregateOutputType = {
   id: string | null
   userId: string | null
   name: string | null
-  icon: string | null
   color: string | null
   position: number | null
   createdAt: Date | null
@@ -49,7 +48,6 @@ export type TodoFolderMaxAggregateOutputType = {
   id: string | null
   userId: string | null
   name: string | null
-  icon: string | null
   color: string | null
   position: number | null
   createdAt: Date | null
@@ -60,7 +58,6 @@ export type TodoFolderCountAggregateOutputType = {
   id: number
   userId: number
   name: number
-  icon: number
   color: number
   position: number
   createdAt: number
@@ -81,7 +78,6 @@ export type TodoFolderMinAggregateInputType = {
   id?: true
   userId?: true
   name?: true
-  icon?: true
   color?: true
   position?: true
   createdAt?: true
@@ -92,7 +88,6 @@ export type TodoFolderMaxAggregateInputType = {
   id?: true
   userId?: true
   name?: true
-  icon?: true
   color?: true
   position?: true
   createdAt?: true
@@ -103,7 +98,6 @@ export type TodoFolderCountAggregateInputType = {
   id?: true
   userId?: true
   name?: true
-  icon?: true
   color?: true
   position?: true
   createdAt?: true
@@ -201,7 +195,6 @@ export type TodoFolderGroupByOutputType = {
   id: string
   userId: string
   name: string
-  icon: string | null
   color: string | null
   position: number
   createdAt: Date
@@ -235,7 +228,6 @@ export type TodoFolderWhereInput = {
   id?: Prisma.StringFilter<"TodoFolder"> | string
   userId?: Prisma.StringFilter<"TodoFolder"> | string
   name?: Prisma.StringFilter<"TodoFolder"> | string
-  icon?: Prisma.StringNullableFilter<"TodoFolder"> | string | null
   color?: Prisma.StringNullableFilter<"TodoFolder"> | string | null
   position?: Prisma.IntFilter<"TodoFolder"> | number
   createdAt?: Prisma.DateTimeFilter<"TodoFolder"> | Date | string
@@ -248,7 +240,6 @@ export type TodoFolderOrderByWithRelationInput = {
   id?: Prisma.SortOrder
   userId?: Prisma.SortOrder
   name?: Prisma.SortOrder
-  icon?: Prisma.SortOrderInput | Prisma.SortOrder
   color?: Prisma.SortOrderInput | Prisma.SortOrder
   position?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -265,7 +256,6 @@ export type TodoFolderWhereUniqueInput = Prisma.AtLeast<{
   NOT?: Prisma.TodoFolderWhereInput | Prisma.TodoFolderWhereInput[]
   userId?: Prisma.StringFilter<"TodoFolder"> | string
   name?: Prisma.StringFilter<"TodoFolder"> | string
-  icon?: Prisma.StringNullableFilter<"TodoFolder"> | string | null
   color?: Prisma.StringNullableFilter<"TodoFolder"> | string | null
   position?: Prisma.IntFilter<"TodoFolder"> | number
   createdAt?: Prisma.DateTimeFilter<"TodoFolder"> | Date | string
@@ -278,7 +268,6 @@ export type TodoFolderOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
   userId?: Prisma.SortOrder
   name?: Prisma.SortOrder
-  icon?: Prisma.SortOrderInput | Prisma.SortOrder
   color?: Prisma.SortOrderInput | Prisma.SortOrder
   position?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -297,7 +286,6 @@ export type TodoFolderScalarWhereWithAggregatesInput = {
   id?: Prisma.StringWithAggregatesFilter<"TodoFolder"> | string
   userId?: Prisma.StringWithAggregatesFilter<"TodoFolder"> | string
   name?: Prisma.StringWithAggregatesFilter<"TodoFolder"> | string
-  icon?: Prisma.StringNullableWithAggregatesFilter<"TodoFolder"> | string | null
   color?: Prisma.StringNullableWithAggregatesFilter<"TodoFolder"> | string | null
   position?: Prisma.IntWithAggregatesFilter<"TodoFolder"> | number
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"TodoFolder"> | Date | string
@@ -307,7 +295,6 @@ export type TodoFolderScalarWhereWithAggregatesInput = {
 export type TodoFolderCreateInput = {
   id?: string
   name: string
-  icon?: string | null
   color?: string | null
   position: number
   createdAt?: Date | string
@@ -320,7 +307,6 @@ export type TodoFolderUncheckedCreateInput = {
   id?: string
   userId: string
   name: string
-  icon?: string | null
   color?: string | null
   position: number
   createdAt?: Date | string
@@ -331,7 +317,6 @@ export type TodoFolderUncheckedCreateInput = {
 export type TodoFolderUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
-  icon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   color?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   position?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -344,7 +329,6 @@ export type TodoFolderUncheckedUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   userId?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
-  icon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   color?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   position?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -356,7 +340,6 @@ export type TodoFolderCreateManyInput = {
   id?: string
   userId: string
   name: string
-  icon?: string | null
   color?: string | null
   position: number
   createdAt?: Date | string
@@ -366,7 +349,6 @@ export type TodoFolderCreateManyInput = {
 export type TodoFolderUpdateManyMutationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
-  icon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   color?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   position?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -377,7 +359,6 @@ export type TodoFolderUncheckedUpdateManyInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   userId?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
-  icon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   color?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   position?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -403,7 +384,6 @@ export type TodoFolderCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
   userId?: Prisma.SortOrder
   name?: Prisma.SortOrder
-  icon?: Prisma.SortOrder
   color?: Prisma.SortOrder
   position?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -418,7 +398,6 @@ export type TodoFolderMaxOrderByAggregateInput = {
   id?: Prisma.SortOrder
   userId?: Prisma.SortOrder
   name?: Prisma.SortOrder
-  icon?: Prisma.SortOrder
   color?: Prisma.SortOrder
   position?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -429,7 +408,6 @@ export type TodoFolderMinOrderByAggregateInput = {
   id?: Prisma.SortOrder
   userId?: Prisma.SortOrder
   name?: Prisma.SortOrder
-  icon?: Prisma.SortOrder
   color?: Prisma.SortOrder
   position?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -506,7 +484,6 @@ export type TodoFolderUpdateOneWithoutTodosNestedInput = {
 export type TodoFolderCreateWithoutUserInput = {
   id?: string
   name: string
-  icon?: string | null
   color?: string | null
   position: number
   createdAt?: Date | string
@@ -517,7 +494,6 @@ export type TodoFolderCreateWithoutUserInput = {
 export type TodoFolderUncheckedCreateWithoutUserInput = {
   id?: string
   name: string
-  icon?: string | null
   color?: string | null
   position: number
   createdAt?: Date | string
@@ -558,7 +534,6 @@ export type TodoFolderScalarWhereInput = {
   id?: Prisma.StringFilter<"TodoFolder"> | string
   userId?: Prisma.StringFilter<"TodoFolder"> | string
   name?: Prisma.StringFilter<"TodoFolder"> | string
-  icon?: Prisma.StringNullableFilter<"TodoFolder"> | string | null
   color?: Prisma.StringNullableFilter<"TodoFolder"> | string | null
   position?: Prisma.IntFilter<"TodoFolder"> | number
   createdAt?: Prisma.DateTimeFilter<"TodoFolder"> | Date | string
@@ -568,7 +543,6 @@ export type TodoFolderScalarWhereInput = {
 export type TodoFolderCreateWithoutTodosInput = {
   id?: string
   name: string
-  icon?: string | null
   color?: string | null
   position: number
   createdAt?: Date | string
@@ -580,7 +554,6 @@ export type TodoFolderUncheckedCreateWithoutTodosInput = {
   id?: string
   userId: string
   name: string
-  icon?: string | null
   color?: string | null
   position: number
   createdAt?: Date | string
@@ -606,7 +579,6 @@ export type TodoFolderUpdateToOneWithWhereWithoutTodosInput = {
 export type TodoFolderUpdateWithoutTodosInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
-  icon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   color?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   position?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -618,7 +590,6 @@ export type TodoFolderUncheckedUpdateWithoutTodosInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   userId?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
-  icon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   color?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   position?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -628,7 +599,6 @@ export type TodoFolderUncheckedUpdateWithoutTodosInput = {
 export type TodoFolderCreateManyUserInput = {
   id?: string
   name: string
-  icon?: string | null
   color?: string | null
   position: number
   createdAt?: Date | string
@@ -638,7 +608,6 @@ export type TodoFolderCreateManyUserInput = {
 export type TodoFolderUpdateWithoutUserInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
-  icon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   color?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   position?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -649,7 +618,6 @@ export type TodoFolderUpdateWithoutUserInput = {
 export type TodoFolderUncheckedUpdateWithoutUserInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
-  icon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   color?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   position?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -660,7 +628,6 @@ export type TodoFolderUncheckedUpdateWithoutUserInput = {
 export type TodoFolderUncheckedUpdateManyWithoutUserInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
-  icon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   color?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   position?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -702,7 +669,6 @@ export type TodoFolderSelect<ExtArgs extends runtime.Types.Extensions.InternalAr
   id?: boolean
   userId?: boolean
   name?: boolean
-  icon?: boolean
   color?: boolean
   position?: boolean
   createdAt?: boolean
@@ -716,7 +682,6 @@ export type TodoFolderSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Ex
   id?: boolean
   userId?: boolean
   name?: boolean
-  icon?: boolean
   color?: boolean
   position?: boolean
   createdAt?: boolean
@@ -728,7 +693,6 @@ export type TodoFolderSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Ex
   id?: boolean
   userId?: boolean
   name?: boolean
-  icon?: boolean
   color?: boolean
   position?: boolean
   createdAt?: boolean
@@ -740,14 +704,13 @@ export type TodoFolderSelectScalar = {
   id?: boolean
   userId?: boolean
   name?: boolean
-  icon?: boolean
   color?: boolean
   position?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }
 
-export type TodoFolderOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "userId" | "name" | "icon" | "color" | "position" | "createdAt" | "updatedAt", ExtArgs["result"]["todoFolder"]>
+export type TodoFolderOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "userId" | "name" | "color" | "position" | "createdAt" | "updatedAt", ExtArgs["result"]["todoFolder"]>
 export type TodoFolderInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   todos?: boolean | Prisma.TodoFolder$todosArgs<ExtArgs>
@@ -770,7 +733,6 @@ export type $TodoFolderPayload<ExtArgs extends runtime.Types.Extensions.Internal
     id: string
     userId: string
     name: string
-    icon: string | null
     color: string | null
     position: number
     createdAt: Date
@@ -1203,7 +1165,6 @@ export interface TodoFolderFieldRefs {
   readonly id: Prisma.FieldRef<"TodoFolder", 'String'>
   readonly userId: Prisma.FieldRef<"TodoFolder", 'String'>
   readonly name: Prisma.FieldRef<"TodoFolder", 'String'>
-  readonly icon: Prisma.FieldRef<"TodoFolder", 'String'>
   readonly color: Prisma.FieldRef<"TodoFolder", 'String'>
   readonly position: Prisma.FieldRef<"TodoFolder", 'Int'>
   readonly createdAt: Prisma.FieldRef<"TodoFolder", 'DateTime'>

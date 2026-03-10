@@ -14,9 +14,13 @@
         <div class="progress" :style="{ width: percentage + '%' }"></div>
       </div>
       
+      <div class="details-counts">
+        <span class="apps-count">{{ appsCount }} apps</span>
+        <span class="apps-count">{{ todosCount }} todos</span>
+      </div>
+
       <div class="details">
         <span>{{ formatBytes(used) }} / {{ formatBytes(total) }}</span>
-        <span class="apps-count">{{ appsCount }} apps</span>
         <button class="apps-btn" @click="handleReset">Clear storage</button>
       </div>
     </div>
@@ -31,9 +35,12 @@
 import { ref, computed, onMounted } from 'vue'
 import { HardDrive } from 'lucide-vue-next'
 import { useAppsStore } from '@/stores/apps'
+import { useTodoStore } from '@/stores/todo'
+import { useAuth } from '@/stores/auth'
 
 const expanded = ref(false)
-const store = useAppsStore()
+const appsStore = useAppsStore()
+const todosStore = useTodoStore()
 
 const storageInfo = computed(() => {
   let total = 5 * 1024 * 1024
@@ -65,7 +72,8 @@ const percentage = computed(() => {
   return raw.toFixed(1)
 })
 
-const appsCount = computed(() => store.apps.value.length)
+const appsCount = computed(() => appsStore.apps.value.length)
+const todosCount = computed(() => todosStore.todos.value.length)
 
 const formatBytes = (bytes: number): string => {
   if (bytes === 0) return '0 B'
@@ -76,12 +84,19 @@ const formatBytes = (bytes: number): string => {
 }
 
 const handleReset = () => {
-  store.reset()
+  appsStore.reset()
+  todosStore.reset()
   localStorage.removeItem("patch_seen_version")
-
-  window.electronAPI?.relaunchApp()
+  localStorage.removeItem("token")
+  localStorage.removeItem("user")
+  
+  const auth = useAuth()
+  auth.logout()
+  
+  setTimeout(() => {
+    window.electronAPI?.relaunchApp()
+  }, 100)
 }
-
 onMounted(() => {
   const handleClickOutside = (e: MouseEvent) => {
     const target = e.target as HTMLElement
@@ -168,9 +183,10 @@ onMounted(() => {
         }
       }
     }
-    
-    .details {
+
+    .details, .details-counts {
       display: flex;
+      align-items: center;
       justify-content: space-between;
       margin-top: 6px;
       font-size: 11px;
@@ -198,7 +214,15 @@ onMounted(() => {
         }
       }
     }
+
+    .details-counts {
+      justify-content: center;
+      gap: 15px;
+      margin-bottom: 10px;
+    }
+
   }
+
   
   .compact {    
     margin-top: 8px;

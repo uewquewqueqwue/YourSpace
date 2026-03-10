@@ -155,7 +155,6 @@ export const TodoFolderScalarFieldEnum = {
   id: 'id',
   userId: 'userId',
   name: 'name',
-  icon: 'icon',
   color: 'color',
   position: 'position',
   createdAt: 'createdAt',

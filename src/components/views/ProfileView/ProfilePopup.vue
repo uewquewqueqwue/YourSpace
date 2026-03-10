@@ -9,8 +9,8 @@
 
     <Teleport to="body">
       <Transition name="popup">
-        <div v-if="isOpen" class="popup-overlay" ref="overlayRef">
-          <div class="popup" ref="modalRef">
+        <div v-if="isOpen" class="popup-overlay" ref="overlayRef" @click.self="close">
+          <div class="popup" ref="modalRef" @click.stop>
             <div class="popup-header">
               <div class="avatar-wrapper" @click="triggerFileInput">
                 <div class="avatar-large">
@@ -49,9 +49,9 @@
             </div>
 
             <div class="popup-footer">
-              <button class="save-btn" @click="saveChanges" :disabled="!hasChanges">
+              <button class="save-btn" @click="saveChanges" :disabled="!hasChanges || isSaving">
                 <Check :size="16" />
-                Save changes
+                {{ isSaving ? 'Saving...' : 'Save changes' }}
               </button>
             </div>
           </div>
@@ -72,12 +72,7 @@ const auth = useAuth()
 const toast = useToast()
 const user = computed(() => auth.user.value)
 
-const { isOpen, close, open } = useModal({
-  onClose: () => {
-    editedName.value = ''
-    previewAvatar.value = ''
-  }
-})
+const { isOpen, close, open, modalRef, overlayRef } = useModal()
 
 const fileInput = ref<HTMLInputElement | null>(null)
 
@@ -85,6 +80,7 @@ const editedName = ref('')
 const previewAvatar = ref('')
 const originalName = ref('')
 const originalAvatar = ref('')
+const isSaving = ref(false)
 
 const hasChanges = computed(() => {
   return editedName.value !== originalName.value || previewAvatar.value !== ''
@@ -124,8 +120,10 @@ const handleAvatarChange = (event: Event) => {
 }
 
 const saveChanges = async () => {
+  if (isSaving.value) return
   if (!user.value) return
   
+  isSaving.value = true
   try {
     const token = localStorage.getItem('token')
     if (!token) {
@@ -135,17 +133,20 @@ const saveChanges = async () => {
     
     const updates: any = {}
     
-    if (editedName.value !== originalName.value) {
-      updates.name = editedName.value
+    if (editedName.value !== originalName.value && editedName.value.trim()) {
+      updates.name = editedName.value.trim()
     }
     
     if (previewAvatar.value) {
       updates.avatar = previewAvatar.value
     }
     
-    if (Object.keys(updates).length === 0) return
+    if (Object.keys(updates).length === 0) {
+      toast.info('No changes to save')
+      return
+    }
     
-    const result = await window.electronAPI.db.updateProfile(token, updates.name || '', updates.avatar || '')
+    const result = await window.electronAPI.db.updateProfile(token, updates)
     
     auth.user.value = result
     
@@ -158,6 +159,8 @@ const saveChanges = async () => {
   } catch (error) {
     console.error('Save error:', error)
     toast.error('Failed to update profile')
+  } finally {
+    isSaving.value = false
   }
 }
 </script>
