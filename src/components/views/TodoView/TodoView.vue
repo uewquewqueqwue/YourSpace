@@ -725,8 +725,7 @@ const handleDeleteTask = async () => {
         transition: all 0.2s;
 
         @include themify() {
-          border: 2px solid themed('border-color');
-          background: transparent;
+          border: 2px solid themed('border-light-color');
 
           &.checked {
             background: themed('brand-primary');

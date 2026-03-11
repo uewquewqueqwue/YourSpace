@@ -36,7 +36,7 @@ export function setupTray(mainWindow: BrowserWindow, iconPath: string, log: any)
             mainLog.error('Sync timeout, force quitting')
             mainWindow.destroy()
             app.quit()
-          }, 3000)
+          }, 3500)
         }
       }
     ])
@@ -56,4 +56,12 @@ export function setupTray(mainWindow: BrowserWindow, iconPath: string, log: any)
   } catch (err) {
     log(`Tray error: ${err}`)
   }
+}
+
+export function isTrayCreated(): boolean {
+  return tray !== null
+}
+
+export function getTray(): Tray | null {
+  return tray
 }

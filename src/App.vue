@@ -25,7 +25,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, computed } from 'vue'
+import { ref, onMounted, computed, onUnmounted } from 'vue' // 👈 добавил onUnmounted
 import { useToast } from '@/composables/useToast'
 import { usePatches } from '@/composables/usePatches'
 import { useSettings } from '@/composables/useSettings'
@@ -58,7 +58,7 @@ const loaderRef = ref<InstanceType<typeof AppLoader>>()
 const showPatchModal = ref(false)
 
 const currentVersion = computed(() => patches.currentVersion.value)
-const PATCH_SEEN_KEY = 'patch_seen_version'
+const PATCH_SEEN_KEY = 'patch_seen_key'
 
 const checkPatches = async () => {
   await patches.fetchPatches()
@@ -105,6 +105,10 @@ onMounted(async () => {
     
     deadlineNotifications.stopChecking()
   })
+})
+
+onUnmounted(() => {
+  deadlineNotifications.stopChecking()
 })
 </script>
 

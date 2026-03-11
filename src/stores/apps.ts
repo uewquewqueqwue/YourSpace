@@ -293,215 +293,219 @@ if (typeof window !== 'undefined') {
   })
 }
 
-export function useAppsStore(): AppsStore {
-  const fetchApps = async () => {
-    const token = getToken()
-    if (token && isAuthenticated()) {
-      loading.value = true
-      error.value = null
-      try {
-        await syncFromServer(token)
-      } catch {
-        error.value = 'Failed to fetch apps'
-      } finally {
-        loading.value = false
-      }
-    }
-  }
-
-  const addApp = async (input: CreateAppInput): Promise<UserAppWithDisplay | null> => {
-
-    if (apps.value.some(a => a.path === input.path)) {
-      error.value = 'App already added'
-      return null
-    }
-
-    const token = getToken()
-    const isAuth = token && isAuthenticated()
-
-
-    const exeName = input.path.split('\\').pop()?.replace('.exe', '') || ''
-
-
-    let catalog = catalogs.value.find(c => c.name === exeName)
-
-    if (!catalog) {
-
-      try {
-        catalog = await window.electronAPI.db.createCatalog({
-          name: exeName,
-          displayName: null,
-          color: generateColor(exeName)
-        })
-        catalogs.value.push(catalog)
-      } catch {
-
-        catalog = {
-          id: 'local-' + crypto.randomUUID(),
-          name: exeName,
-          displayName: null,
-          color: generateColor(exeName),
-          icon: null,
-          createdAt: new Date(),
-          updatedAt: new Date()
-        }
-      }
-    }
-
-
-    const displayName = input.customName || catalog.displayName || catalog.name
-
-    const newApp: UserAppWithDisplay = {
-      id: 'local-' + crypto.randomUUID(),
-      userId: isAuth ? 'pending' : 'local',
-      catalogId: catalog.id,
-      path: input.path,
-      customName: input.customName || null,
-      customColor: input.customColor || null,
-      totalMinutes: 0,
-      lastUsed: null,
-      createdAt: new Date(),
-      updatedAt: new Date(),
-      catalog,
-      displayName,
-      displayColor: input.customColor || catalog.color || generateColor(catalog.name),
-      isActive: false,
-      currentSession: null,
-      hasInvalidPath: false
-    }
-
-    apps.value.push(newApp)
-    saveToStorage()
-    checkAppStatus(newApp)
-
-
-    if (isAuth) {
-      try {
-        const serverApp = await window.electronAPI.db.createApp(token, {
-          path: newApp.path,
-          catalogName: catalog.name,
-          customName: newApp.customName || undefined,
-          customColor: newApp.customColor || undefined
-        })
-
-
-        newApp.id = serverApp.id
-        newApp.catalogId = serverApp.catalogId
-        newApp.catalog = serverApp.catalog
-
-
-        updateAppDisplayName(newApp)
-
-        saveToStorage()
-      } catch (err) {
-        console.error('Failed to sync new app:', err)
-      }
-    }
-
-    return newApp
-  }
-
-  const removeApp = async (id: string): Promise<boolean> => {
-    const index = apps.value.findIndex(a => a.id === id)
-    if (index === -1) return false
-
-    const [app] = apps.value.splice(index, 1)
-    quickApps.value = quickApps.value.filter(a => a.id !== id)
-    saveToStorage()
-    saveQuickToStorage()
-
-    const token = getToken()
-    if (token && isAuthenticated() && !id.startsWith('local-')) {
-      try {
-        await window.electronAPI.db.deleteApp(token, id)
-      } catch (err) {
-        console.error('Failed to delete from server:', err)
-      }
-    }
-
-    return true
-  }
-
-  const launchApp = async (path: string): Promise<boolean> => {
+const fetchApps = async () => {
+  const token = getToken()
+  if (token && isAuthenticated()) {
+    loading.value = true
+    error.value = null
     try {
-      const result = await window.electronAPI.apps.launchApp(path)
-      return result.success
+      await syncFromServer(token)
     } catch {
-      return false
+      error.value = 'Failed to fetch apps'
+    } finally {
+      loading.value = false
     }
-  }
-
-  const forceSync = async (token?: string) => {
-    const t = token || getToken()
-    if (t && isAuthenticated()) {
-      await syncToServer(t)
-    }
-  }
-
-  const addToQuick = (id: string): boolean => {
-    const app = apps.value.find(a => a.id === id)
-    if (!app || quickApps.value.includes(app)) return false
-    quickApps.value.push(app)
-    saveQuickToStorage()
-    return true
-  }
-
-  const removeFromQuick = (id: string): void => {
-    quickApps.value = quickApps.value.filter(a => a.id !== id)
-    saveQuickToStorage()
-  }
-
-  const isInQuick = (id: string): boolean => {
-    return quickApps.value.some(a => a.id === id)
-  }
-
-  const getAppById = (id: string) => {
-    return apps.value.find(a => a.id === id)
-  }
-
-  const getActiveApps = () => {
-    return apps.value.filter(a => a.isActive)
-  }
-
-  const getTotalTimeToday = (): number => {
-    const today = new Date()
-    today.setHours(0, 0, 0, 0)
-    return apps.value.reduce((total, app) =>
-      total + (app.lastUsed && app.lastUsed >= today ? app.totalMinutes : 0), 0)
-  }
-
-  const reset = () => {
-    apps.value = []
-    quickApps.value = []
-    localStorage.removeItem(STORAGE_KEY)
-    localStorage.removeItem(QUICK_KEY)
-  }
-
-  const logout = () => {
-    pendingChanges.value = false
-    stopPeriodicSync()
-  }
-
-  return {
-    apps,
-    quickApps,
-    loading,
-    error,
-    fetchApps,
-    addApp,
-    removeApp,
-    launchApp,
-    forceSync,
-    addToQuick,
-    removeFromQuick,
-    isInQuick,
-    getAppById,
-    getActiveApps,
-    getTotalTimeToday,
-    reset,
-    logout,
-    saveToStorage,
-    startPeriodicSync,
-    stopPeriodicSync
   }
 }
+
+const addApp = async (input: CreateAppInput): Promise<UserAppWithDisplay | null> => {
+
+  if (apps.value.some(a => a.path === input.path)) {
+    error.value = 'App already added'
+    return null
+  }
+
+  const token = getToken()
+  const isAuth = token && isAuthenticated()
+
+
+  const exeName = input.path.split('\\').pop()?.replace('.exe', '') || ''
+
+
+  let catalog = catalogs.value.find(c => c.name === exeName)
+
+  if (!catalog) {
+
+    try {
+      catalog = await window.electronAPI.db.createCatalog({
+        name: exeName,
+        displayName: null,
+        color: generateColor(exeName)
+      })
+      catalogs.value.push(catalog)
+    } catch {
+
+      catalog = {
+        id: 'local-' + crypto.randomUUID(),
+        name: exeName,
+        displayName: null,
+        color: generateColor(exeName),
+        icon: null,
+        createdAt: new Date(),
+        updatedAt: new Date()
+      }
+    }
+  }
+
+
+  const displayName = input.customName || catalog.displayName || catalog.name
+
+  const newApp: UserAppWithDisplay = {
+    id: 'local-' + crypto.randomUUID(),
+    userId: isAuth ? 'pending' : 'local',
+    catalogId: catalog.id,
+    path: input.path,
+    customName: input.customName || null,
+    customColor: input.customColor || null,
+    totalMinutes: 0,
+    lastUsed: null,
+    createdAt: new Date(),
+    updatedAt: new Date(),
+    catalog,
+    displayName,
+    displayColor: input.customColor || catalog.color || generateColor(catalog.name),
+    isActive: false,
+    currentSession: null,
+    hasInvalidPath: false
+  }
+
+  apps.value.push(newApp)
+  saveToStorage()
+  checkAppStatus(newApp)
+
+
+  if (isAuth) {
+    try {
+      const serverApp = await window.electronAPI.db.createApp(token, {
+        path: newApp.path,
+        catalogName: catalog.name,
+        customName: newApp.customName || undefined,
+        customColor: newApp.customColor || undefined
+      })
+
+
+      newApp.id = serverApp.id
+      newApp.catalogId = serverApp.catalogId
+      newApp.catalog = serverApp.catalog
+
+
+      updateAppDisplayName(newApp)
+
+      saveToStorage()
+    } catch (err) {
+      console.error('Failed to sync new app:', err)
+    }
+  }
+
+  return newApp
+}
+
+const removeApp = async (id: string): Promise<boolean> => {
+  const index = apps.value.findIndex(a => a.id === id)
+  if (index === -1) return false
+
+  const [app] = apps.value.splice(index, 1)
+  quickApps.value = quickApps.value.filter(a => a.id !== id)
+  saveToStorage()
+  saveQuickToStorage()
+
+  const token = getToken()
+  if (token && isAuthenticated() && !id.startsWith('local-')) {
+    try {
+      await window.electronAPI.db.deleteApp(token, id)
+    } catch (err) {
+      console.error('Failed to delete from server:', err)
+    }
+  }
+
+  return true
+}
+
+const launchApp = async (path: string): Promise<boolean> => {
+  try {
+    const result = await window.electronAPI.apps.launchApp(path)
+    return result.success
+  } catch {
+    return false
+  }
+}
+
+const forceSync = async (token?: string) => {
+  const t = token || getToken()
+  if (t && isAuthenticated()) {
+    await syncToServer(t)
+  }
+}
+
+const addToQuick = (id: string): boolean => {
+  const app = apps.value.find(a => a.id === id)
+  if (!app || quickApps.value.includes(app)) return false
+  quickApps.value.push(app)
+  saveQuickToStorage()
+  return true
+}
+
+const removeFromQuick = (id: string): void => {
+  quickApps.value = quickApps.value.filter(a => a.id !== id)
+  saveQuickToStorage()
+}
+
+const isInQuick = (id: string): boolean => {
+  return quickApps.value.some(a => a.id === id)
+}
+
+const getAppById = (id: string) => {
+  return apps.value.find(a => a.id === id)
+}
+
+const getActiveApps = () => {
+  return apps.value.filter(a => a.isActive)
+}
+
+const getTotalTimeToday = (): number => {
+  const today = new Date()
+  today.setHours(0, 0, 0, 0)
+  return apps.value.reduce((total, app) =>
+    total + (app.lastUsed && app.lastUsed >= today ? app.totalMinutes : 0), 0)
+}
+
+const reset = () => {
+  apps.value = []
+  quickApps.value = []
+  localStorage.removeItem(STORAGE_KEY)
+  localStorage.removeItem(QUICK_KEY)
+}
+
+const logout = () => {
+  pendingChanges.value = false
+  stopPeriodicSync()
+}
+
+const storeMethods = {
+  apps,
+  quickApps,
+  loading,
+  error,
+  fetchApps,
+  addApp,
+  removeApp,
+  launchApp,
+  forceSync,
+  addToQuick,
+  removeFromQuick,
+  isInQuick,
+  getAppById,
+  getActiveApps,
+  getTotalTimeToday,
+  reset,
+  logout,
+  saveToStorage,
+  startPeriodicSync,
+  stopPeriodicSync
+}
+
+export function useAppsStore(): AppsStore {
+  return storeMethods
+}
+
+export const appsStore = storeMethods

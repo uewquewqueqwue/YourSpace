@@ -14,13 +14,14 @@ import { setupCatalogsHandlers } from '../../server/handlers/catalogs'
 import { setupVersionsHandlers } from '../../server/handlers/versions'
 import { setupTodoHandlers } from '../../server/handlers/todo'
 import { setupMediaHandlers } from "./handlers/media"
-import { setupTray } from './tray'
+import { setupTray, isTrayCreated, getTray } from './tray'
 import { mainLog } from '@/log/logger'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 
 let mainWindow: Electron.BrowserWindow | null = null
 let updater: ReturnType<typeof setupUpdater> | null = null
+let isQuitting = false
 
 if (!app.requestSingleInstanceLock()) {
   app.quit()
@@ -41,6 +42,38 @@ if (!app.requestSingleInstanceLock()) {
     const isDev = process.env.NODE_ENV === 'development'
 
     mainWindow = createMainWindow({ preloadPath, iconPath, isDev })
+
+    try {
+      setupTray(mainWindow, iconPath, writeDebug)
+      mainLog.success('Tray created successfully')
+    } catch (error) {
+      writeDebug(`Tray creation failed: ${error}`)
+    }
+
+    mainWindow.on('close', (event) => {
+      if (isQuitting) {
+        mainWindow = null
+        return true
+      }
+      
+      if (!isTrayCreated()) {
+        return true
+      }
+      
+      event.preventDefault()
+      mainWindow?.hide()
+      
+      const tray = getTray()
+      if (tray) {
+        tray.displayBalloon({
+          title: 'Приложение свернуто',
+          content: 'Приложение продолжает работу в трее'
+        })
+      }
+      
+      return false
+    })
+
     updater = setupUpdater(mainWindow)
 
     setupAuthHandlers()
@@ -51,12 +84,6 @@ if (!app.requestSingleInstanceLock()) {
     setupWindowHandlers(mainWindow)
     setupMediaHandlers()
     setupTodoHandlers()
-
-    try {
-      setupTray(mainWindow, iconPath, writeDebug)
-    } catch (error) {
-      writeDebug(`Tray creation failed: ${error}`)
-    }
 
     ipcMain.handle('dialog:showOpenDialog', async (event, options) => {
       return dialog.showOpenDialog(options)
@@ -79,6 +106,18 @@ if (!app.requestSingleInstanceLock()) {
       app.exit(0)
     })
 
+    ipcMain.on('quit-app', () => {
+      isQuitting = true
+      app.quit()
+    })
+
+    ipcMain.on('show-window', () => {
+      if (mainWindow) {
+        mainWindow.show()
+        mainWindow.focus()
+      }
+    })
+
     mainLog.success('Main window created')
     mainLog.info('Updater instance:', updater ? 'yes' : 'no')
 
@@ -89,4 +128,13 @@ if (!app.requestSingleInstanceLock()) {
     }
   })
 
+  app.on('before-quit', () => {
+    isQuitting = true
+  })
+
+  app.on('window-all-closed', () => {
+    if (process.platform !== 'darwin' || isQuitting) {
+      app.quit()
+    }
+  })
 }

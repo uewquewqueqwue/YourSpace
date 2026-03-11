@@ -1,7 +1,13 @@
 import { Ref } from 'vue'
-import type { UserAppWithDisplay } from './apps'
-import type { CreateAppInput } from './apps'
+import type { UserAppWithDisplay, CreateAppInput } from './apps'
 import type { User } from './user'
+import type {
+  UserTodoWithDisplay,
+  TodoFolder,
+  TodoTag,
+  CreateTodoInput,
+  UpdateTodoInput
+} from './todo'
 
 export interface AppsStore {
 
@@ -40,7 +46,7 @@ export interface AuthStore {
   loading: Ref<boolean>
   error: Ref<string | null>
   showLoginModal: Ref<boolean>
-  
+
   login: (email: string, password: string) => Promise<void>
   register: (name: string, email: string, password: string) => Promise<void>
   logout: () => Promise<void>
@@ -48,4 +54,47 @@ export interface AuthStore {
   updateProfile: (token: string, updates: { name?: string; avatar?: string }) => Promise<User>
   openLogin: () => void
   closeLogin: () => void
+}
+
+export interface TodoStore {
+
+  todos: Readonly<Ref<UserTodoWithDisplay[]>>
+  folders: Readonly<Ref<TodoFolder[]>>
+  tags: Readonly<Ref<TodoTag[]>>
+  loading: Readonly<Ref<boolean>>
+  error: Readonly<Ref<string | null>>
+
+
+  fetchTodos: () => Promise<void>
+  addTodo: (input: CreateTodoInput) => Promise<UserTodoWithDisplay | null>
+  updateTodo: (id: string, updates: UpdateTodoInput) => Promise<UserTodoWithDisplay | null>
+  deleteTodo: (id: string) => Promise<boolean>
+
+
+  createTag: (data: { name: string; color: string }) => Promise<TodoTag>
+  deleteTag: (id: string) => Promise<boolean>
+  updateTag: (id: string, updates: { name?: string; color?: string }) => Promise<TodoTag | null>
+  getTagById: (id: string) => TodoTag | undefined
+
+
+  createFolder: (data: { name: string; color?: string }) => Promise<TodoFolder>
+  deleteFolder: (id: string) => Promise<boolean>
+  updateFolder: (id: string, updates: { name?: string; color?: string }) => Promise<TodoFolder | null>
+  getFolderById: (id: string) => TodoFolder | undefined
+
+
+  getActiveTodos: () => UserTodoWithDisplay[]
+  getCompletedTodos: () => UserTodoWithDisplay[]
+  getTodosByTag: (tagId: string) => UserTodoWithDisplay[]
+  getTodosByFolder: (folderId: string) => UserTodoWithDisplay[]
+
+
+  reset: () => void
+  logout: () => void
+  saveToStorage: () => void
+  forceSync: (token?: string) => Promise<void>
+
+
+  startPeriodicSync: () => void
+  stopPeriodicSync: () => void
 }

@@ -1,12 +1,9 @@
 <template>
   <div class="settings-view">
-    <div class="header">
-      <h1>Settings</h1>
-      <button v-if="hasChanges" class="save-btn" @click="saveSettings" :disabled="isSaving">
-        <Save :size="16" />
-        {{ isSaving ? 'Saving...' : 'Save changes' }}
-      </button>
-    </div>
+    <button v-if="hasChanges" class="save-btn" @click="saveSettings" :disabled="isSaving">
+      <Save :size="16" />
+      {{ isSaving ? 'Saving...' : 'Save changes' }}
+    </button>
 
     <div class="settings-container">
       <div class="settings-nav">
@@ -290,8 +287,12 @@ onMounted(() => {
       color: themed('text-primary');
     }
   }
+}
 
-  .save-btn {
+.save-btn {
+    position: fixed;
+    bottom: 30px;
+    right: 430px;
     border: none;
     border-radius: 8px;
     padding: 8px 16px;
@@ -311,7 +312,6 @@ onMounted(() => {
       cursor: not-allowed;
     }
   }
-}
 
 .settings-container {
   flex: 1;

@@ -1,9 +1,8 @@
 import { ref } from 'vue'
 import type { User } from '@/types/user'
 import type { AuthStore } from "@/types/store"
-import { useAppsStore } from './apps'
-import { useTodoStore } from './todo'
-
+import { todoStore } from './todo'
+import { appsStore } from './apps'
 
 const user = ref<User | null>(null)
 const loading = ref(false)
@@ -30,11 +29,10 @@ export function useAuth(): AuthStore {
       user.value = userData
       saveUserToStorage(userData)
 
-      const appsStore = useAppsStore()
-      await appsStore.fetchApps()
-
-      const todoStore = useTodoStore()
-      await todoStore.fetchTodos()
+      await Promise.all([
+        appsStore.fetchApps(),
+        todoStore.fetchTodos()
+      ])
 
     } catch (err) {
       error.value = err instanceof Error ? err.message : 'Login failed'
@@ -54,11 +52,10 @@ export function useAuth(): AuthStore {
       user.value = userData
       saveUserToStorage(userData)
 
-      const appsStore = useAppsStore()
-      await appsStore.fetchApps()
-
-      const todoStore = useTodoStore()
-      await todoStore.fetchTodos()
+      await Promise.all([
+        appsStore.fetchApps(),
+        todoStore.fetchTodos()
+      ])
 
     } catch (err) {
       error.value = err instanceof Error ? err.message : 'Registration failed'
@@ -77,8 +74,8 @@ export function useAuth(): AuthStore {
       }
     }
 
-    const appsStore = useAppsStore()
     appsStore.logout()
+    todoStore.logout()
 
     user.value = null
     saveUserToStorage(null)
@@ -102,8 +99,10 @@ export function useAuth(): AuthStore {
       user.value = userData
       saveUserToStorage(userData)
 
-      const appsStore = useAppsStore()
-      await appsStore.fetchApps()
+      await Promise.all([
+        appsStore.fetchApps(),
+        todoStore.fetchTodos()
+      ])
 
     } catch {
       localStorage.removeItem('token')

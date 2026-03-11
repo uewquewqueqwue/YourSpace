@@ -29,4 +29,8 @@ export function setupWindowHandlers(win: BrowserWindow | null) {
   ipcMain.on('window-hide-tray', () => {
     win?.hide()
   })
+
+  ipcMain.on('window-close', () => {
+    win?.hide()
+  })
 }
