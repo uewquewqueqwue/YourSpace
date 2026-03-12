@@ -1,0 +1,62 @@
+name: Build and Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  build:
+    runs-on: ${{ matrix.os }}
+    
+    strategy:
+      matrix:
+        os: [windows-latest, macos-latest, ubuntu-latest]
+        
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'yarn'
+          
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+        
+      - name: Create .env file
+        run: |
+          echo "DATABASE_URL=${{ secrets.DATABASE_URL }}" >> .env
+          echo "GH_TOKEN=${{ secrets.GH_TOKEN }}" >> .env
+          echo "NODE_ENV=production" >> .env
+        shell: bash
+        
+      - name: Run tests
+        run: yarn test:run
+        
+      - name: Build application
+        run: yarn build
+        env:
+          NODE_ENV: production
+        
+      - name: Build and publish (Windows)
+        if: matrix.os == 'windows-latest'
+        run: yarn push
+        env:
+          GH_TOKEN: ${{ secrets.GH_TOKEN }}
+          
+      - name: Build and publish (macOS)
+        if: matrix.os == 'macos-latest'
+        run: yarn push
+        env:
+          GH_TOKEN: ${{ secrets.GH_TOKEN }}
+          APPLE_ID: ${{ secrets.APPLE_ID }}
+          APPLE_ID_PASSWORD: ${{ secrets.APPLE_ID_PASSWORD }}
+          
+      - name: Build and publish (Linux)
+        if: matrix.os == 'ubuntu-latest'
+        run: yarn push
+        env:
+          GH_TOKEN: ${{ secrets.GH_TOKEN }}
