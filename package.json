@@ -95,7 +95,8 @@
     ],
     "files": [
       "dist/**/*",
-      "!dist_electron"
+      "!dist_electron",
+      "!node_modules/@prisma/studio-core"
     ],
     "win": {
       "target": [

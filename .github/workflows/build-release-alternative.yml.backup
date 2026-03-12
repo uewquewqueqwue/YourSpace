@@ -1,4 +1,4 @@
-name: Build and Release
+name: Build and Release (Alternative)
 
 on:
   push:
@@ -8,6 +8,10 @@ on:
 jobs:
   build:
     runs-on: ${{ matrix.os }}
+    
+    # Важно: даем права на запись в репозиторий
+    permissions:
+      contents: write
     
     strategy:
       fail-fast: false
@@ -30,7 +34,7 @@ jobs:
       - name: Create .env file
         run: |
           echo "DATABASE_URL=${{ secrets.DATABASE_URL }}" >> .env
-          echo "GH_TOKEN=${{ secrets.GH_TOKEN }}" >> .env
+          echo "GH_TOKEN=${{ secrets.GITHUB_TOKEN }}" >> .env
           echo "NODE_ENV=production" >> .env
         shell: bash
         
@@ -51,5 +55,6 @@ jobs:
       - name: Build and publish
         run: yarn push
         env:
-          GH_TOKEN: ${{ secrets.GH_TOKEN }}
-          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
