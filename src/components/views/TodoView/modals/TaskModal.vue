@@ -138,7 +138,7 @@ import { ref, watch, nextTick, computed } from 'vue'
 import { X, Check, Plus, Trash2, Folder, ChevronDown } from 'lucide-vue-next'
 import { ToDoPriority } from '@/types/todo'
 import ConfirmDialog from '@/components/common/ConfirmDialog.vue'
-import { useTodoStore } from '@/stores/todo'
+import { useTodoStore } from '@/stores/todo.pinia'
 import { useConfirmDelete } from '@/composables/useConfirmDelete'
 import { onClickOutside } from '@vueuse/core'
 

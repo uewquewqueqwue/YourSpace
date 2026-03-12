@@ -1,12 +1,12 @@
 <template>
   <div class="form">
-    <div v-if="auth.error.value" class="error">
-      {{ auth.error.value }}
+    <div v-if="authStore.error" class="error">
+      {{ authStore.error }}
     </div>
 
     <div class="field" :class="{ error: getFieldError('name') }">
       <User :size="16" class="icon" />
-      <input v-model="name" type="text" placeholder="Name" :disabled="auth.loading.value" @keyup.enter="handleSubmit">
+      <input v-model="name" type="text" placeholder="Name" :disabled="authStore.loading" @keyup.enter="handleSubmit">
       <span v-if="getFieldError('name')" class="field-error">
         {{ getFieldError('name') }}
       </span>
@@ -14,7 +14,7 @@
 
     <div class="field" :class="{ error: getFieldError('email') }">
       <Mail :size="16" class="icon" />
-      <input v-model="email" type="email" placeholder="Email" :disabled="auth.loading.value"
+      <input v-model="email" type="email" placeholder="Email" :disabled="authStore.loading"
         @keyup.enter="handleSubmit">
       <span v-if="getFieldError('email')" class="field-error">
         {{ getFieldError('email') }}
@@ -23,7 +23,7 @@
 
     <div class="field" :class="{ error: getFieldError('password') }">
       <Lock :size="16" class="icon" />
-      <input v-model="password" type="password" placeholder="Password" :disabled="auth.loading.value"
+      <input v-model="password" type="password" placeholder="Password" :disabled="authStore.loading"
         @keyup.enter="handleSubmit">
       <span v-if="getFieldError('password')" class="field-error">
         {{ getFieldError('password') }}
@@ -32,17 +32,17 @@
 
     <div class="field" :class="{ error: getFieldError('confirmPassword') }">
       <Lock :size="16" class="icon" />
-      <input v-model="confirmPassword" type="password" placeholder="Confirm password" :disabled="auth.loading.value"
+      <input v-model="confirmPassword" type="password" placeholder="Confirm password" :disabled="authStore.loading"
         @keyup.enter="handleSubmit">
       <span v-if="getFieldError('confirmPassword')" class="field-error">
         {{ getFieldError('confirmPassword') }}
       </span>
     </div>
 
-    <button class="submit-btn" @click="handleSubmit" :disabled="auth.loading.value">
-      <Loader v-if="auth.loading.value" :size="16" class="spin" />
+    <button class="submit-btn" @click="handleSubmit" :disabled="authStore.loading">
+      <Loader v-if="authStore.loading" :size="16" class="spin" />
       <LogIn v-else :size="16" />
-      {{ auth.loading.value ? 'Creating account...' : 'Sign Up' }}
+      {{ authStore.loading ? 'Creating account...' : 'Sign Up' }}
     </button>
   </div>
 </template>
@@ -50,11 +50,11 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { User, Mail, Lock, LogIn, Loader } from 'lucide-vue-next'
-import { useAuth } from '@/stores/auth'
+import { useAuthStore } from '@/stores/auth.pinia'
 import { Validator } from '@/utils/validators'
 import type { ValidationError } from '@/types/errors'
 
-const auth = useAuth()
+const authStore = useAuthStore()
 const name = ref('')
 const email = ref('')
 const password = ref('')
@@ -77,9 +77,9 @@ const handleSubmit = async () => {
   
   if (errors.value.length > 0) return
   
-  await auth.register(name.value, email.value, password.value)
+  await authStore.register(name.value, email.value, password.value)
 
-  if (!auth.error.value) {
+  if (!authStore.error) {
     emit('success')
   }
 }

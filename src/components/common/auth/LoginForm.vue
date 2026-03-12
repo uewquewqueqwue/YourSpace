@@ -1,7 +1,7 @@
 <template>
   <div class="form">
-    <div v-if="auth.error.value" class="error">
-      {{ auth.error.value }}
+    <div v-if="authStore.error" class="error">
+      {{ authStore.error }}
     </div>
 
     <div class="field" :class="{ error: getFieldError('email') }">
@@ -10,7 +10,7 @@
         v-model="email" 
         type="email" 
         placeholder="Email"
-        :disabled="auth.loading.value"
+        :disabled="authStore.loading"
         @keyup.enter="handleSubmit"
       >
       <span v-if="getFieldError('email')" class="field-error">
@@ -24,7 +24,7 @@
         v-model="password" 
         type="password" 
         placeholder="Password"
-        :disabled="auth.loading.value"
+        :disabled="authStore.loading"
         @keyup.enter="handleSubmit"
       >
       <span v-if="getFieldError('password')" class="field-error">
@@ -35,11 +35,11 @@
     <button 
       class="submit-btn" 
       @click="handleSubmit"
-      :disabled="auth.loading.value"
+      :disabled="authStore.loading"
     >
-      <Loader v-if="auth.loading.value" :size="16" class="spin" />
+      <Loader v-if="authStore.loading" :size="16" class="spin" />
       <LogIn v-else :size="16" />
-      {{ auth.loading.value ? 'Signing in...' : 'Sign In' }}
+      {{ authStore.loading ? 'Signing in...' : 'Sign In' }}
     </button>
   </div>
 </template>
@@ -47,11 +47,11 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { Mail, Lock, LogIn, Loader } from 'lucide-vue-next'
-import { useAuth } from '@/stores/auth'
+import { useAuthStore } from '@/stores/auth.pinia'
 import { Validator } from '@/utils/validators'
 import type { ValidationError } from '@/types/errors'
 
-const auth = useAuth()
+const authStore = useAuthStore()
 const email = ref('')
 const password = ref('')
 const errors = ref<ValidationError[]>([])
@@ -67,9 +67,9 @@ const handleSubmit = async () => {
   
   if (errors.value.length > 0) return
   
-  await auth.login(email.value, password.value)
+  await authStore.login(email.value, password.value)
   
-  if (!auth.error.value) {
+  if (!authStore.error) {
     emit('success')
   }
 }

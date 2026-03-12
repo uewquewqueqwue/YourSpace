@@ -85,16 +85,16 @@
         <div v-else-if="activeSection === 'account'" class="settings-section">
           <h2>Account</h2>
 
-          <template v-if="auth.user.value">
+          <template v-if="authStore.user">
             <div class="profile-card">
               <div class="profile-header">
                 <div class="avatar">
-                  <img v-if="auth.user.value.avatar" :src="auth.user.value.avatar" alt="">
+                  <img v-if="authStore.user.avatar" :src="authStore.user.avatar" alt="">
                   <User v-else :size="32" />
                 </div>
                 <div class="profile-info">
-                  <h3>{{ auth.user.value.name || 'User' }}</h3>
-                  <p>{{ auth.user.value.email }}</p>
+                  <h3>{{ authStore.user.name || 'User' }}</h3>
+                  <p>{{ authStore.user.email }}</p>
                 </div>
               </div>
             </div>
@@ -126,7 +126,7 @@
                 </div>
               </div>
             </div>
-            <button class="info-btn" @click.stop="auth.openLogin">
+            <button class="info-btn" @click.stop="authStore.openLogin">
               <LogIn :size="16" />
               Login
             </button>
@@ -187,7 +187,7 @@ import {
   Monitor, LogOut, LogIn, RefreshCw,
   ChevronRight, Save, Download
 } from 'lucide-vue-next'
-import { useAuth } from '@/stores/auth'
+import { useAuthStore } from '@/stores/auth.pinia'
 import { useSettings } from '@/composables/useSettings'
 import { useToast } from '@/composables/useToast'
 import { version } from '../../../../package.json'
@@ -195,7 +195,7 @@ import { version } from '../../../../package.json'
 const { settings } = useSettings()
 const isSaving = ref(false)
 const activeSection = ref('appearance')
-const auth = useAuth()
+const authStore = useAuthStore()
 const toast = useToast()
 
 const currentVersion = ref(version)
@@ -243,7 +243,7 @@ const onProgress = (progress: any) => {
   }
 }
 const handleLogout = () => {
-  auth.logout()
+  authStore.logout()
   toast.success('Logged out successfully')
 }
 

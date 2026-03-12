@@ -1,8 +1,8 @@
 <template>
   <Teleport to="body">
-    <div v-if="showModal" class="modal-overlay" ref="overlayRef" @click.self="auth.closeLogin">
+    <div v-if="showModal" class="modal-overlay" ref="overlayRef" @click.self="authStore.closeLogin">
       <div class="modal" ref="modalRef">
-        <button class="close-btn" @click="auth.closeLogin">
+        <button class="close-btn" @click="authStore.closeLogin">
           <X :size="18" />
         </button>
 
@@ -28,30 +28,30 @@
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue'
 import { X } from 'lucide-vue-next'
-import { useAuth } from '@/stores/auth'
+import { useAuthStore } from '@/stores/auth.pinia'
 import { useToast } from '@/composables/useToast'
 import { useModal } from '@/composables/useModal'
 import LoginForm from '@/components/common/auth/LoginForm.vue'
 import RegisterForm from '@/components/common/auth/RegisterForm.vue'
 
-const auth = useAuth()
+const authStore = useAuthStore()
 const isLogin = ref(true)
 const toast = useToast()
-const showModal = computed(() => auth.showLoginModal.value)
+const showModal = computed(() => authStore.showLoginModal)
 
 const { modalRef, overlayRef, close } = useModal({
-  onClose: () => auth.closeLogin(),
+  onClose: () => authStore.closeLogin(),
   closeOnClickOutside: true,
   closeOnEscape: true
 })
 
 const handleEscape = (e: KeyboardEvent) => {
   if (e.key === 'Escape' && showModal.value) {
-    auth.closeLogin()
+    authStore.closeLogin()
   }
 }
 
-watch(() => auth.showLoginModal.value, (val) => {
+watch(() => authStore.showLoginModal, (val) => {
   if (val) {
     window.addEventListener('keydown', handleEscape)
   } else {
@@ -61,12 +61,12 @@ watch(() => auth.showLoginModal.value, (val) => {
 
 const switchMode = () => {
   isLogin.value = !isLogin.value
-  auth.error.value = null
+  authStore.error = null
 }
 
 const handleSuccess = () => {
-  toast.success(isLogin.value ? `Welcome back ${auth.user.value?.name}!` : 'Account created!')
-  auth.closeLogin()
+  toast.success(isLogin.value ? `Welcome back ${authStore.user?.name}!` : 'Account created!')
+  authStore.closeLogin()
   isLogin.value = true
 }
 </script>

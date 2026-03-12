@@ -1,104 +1,56 @@
 import { ipcMain } from 'electron'
-import { prisma } from '../prisma'
 import { authenticate } from '../middleware/auth'
+import { appService } from '../services/AppService'
+import { handleError } from '../utils/errors'
+import { z } from 'zod'
 
 export function setupAppsHandlers() {
   ipcMain.handle('apps:getAll', async (event, token) => {
-    const user = await authenticate(token)
-
-    return prisma.userApp.findMany({
-      where: { userId: user.id },
-      select: {
-        id: true,
-        path: true,
-        customName: true,
-        customColor: true,
-        totalMinutes: true,
-        lastUsed: true,
-        catalog: {
-          select: {
-            id: true,
-            name: true,
-            displayName: true,
-            icon: true,
-            color: true
-          }
-        }
-      }
-    })
+    try {
+      const user = await authenticate(token)
+      return await appService.getAllApps(user.id)
+    } catch (error) {
+      handleError(error, 'apps:getAll')
+    }
   })
 
-  ipcMain.handle('apps:create', async (event, { token, path, catalogName, customName, customColor }) => {
-    const user = await authenticate(token)
-    const exeName = path.split('\\').pop()?.replace('.exe', '') || catalogName
-
-    return prisma.$transaction(async (tx) => {
-      let catalog = await tx.appCatalog.findUnique({
-        where: { name: exeName }
-      })
-
-      if (!catalog) {
-        catalog = await tx.appCatalog.create({
-          data: {
-            name: exeName,
-          }
-        })
+  ipcMain.handle('apps:create', async (event, { token, ...data }) => {
+    try {
+      const user = await authenticate(token)
+      return await appService.createApp(user.id, data)
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        throw new Error(error.errors[0].message)
       }
-
-      return tx.userApp.create({
-        data: {
-          userId: user.id,
-          catalogId: catalog.id,
-          path,
-          customName,
-          customColor,
-          lastUsed: new Date()
-        },
-        select: {
-          id: true,
-          path: true,
-          customName: true,
-          customColor: true,
-          totalMinutes: true,
-          lastUsed: true,
-          catalog: {
-            select: {
-              id: true,
-              name: true,
-              displayName: true,
-              icon: true,
-              color: true
-            }
-          }
-        }
-      })
-    })
+      handleError(error, 'apps:create')
+    }
   })
 
-  ipcMain.handle('apps:update', async (event, { token, id, totalMinutes, lastUsed }) => {
-    const user = await authenticate(token)
-
-    return prisma.userApp.update({
-      where: { id, userId: user.id },
-      data: {
-        totalMinutes,
-        lastUsed: lastUsed ? new Date(lastUsed) : undefined
-      },
-      select: {
-        id: true,
-        totalMinutes: true,
-        lastUsed: true
+  ipcMain.handle('apps:update', async (event, { token, id, ...updates }) => {
+    try {
+      const user = await authenticate(token)
+      
+      // Convert lastUsed string to Date if present
+      if (updates.lastUsed && typeof updates.lastUsed === 'string') {
+        updates.lastUsed = new Date(updates.lastUsed)
       }
-    })
+      
+      return await appService.updateApp(id, user.id, updates)
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        throw new Error(error.errors[0].message)
+      }
+      handleError(error, 'apps:update')
+    }
   })
 
   ipcMain.handle('apps:delete', async (event, { token, id }) => {
-    const user = await authenticate(token)
-
-    await prisma.userApp.delete({
-      where: { id, userId: user.id }
-    })
-
-    return { success: true }
+    try {
+      const user = await authenticate(token)
+      await appService.deleteApp(id, user.id)
+      return { success: true }
+    } catch (error) {
+      handleError(error, 'apps:delete')
+    }
   })
 }

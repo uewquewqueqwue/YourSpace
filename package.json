@@ -1,6 +1,6 @@
 {
   "name": "your-space",
-  "version": "1.2.8",
+  "version": "1.2.9",
   "productName": "YourSpace",
   "description": "YourSpace - app launcher and tracker",
   "author": "Uewque",
@@ -15,7 +15,13 @@
     "preview": "electron-vite preview",
     "dist": "yarn build && electron-builder",
     "push": "yarn build && electron-builder --publish always",
-    "release": "env-cmd yarn push"
+    "release": "node scripts/release.js patch",
+    "release:minor": "node scripts/release.js minor",
+    "release:major": "node scripts/release.js major",
+    "test": "vitest",
+    "test:ui": "vitest --ui",
+    "test:run": "vitest run",
+    "test:coverage": "vitest run --coverage"
   },
   "dependencies": {
     "@prisma/client": "^7.4.2",
@@ -32,9 +38,12 @@
     "lucide-vue-next": "^0.575.0",
     "marked": "^17.0.4",
     "node-vibrant": "^4.0.4",
+    "pinia": "^3.0.4",
     "vite": "^7.3.1",
     "vue": "^3.5.29",
-    "ws": "^8.19.0"
+    "winston": "^3.19.0",
+    "ws": "^8.19.0",
+    "zod": "^4.3.6"
   },
   "devDependencies": {
     "@types/bcrypt": "^6.0.0",
@@ -45,16 +54,20 @@
     "@types/node": "^25.3.3",
     "@types/ws": "^8.18.1",
     "@vitejs/plugin-vue": "^6.0.4",
+    "@vitest/ui": "^4.0.18",
+    "@vue/test-utils": "^2.4.6",
     "concurrently": "^9.2.1",
     "dotenv-cli": "^11.0.0",
     "electron": "^40.6.1",
     "electron-builder": "26.8.1",
     "electron-vite": "^5.0.0",
     "env-cmd": "^11.0.0",
+    "happy-dom": "^20.8.3",
     "prisma": "^7.4.2",
     "sass": "^1.97.3",
     "tsx": "^4.21.0",
     "typescript": "^5.9.3",
+    "vitest": "^4.0.18",
     "wait-on": "^9.0.4"
   },
   "build": {

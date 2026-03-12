@@ -37,7 +37,7 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { X } from 'lucide-vue-next'
-import { useAppsStore } from '@/stores/apps'
+import { useAppsStore } from '@/stores/apps.pinia'
 import { useToast } from '@/composables/useToast'
 import { safeFirstChar, safeDisplayName } from '@/utils/safe'
 import type { UserAppWithDisplay } from '@/types/apps'

@@ -64,13 +64,13 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
 import { User, Camera, Check } from 'lucide-vue-next'
-import { useAuth } from '@/stores/auth'
+import { useAuthStore } from '@/stores/auth.pinia'
 import { useToast } from '@/composables/useToast'
 import { useModal } from '@/composables/useModal'
 
-const auth = useAuth()
+const authStore = useAuthStore()
 const toast = useToast()
-const user = computed(() => auth.user.value)
+const user = computed(() => authStore.user)
 
 const { isOpen, close, open, modalRef, overlayRef } = useModal()
 
@@ -88,7 +88,7 @@ const hasChanges = computed(() => {
 
 const handleTriggerClick = () => {
   if (!user.value) {
-    auth.openLogin()
+    authStore.openLogin()
     return
   }
   
@@ -148,7 +148,7 @@ const saveChanges = async () => {
     
     const result = await window.electronAPI.db.updateProfile(token, updates)
     
-    auth.user.value = result
+    authStore.user = result
     
     originalName.value = result.name || ''
     originalAvatar.value = result.avatar ?? ''

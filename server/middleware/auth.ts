@@ -1,12 +1,6 @@
 import { prisma } from '@server/prisma'
 import jwt from 'jsonwebtoken'
-import 'dotenv/config'
-
-// @ts-ignore
-const JWT_SECRET: string = process.env.JWT_SECRET
-if (!JWT_SECRET) {
-  throw new Error('JWT_SECRET is not defined in environment variables')
-}
+import { JWT_SECRET } from '../config/secrets'
 
 export const sessions = new Map<string, any>()
 

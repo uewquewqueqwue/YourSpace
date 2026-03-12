@@ -77,7 +77,7 @@ import { Mailbox, LayoutGrid, Image, Cpu, FileDiff, Settings, ListTodo } from 'l
 import AuthModal from '@/components/common/auth/AuthModal.vue'
 import ProfilePopup from '@/components/views/ProfileView/ProfilePopup.vue';
 import MusicPopup from '@/components/views/MusicView/MusicPopup.vue';
-import { useTodoStore } from '@/stores/todo'
+import { useTodoStore } from '@/stores/todo.pinia'
 
 const props = defineProps<{
   tab: string
@@ -90,7 +90,7 @@ const isDev = import.meta.env.DEV
 // Получаем количество активных задач
 const todoStore = useTodoStore()
 const activeTodoCount = computed(() => 
-  todoStore.todos.value?.filter(t => !t.completed).length || 0
+  todoStore.todos?.filter(t => !t.completed).length || 0
 )
 
 const setTab = (tab: string) => emit('update:tab', tab)

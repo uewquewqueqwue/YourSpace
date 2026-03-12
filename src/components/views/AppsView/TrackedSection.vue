@@ -92,7 +92,7 @@
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted } from 'vue'
 import { Plus, Edit, Trash2, Clock, Calendar, Star, ChartCandlestick, LayoutGrid } from 'lucide-vue-next'
-import { useAppsStore } from '@/stores/apps'
+import { useAppsStore } from '@/stores/apps.pinia'
 import { useToast } from '@/composables/useToast'
 import { safeFirstChar, safeDisplayName } from '@/utils/safe'
 import { useConfirmDelete } from '@/composables/useConfirmDelete'

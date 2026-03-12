@@ -22,7 +22,7 @@ import QuickLaunchSection from '@/components/views/AppsView/QuickLaunchSection.v
 import AddAppModal from '@/components/views/AppsView/modals/AddAppModal.vue'
 import SearchHint from './SearchHint.vue'
 import SearchModal from './modals/SearchModal.vue'
-import { useAppsStore } from '@/stores/apps'
+import { useAppsStore } from '@/stores/apps.pinia'
 import { useSearch } from '@/composables/useSearch'
 
 const showAddModal = ref(false)

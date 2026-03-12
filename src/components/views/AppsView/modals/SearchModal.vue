@@ -61,7 +61,7 @@
 <script setup lang="ts">
 import { ref, computed, watch, nextTick, shallowRef } from 'vue'
 import { Search, Play } from 'lucide-vue-next'
-import { useAppsStore } from '@/stores/apps'
+import { useAppsStore } from '@/stores/apps.pinia'
 import { useToast } from '@/composables/useToast'
 import { useSearch } from '@/composables/useSearch'
 import { debounce } from 'lodash-es'
@@ -98,7 +98,7 @@ const updateSearch = debounce((query: string) => {
   }
   
   const search = query.toLowerCase().trim()
-  const results = store.apps.value.filter(app => 
+  const results = store.apps.filter(app => 
     app.displayName.toLowerCase().includes(search) ||
     app.path.toLowerCase().includes(search)
   )
@@ -146,7 +146,7 @@ const launchApp = async (app: any) => {
   }
 }
 
-watch(() => store.apps.value.length, () => {
+watch(() => store.apps.length, () => {
   searchCache.clear()
 })
 

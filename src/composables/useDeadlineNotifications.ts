@@ -1,6 +1,6 @@
 import { ref } from 'vue'
 import { useToast } from './useToast'
-import { useTodoStore } from '@/stores/todo'
+import { useTodoStore } from '@/stores/todo.pinia'
 
 export function useDeadlineNotifications() {
   const toast = useToast()
@@ -63,7 +63,7 @@ export function useDeadlineNotifications() {
   const checkDeadlines = () => {
     const now = new Date()
     const currentTime = now.getTime()
-    const todos = todoStore.todos.value
+    const todos = todoStore.todos
 
     todos.forEach(todo => {
       if (!todo.dueDate || todo.completed) return

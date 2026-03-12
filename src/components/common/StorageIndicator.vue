@@ -34,9 +34,9 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
 import { HardDrive } from 'lucide-vue-next'
-import { useAppsStore } from '@/stores/apps'
-import { useTodoStore } from '@/stores/todo'
-import { useAuth } from '@/stores/auth'
+import { useAppsStore } from '@/stores/apps.pinia'
+import { useTodoStore } from '@/stores/todo.pinia'
+import { useAuthStore } from '@/stores/auth.pinia'
 
 const expanded = ref(false)
 const appsStore = useAppsStore()
@@ -72,8 +72,8 @@ const percentage = computed(() => {
   return raw.toFixed(1)
 })
 
-const appsCount = computed(() => appsStore.apps.value.length)
-const todosCount = computed(() => todosStore.todos.value.length)
+const appsCount = computed(() => appsStore.apps.length)
+const todosCount = computed(() => todosStore.todos.length)
 
 const formatBytes = (bytes: number): string => {
   if (bytes === 0) return '0 B'
@@ -90,8 +90,8 @@ const handleReset = () => {
   localStorage.removeItem("token")
   localStorage.removeItem("user")
   
-  const auth = useAuth()
-  auth.logout()
+  const authStore = useAuthStore()
+  authStore.logout()
   
   setTimeout(() => {
     window.electronAPI?.relaunchApp()

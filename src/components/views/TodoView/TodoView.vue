@@ -155,7 +155,7 @@ import TaskModal from './modals/TaskModal.vue'
 import FolderModal from './modals/FolderModal.vue'
 import TagModal from './modals/TagModal.vue'
 import ConfirmDialog from '@/components/common/ConfirmDialog.vue'
-import { useTodoStore } from '@/stores/todo'
+import { useTodoStore } from '@/stores/todo.pinia'
 import { useDeadlineNotifications } from '@/composables/useDeadlineNotifications'
 
 const BRAND_COLOR = '#8B5CF6'
@@ -179,13 +179,13 @@ const editingTag = ref<any>(null)
 const deletingTask = ref<any>(null)
 const forceUpdate = ref(0)
 
-const totalTasksCount = computed(() => todos.value?.length || 0)
-const activeCount = computed(() => todos.value?.filter(t => !t.completed).length || 0)
-const completedCount = computed(() => todos.value?.filter(t => t.completed).length || 0)
+const totalTasksCount = computed(() => todos?.length || 0)
+const activeCount = computed(() => todos?.filter(t => !t.completed).length || 0)
+const completedCount = computed(() => todos?.filter(t => t.completed).length || 0)
 
 const filteredTodos = computed(() => {
   forceUpdate.value
-  const todoList = todos.value
+  const todoList = todos
   if (!todoList) return []
 
   let result = todoList
@@ -204,8 +204,8 @@ const filteredTodos = computed(() => {
 })
 
 const getFolderTaskCount = (folderId: string) => {
-  if (!folderId || !todos.value?.length) return 0
-  return todos.value.filter(t => t?.folderId === folderId).length
+  if (!folderId || !todos?.length) return 0
+  return todos.filter(t => t?.folderId === folderId).length
 }
 
 const formatDate = (date: Date | string) => {

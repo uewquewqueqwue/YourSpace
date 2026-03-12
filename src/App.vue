@@ -25,13 +25,13 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, computed, onUnmounted } from 'vue' // 👈 добавил onUnmounted
+import { ref, onMounted, computed, onUnmounted } from 'vue'
 import { useToast } from '@/composables/useToast'
 import { usePatches } from '@/composables/usePatches'
 import { useSettings } from '@/composables/useSettings'
-import { useAuth } from '@/stores/auth'
-import { useAppsStore, initializeAppsStore } from '@/stores/apps'
-import { useTodoStore, initializeTodoStore } from '@/stores/todo'
+import { useAuthStore } from '@/stores/auth.pinia'
+import { useAppsStore } from '@/stores/apps.pinia'
+import { useTodoStore } from '@/stores/todo.pinia'
 import NavBar from '@/components/layout/NavBar.vue'
 import MainView from '@/components/views/MainView.vue'
 import RightPanel from '@/components/layout/RightPanel.vue'
@@ -46,7 +46,7 @@ import { useDeadlineNotifications } from './composables/useDeadlineNotifications
 const { toasts } = useToast()
 const patches = usePatches()
 const { applyAll } = useSettings()
-const auth = useAuth()
+const authStore = useAuthStore()
 const appsStore = useAppsStore()
 const todoStore = useTodoStore()
 
@@ -76,10 +76,10 @@ const markPatchesAsSeen = () => {
 onMounted(async () => {
   applyAll()
 
-  await auth.checkAuth()
+  await authStore.checkAuth()
 
-  initializeAppsStore()
-  initializeTodoStore()
+  await appsStore.initialize()
+  await todoStore.initialize()
 
   loaderRef.value?.finish()
   setTimeout(() => {
@@ -95,7 +95,7 @@ onMounted(async () => {
 
   window.electronAPI?.window.onAppClosing(async () => {
     const token = localStorage.getItem('token')
-    if (auth.user.value && token) {
+    if (authStore.user && token) {
       await appsStore.forceSync(token)
       await todoStore.forceSync(token)
     } else {
@@ -104,11 +104,15 @@ onMounted(async () => {
     }
     
     deadlineNotifications.stopChecking()
+    appsStore.cleanup()
+    todoStore.cleanup()
   })
 })
 
 onUnmounted(() => {
   deadlineNotifications.stopChecking()
+  appsStore.cleanup()
+  todoStore.cleanup()
 })
 </script>
 

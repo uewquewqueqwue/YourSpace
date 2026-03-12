@@ -16,11 +16,20 @@ writeDebug('execPath: ' + process.execPath)
 writeDebug('resourcesPath: ' + process.resourcesPath)
 writeDebug('cwd: ' + process.cwd())
 
-const paths = [
-  path.join(process.resourcesPath || '', '.env'),
-  path.join(path.dirname(process.execPath), 'resources', '.env'),
-  path.join(path.dirname(process.execPath), '.env'),
-]
+const isDev = process.env.NODE_ENV === 'development'
+
+const paths = isDev 
+  ? [
+      path.join(process.cwd(), '.env'),
+      path.join(process.resourcesPath || '', '.env'),
+      path.join(path.dirname(process.execPath), 'resources', '.env'),
+      path.join(path.dirname(process.execPath), '.env'),
+    ]
+  : [
+      path.join(process.resourcesPath || '', '.env'),
+      path.join(path.dirname(process.execPath), 'resources', '.env'),
+      path.join(path.dirname(process.execPath), '.env'),
+    ]
 
 let loaded = false
 for (const p of paths) {

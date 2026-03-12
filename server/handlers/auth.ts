@@ -1,69 +1,76 @@
 import { ipcMain } from 'electron'
-import { prisma } from '../prisma'
-import { authenticate, createToken, sessions } from '../middleware/auth'
-
+import { authenticate, sessions } from '../middleware/auth'
+import { authService } from '../services/AuthService'
+import { handleError } from '../utils/errors'
+import { rateLimit } from '../utils/rateLimit'
+import { z } from 'zod'
 
 export function setupAuthHandlers() {
-  ipcMain.handle('auth:login', async (event, { email, password }) => {
-    const user = await prisma.user.findUnique({ where: { email } })
+  ipcMain.handle('auth:login', async (event, data) => {
+    try {
+      // Rate limit: 5 attempts per minute per email
+      const email = data?.email || 'unknown'
+      rateLimit(`login:${email}`, 5, 60000)
 
-    if (!user || user.password !== password) {
-      throw new Error('Invalid credentials')
+      const result = await authService.login(data)
+      sessions.set(result.token, result.user)
+      
+      return result
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        throw new Error(error.errors[0].message)
+      }
+      handleError(error, 'auth:login')
     }
-
-    const token = createToken(user.id)
-
-    const { password: _, ...userWithoutPassword } = user
-    sessions.set(token, userWithoutPassword)
-
-    return { user: userWithoutPassword, token }
   })
 
-  ipcMain.handle('auth:register', async (event, { name, email, password }) => {
-    const existing = await prisma.user.findUnique({ where: { email } })
-    if (existing) throw new Error('User already exists')
+  ipcMain.handle('auth:register', async (event, data) => {
+    try {
+      // Rate limit: 3 registrations per hour per IP (using email as proxy)
+      const email = data?.email || 'unknown'
+      rateLimit(`register:${email}`, 3, 3600000)
 
-    const newUser = await prisma.user.create({
-      data: {
-        name,
-        email,
-        password,
-        avatar: `https://api.dicebear.com/7.x/initials/svg?seed=${email}`
+      const result = await authService.register(data)
+      sessions.set(result.token, result.user)
+      
+      return result
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        throw new Error(error.errors[0].message)
       }
-    })
-
-    const token = createToken(newUser.id)
-
-    const { password: _, ...userWithoutPassword } = newUser
-    sessions.set(token, userWithoutPassword)
-
-    return { user: userWithoutPassword, token }
+      handleError(error, 'auth:register')
+    }
   })
 
   ipcMain.handle('auth:logout', async (event, token) => {
-    sessions.delete(token)
-    return { success: true }
+    try {
+      if (token) {
+        sessions.delete(token)
+      }
+      return { success: true }
+    } catch (error) {
+      handleError(error, 'auth:logout')
+    }
   })
 
   ipcMain.handle('auth:me', async (event, token) => {
-    return authenticate(token)
+    try {
+      return await authenticate(token)
+    } catch (error) {
+      handleError(error, 'auth:me')
+    }
   })
 
   ipcMain.handle('auth:updateProfile', async (event, { token, ...updates }) => {
-    const user = await authenticate(token)
-
-    const data: any = {}
-    if (updates.name !== undefined) data.name = updates.name
-    if (updates.avatar !== undefined) data.avatar = updates.avatar
-
-    const updatedUser = await prisma.user.update({
-      where: { id: user.id },
-      data
-    })
-
-    const { password: _, ...userWithoutPassword } = updatedUser
-    sessions.set(token, userWithoutPassword)
-
-    return userWithoutPassword
+    try {
+      const user = await authenticate(token)
+      const updatedUser = await authService.updateProfile(user.id, updates)
+      
+      sessions.set(token, updatedUser)
+      
+      return updatedUser
+    } catch (error) {
+      handleError(error, 'auth:updateProfile')
+    }
   })
 }
