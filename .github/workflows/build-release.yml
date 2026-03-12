@@ -9,6 +9,10 @@ jobs:
   build:
     runs-on: ${{ matrix.os }}
     
+    # Даем права на запись в репозиторий для GITHUB_TOKEN
+    permissions:
+      contents: write
+    
     strategy:
       fail-fast: false
       matrix:
@@ -51,5 +55,5 @@ jobs:
       - name: Build and publish
         run: yarn push
         env:
-          GH_TOKEN: ${{ secrets.GH_TOKEN }}
-          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
+          GH_TOKEN: ${{ secrets.GH_TOKEN || secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GH_TOKEN || secrets.GITHUB_TOKEN }}
