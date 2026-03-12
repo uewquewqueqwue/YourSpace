@@ -1,4 +1,4 @@
-# 🔧 Исправление GitHub Actions Build
+# 🔧 Исправление GitHub Actions Build (Windows Only)
 
 ## Что было исправлено
 
@@ -44,18 +44,29 @@
     DATABASE_URL: ${{ secrets.DATABASE_URL }}
 ```
 
-### 4. ✅ Отключен fail-fast режим
-**Проблема:** Если одна платформа падала, остальные отменялись
+### 4. ✅ Добавлен email автора
+**Проблема:** Linux .deb пакет требовал email автора
+
+**Решение:**
+```json
+"author": {
+  "name": "Uewque",
+  "email": "uewque@example.com"
+}
+```
+
+### 5. ✅ Убрана сборка для macOS и Linux
+**Проблема:** Вам нужна только Windows сборка
 
 **Решение:**
 ```yaml
 strategy:
-  fail-fast: false  # ← Добавлено
+  fail-fast: false
   matrix:
-    os: [windows-latest, macos-latest, ubuntu-latest]
+    os: [windows-latest]  # ← Только Windows
 ```
 
-## Обновленный workflow
+## Обновленный workflow (только Windows)
 
 Файл: `.github/workflows/build-release.yml`
 
@@ -74,7 +85,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [windows-latest, macos-latest, ubuntu-latest]
+        os: [windows-latest]
         
     steps:
       - name: Checkout code
@@ -110,22 +121,7 @@ jobs:
           NODE_ENV: production
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
         
-      - name: Build and publish (Windows)
-        if: matrix.os == 'windows-latest'
-        run: yarn push
-        env:
-          GH_TOKEN: ${{ secrets.GH_TOKEN }}
-          
-      - name: Build and publish (macOS)
-        if: matrix.os == 'macos-latest'
-        run: yarn push
-        env:
-          GH_TOKEN: ${{ secrets.GH_TOKEN }}
-          APPLE_ID: ${{ secrets.APPLE_ID }}
-          APPLE_ID_PASSWORD: ${{ secrets.APPLE_ID_PASSWORD }}
-          
-      - name: Build and publish (Linux)
-        if: matrix.os == 'ubuntu-latest'
+      - name: Build and publish
         run: yarn push
         env:
           GH_TOKEN: ${{ secrets.GH_TOKEN }}

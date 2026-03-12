@@ -6,8 +6,9 @@
 2. ✅ Обновлен Node.js до версии 24
 3. ✅ Добавлена генерация Prisma Client
 4. ✅ Настроена передача DATABASE_URL
-5. ✅ Отключен fail-fast режим
-6. ✅ Создана полная документация
+5. ✅ Добавлен email автора в package.json
+6. ✅ Убрана сборка для macOS и Linux (только Windows)
+7. ✅ Создана полная документация
 
 ## 📋 Что нужно сделать СЕЙЧАС
 
@@ -38,6 +39,8 @@ https://github.com/uewquewqueqwue/YourSpace/settings/secrets/actions
 - Name: `GH_TOKEN`
 - Value: Вставьте скопированный токен
 - Нажмите "Add secret"
+
+**Примечание:** Теперь сборка только для Windows, поэтому секреты APPLE_ID и APPLE_ID_PASSWORD не нужны.
 
 ### Шаг 2: Закоммитить изменения
 

@@ -3,7 +3,10 @@
   "version": "1.3.1",
   "productName": "YourSpace",
   "description": "YourSpace - app launcher and tracker",
-  "author": "Uewque",
+  "author": {
+    "name": "Uewque",
+    "email": "uewque@example.com"
+  },
   "packageManager": "yarn@4.12.0",
   "main": "dist/main/index.js",
   "type": "module",

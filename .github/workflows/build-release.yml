@@ -12,7 +12,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [windows-latest, macos-latest, ubuntu-latest]
+        os: [windows-latest]
         
     steps:
       - name: Checkout code
@@ -48,22 +48,7 @@ jobs:
           NODE_ENV: production
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
         
-      - name: Build and publish (Windows)
-        if: matrix.os == 'windows-latest'
-        run: yarn push
-        env:
-          GH_TOKEN: ${{ secrets.GH_TOKEN }}
-          
-      - name: Build and publish (macOS)
-        if: matrix.os == 'macos-latest'
-        run: yarn push
-        env:
-          GH_TOKEN: ${{ secrets.GH_TOKEN }}
-          APPLE_ID: ${{ secrets.APPLE_ID }}
-          APPLE_ID_PASSWORD: ${{ secrets.APPLE_ID_PASSWORD }}
-          
-      - name: Build and publish (Linux)
-        if: matrix.os == 'ubuntu-latest'
+      - name: Build and publish
         run: yarn push
         env:
           GH_TOKEN: ${{ secrets.GH_TOKEN }}
