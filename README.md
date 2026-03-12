@@ -1,10 +1,3 @@
-# YourSpace
-
-Personal app launcher and tracker built with Electron + Vue 3.
-
-## License
-
-Private project.
 # 🚀 YourSpace
 
 **Your digital command center, beautifully crafted.**
