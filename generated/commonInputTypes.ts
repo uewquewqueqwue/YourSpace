@@ -236,6 +236,23 @@ export type EnumToDoPriorityWithAggregatesFilter<$PrismaModel = never> = {
   _max?: Prisma.NestedEnumToDoPriorityFilter<$PrismaModel>
 }
 
+export type EnumSyncStatusFilter<$PrismaModel = never> = {
+  equals?: $Enums.SyncStatus | Prisma.EnumSyncStatusFieldRefInput<$PrismaModel>
+  in?: $Enums.SyncStatus[] | Prisma.ListEnumSyncStatusFieldRefInput<$PrismaModel>
+  notIn?: $Enums.SyncStatus[] | Prisma.ListEnumSyncStatusFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumSyncStatusFilter<$PrismaModel> | $Enums.SyncStatus
+}
+
+export type EnumSyncStatusWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.SyncStatus | Prisma.EnumSyncStatusFieldRefInput<$PrismaModel>
+  in?: $Enums.SyncStatus[] | Prisma.ListEnumSyncStatusFieldRefInput<$PrismaModel>
+  notIn?: $Enums.SyncStatus[] | Prisma.ListEnumSyncStatusFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumSyncStatusWithAggregatesFilter<$PrismaModel> | $Enums.SyncStatus
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumSyncStatusFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumSyncStatusFilter<$PrismaModel>
+}
+
 export type NestedStringFilter<$PrismaModel = never> = {
   equals?: string | Prisma.StringFieldRefInput<$PrismaModel>
   in?: string[] | Prisma.ListStringFieldRefInput<$PrismaModel>
@@ -469,6 +486,23 @@ export type NestedEnumToDoPriorityWithAggregatesFilter<$PrismaModel = never> = {
   _count?: Prisma.NestedIntFilter<$PrismaModel>
   _min?: Prisma.NestedEnumToDoPriorityFilter<$PrismaModel>
   _max?: Prisma.NestedEnumToDoPriorityFilter<$PrismaModel>
+}
+
+export type NestedEnumSyncStatusFilter<$PrismaModel = never> = {
+  equals?: $Enums.SyncStatus | Prisma.EnumSyncStatusFieldRefInput<$PrismaModel>
+  in?: $Enums.SyncStatus[] | Prisma.ListEnumSyncStatusFieldRefInput<$PrismaModel>
+  notIn?: $Enums.SyncStatus[] | Prisma.ListEnumSyncStatusFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumSyncStatusFilter<$PrismaModel> | $Enums.SyncStatus
+}
+
+export type NestedEnumSyncStatusWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.SyncStatus | Prisma.EnumSyncStatusFieldRefInput<$PrismaModel>
+  in?: $Enums.SyncStatus[] | Prisma.ListEnumSyncStatusFieldRefInput<$PrismaModel>
+  notIn?: $Enums.SyncStatus[] | Prisma.ListEnumSyncStatusFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumSyncStatusWithAggregatesFilter<$PrismaModel> | $Enums.SyncStatus
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumSyncStatusFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumSyncStatusFilter<$PrismaModel>
 }
 
 

@@ -162,10 +162,11 @@ const BRAND_COLOR = '#8B5CF6'
 const store = useTodoStore()
 const { resetNotifications } = useDeadlineNotifications()
 
-const todos = store.todos
-const folders = store.folders
-const tags = store.tags
-const isLoading = store.loading
+// Use computed to make store data reactive
+const todos = computed(() => store.todos)
+const folders = computed(() => store.folders)
+const tags = computed(() => store.tags)
+const isLoading = computed(() => store.loading)
 
 const selectedFolder = ref<string | null>(null)
 const showCompleted = ref<boolean | null>(null) // null = all, false = active, true = completed
@@ -179,13 +180,13 @@ const editingTag = ref<any>(null)
 const deletingTask = ref<any>(null)
 const forceUpdate = ref(0)
 
-const totalTasksCount = computed(() => todos?.length || 0)
-const activeCount = computed(() => todos?.filter(t => !t.completed).length || 0)
-const completedCount = computed(() => todos?.filter(t => t.completed).length || 0)
+const totalTasksCount = computed(() => todos.value?.length || 0)
+const activeCount = computed(() => todos.value?.filter(t => !t.completed).length || 0)
+const completedCount = computed(() => todos.value?.filter(t => t.completed).length || 0)
 
 const filteredTodos = computed(() => {
   forceUpdate.value
-  const todoList = todos
+  const todoList = todos.value
   if (!todoList) return []
 
   let result = todoList
@@ -204,8 +205,8 @@ const filteredTodos = computed(() => {
 })
 
 const getFolderTaskCount = (folderId: string) => {
-  if (!folderId || !todos?.length) return 0
-  return todos.filter(t => t?.folderId === folderId).length
+  if (!folderId || !todos.value?.length) return 0
+  return todos.value.filter(t => t?.folderId === folderId).length
 }
 
 const formatDate = (date: Date | string) => {

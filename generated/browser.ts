@@ -62,3 +62,13 @@ export type UserTodo = Prisma.UserTodoModel
  * 
  */
 export type UserTodoTag = Prisma.UserTodoTagModel
+/**
+ * Model GoogleAccount
+ * 
+ */
+export type GoogleAccount = Prisma.GoogleAccountModel
+/**
+ * Model Email
+ * 
+ */
+export type Email = Prisma.EmailModel

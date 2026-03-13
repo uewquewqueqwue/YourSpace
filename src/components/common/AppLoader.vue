@@ -7,7 +7,7 @@
       </div>
 
       <div class="connection-status">
-        <div class="status-dot" :class="{ connected: connectionStep === 3 }"></div>
+        <div class="status-dot" :class="{ connected: isConnected }"></div>
         <span>{{ status }}</span>
       </div>
 
@@ -30,60 +30,89 @@ import { ref, onMounted, onUnmounted } from 'vue'
 
 const progress = ref(0)
 const status = ref('Initializing...')
-const connectionStep = ref(1)
-const checkingUpdates = ref(false)
+const isConnected = ref(false)
 
 const steps = [
-  { max: 20, text: 'Loading modules...', step: 1 },
-  { max: 40, text: 'Connecting to services...', step: 1 },
-  { max: 50, text: 'Syncing data...', step: 1 },
-  { max: 90, text: 'Checking for updates...', step: 2 },
-  { max: 95, text: 'Finalizing...', step: 3 }
+  { progress: 20, text: 'Loading modules...', duration: 300 },
+  { progress: 40, text: 'Connecting to database...', duration: 200 },
+  { progress: 60, text: 'Loading user data...', duration: 200 },
+  { progress: 80, text: 'Checking for updates...', duration: 300 },
+  { progress: 95, text: 'Finalizing...', duration: 200 }
 ]
 
-let interval: NodeJS.Timeout
+let interval: NodeJS.Timeout | null = null
 let currentStep = 0
 
-onMounted(() => {
-  interval = setInterval(() => {
-    if (currentStep < steps.length) {
-      const target = steps[currentStep].max
-      
-      if (progress.value < target) {
-        const increment = (target - progress.value) * 0.1 + Math.random() * 0.5
-        progress.value = Math.min(target, progress.value + increment)
-        
-        if (progress.value >= 75 && !checkingUpdates.value) {
-          checkingUpdates.value = true
-          window.electronAPI?.updater.checkForUpdates()
-        }
-        
-        status.value = steps[currentStep].text
-        connectionStep.value = steps[currentStep].step
-      } else {
-        currentStep++
-      }
-    } else if (progress.value < 100) {
-      progress.value = 99.9
+const animateProgress = () => {
+  if (currentStep >= steps.length) {
+    isConnected.value = true
+    return
+  }
+
+  const step = steps[currentStep]
+  status.value = step.text
+
+  const startProgress = progress.value
+  const targetProgress = step.progress
+  const duration = step.duration
+  const startTime = Date.now()
+  let animationId: number
+
+  const animate = () => {
+    const elapsed = Date.now() - startTime
+    const percent = Math.min(elapsed / duration, 1)
+    
+    progress.value = startProgress + (targetProgress - startProgress) * percent
+
+    if (percent < 1) {
+      animationId = requestAnimationFrame(animate)
+    } else {
+      currentStep++
+      animateProgress()
     }
+  }
+
+  animationId = requestAnimationFrame(animate)
+  
+  // Store animation ID for cleanup
+  if (!interval) {
+    interval = animationId as any
+  }
+}
+
+onMounted(() => {
+  // Start animation after a short delay
+  setTimeout(() => {
+    animateProgress()
   }, 100)
 })
 
 onUnmounted(() => {
-  clearInterval(interval)
+  if (interval) {
+    clearInterval(interval)
+  }
 })
 
 const finish = () => {
-  const finishInterval = setInterval(() => {
-    if (progress.value < 99.9) {
-      progress.value += (100 - progress.value) * 0.3
-    } else {
-      progress.value = 100
-      status.value = 'Connected!'
-      connectionStep.value = 3
-      clearInterval(finishInterval)
+  // Animate to 100%
+  const startProgress = progress.value
+  const startTime = Date.now()
+  const duration = 300
+
+  const animate = () => {
+    const elapsed = Date.now() - startTime
+    const percent = Math.min(elapsed / duration, 1)
+    
+    progress.value = startProgress + (100 - startProgress) * percent
+    status.value = 'Connected!'
+    isConnected.value = true
+
+    if (percent < 1) {
+      requestAnimationFrame(animate)
     }
-  }, 50)
+  }
+
+  animate()
 }
 
 defineExpose({ finish })

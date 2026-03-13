@@ -202,6 +202,7 @@ export type UserWhereInput = {
   todoFolders?: Prisma.TodoFolderListRelationFilter
   todoTags?: Prisma.TodoTagListRelationFilter
   todoItems?: Prisma.UserTodoListRelationFilter
+  googleAccounts?: Prisma.GoogleAccountListRelationFilter
 }
 
 export type UserOrderByWithRelationInput = {
@@ -216,6 +217,7 @@ export type UserOrderByWithRelationInput = {
   todoFolders?: Prisma.TodoFolderOrderByRelationAggregateInput
   todoTags?: Prisma.TodoTagOrderByRelationAggregateInput
   todoItems?: Prisma.UserTodoOrderByRelationAggregateInput
+  googleAccounts?: Prisma.GoogleAccountOrderByRelationAggregateInput
 }
 
 export type UserWhereUniqueInput = Prisma.AtLeast<{
@@ -233,6 +235,7 @@ export type UserWhereUniqueInput = Prisma.AtLeast<{
   todoFolders?: Prisma.TodoFolderListRelationFilter
   todoTags?: Prisma.TodoTagListRelationFilter
   todoItems?: Prisma.UserTodoListRelationFilter
+  googleAccounts?: Prisma.GoogleAccountListRelationFilter
 }, "id" | "email">
 
 export type UserOrderByWithAggregationInput = {
@@ -273,6 +276,7 @@ export type UserCreateInput = {
   todoFolders?: Prisma.TodoFolderCreateNestedManyWithoutUserInput
   todoTags?: Prisma.TodoTagCreateNestedManyWithoutUserInput
   todoItems?: Prisma.UserTodoCreateNestedManyWithoutUserInput
+  googleAccounts?: Prisma.GoogleAccountCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateInput = {
@@ -287,6 +291,7 @@ export type UserUncheckedCreateInput = {
   todoFolders?: Prisma.TodoFolderUncheckedCreateNestedManyWithoutUserInput
   todoTags?: Prisma.TodoTagUncheckedCreateNestedManyWithoutUserInput
   todoItems?: Prisma.UserTodoUncheckedCreateNestedManyWithoutUserInput
+  googleAccounts?: Prisma.GoogleAccountUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserUpdateInput = {
@@ -301,6 +306,7 @@ export type UserUpdateInput = {
   todoFolders?: Prisma.TodoFolderUpdateManyWithoutUserNestedInput
   todoTags?: Prisma.TodoTagUpdateManyWithoutUserNestedInput
   todoItems?: Prisma.UserTodoUpdateManyWithoutUserNestedInput
+  googleAccounts?: Prisma.GoogleAccountUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateInput = {
@@ -315,6 +321,7 @@ export type UserUncheckedUpdateInput = {
   todoFolders?: Prisma.TodoFolderUncheckedUpdateManyWithoutUserNestedInput
   todoTags?: Prisma.TodoTagUncheckedUpdateManyWithoutUserNestedInput
   todoItems?: Prisma.UserTodoUncheckedUpdateManyWithoutUserNestedInput
+  googleAccounts?: Prisma.GoogleAccountUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateManyInput = {
@@ -450,6 +457,20 @@ export type UserUpdateOneRequiredWithoutTodoItemsNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutTodoItemsInput, Prisma.UserUpdateWithoutTodoItemsInput>, Prisma.UserUncheckedUpdateWithoutTodoItemsInput>
 }
 
+export type UserCreateNestedOneWithoutGoogleAccountsInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutGoogleAccountsInput, Prisma.UserUncheckedCreateWithoutGoogleAccountsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutGoogleAccountsInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserUpdateOneRequiredWithoutGoogleAccountsNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutGoogleAccountsInput, Prisma.UserUncheckedCreateWithoutGoogleAccountsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutGoogleAccountsInput
+  upsert?: Prisma.UserUpsertWithoutGoogleAccountsInput
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutGoogleAccountsInput, Prisma.UserUpdateWithoutGoogleAccountsInput>, Prisma.UserUncheckedUpdateWithoutGoogleAccountsInput>
+}
+
 export type UserCreateWithoutAppsInput = {
   id?: string
   email: string
@@ -461,6 +482,7 @@ export type UserCreateWithoutAppsInput = {
   todoFolders?: Prisma.TodoFolderCreateNestedManyWithoutUserInput
   todoTags?: Prisma.TodoTagCreateNestedManyWithoutUserInput
   todoItems?: Prisma.UserTodoCreateNestedManyWithoutUserInput
+  googleAccounts?: Prisma.GoogleAccountCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutAppsInput = {
@@ -474,6 +496,7 @@ export type UserUncheckedCreateWithoutAppsInput = {
   todoFolders?: Prisma.TodoFolderUncheckedCreateNestedManyWithoutUserInput
   todoTags?: Prisma.TodoTagUncheckedCreateNestedManyWithoutUserInput
   todoItems?: Prisma.UserTodoUncheckedCreateNestedManyWithoutUserInput
+  googleAccounts?: Prisma.GoogleAccountUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutAppsInput = {
@@ -503,6 +526,7 @@ export type UserUpdateWithoutAppsInput = {
   todoFolders?: Prisma.TodoFolderUpdateManyWithoutUserNestedInput
   todoTags?: Prisma.TodoTagUpdateManyWithoutUserNestedInput
   todoItems?: Prisma.UserTodoUpdateManyWithoutUserNestedInput
+  googleAccounts?: Prisma.GoogleAccountUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutAppsInput = {
@@ -516,6 +540,7 @@ export type UserUncheckedUpdateWithoutAppsInput = {
   todoFolders?: Prisma.TodoFolderUncheckedUpdateManyWithoutUserNestedInput
   todoTags?: Prisma.TodoTagUncheckedUpdateManyWithoutUserNestedInput
   todoItems?: Prisma.UserTodoUncheckedUpdateManyWithoutUserNestedInput
+  googleAccounts?: Prisma.GoogleAccountUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutTodoFoldersInput = {
@@ -529,6 +554,7 @@ export type UserCreateWithoutTodoFoldersInput = {
   apps?: Prisma.UserAppCreateNestedManyWithoutUserInput
   todoTags?: Prisma.TodoTagCreateNestedManyWithoutUserInput
   todoItems?: Prisma.UserTodoCreateNestedManyWithoutUserInput
+  googleAccounts?: Prisma.GoogleAccountCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutTodoFoldersInput = {
@@ -542,6 +568,7 @@ export type UserUncheckedCreateWithoutTodoFoldersInput = {
   apps?: Prisma.UserAppUncheckedCreateNestedManyWithoutUserInput
   todoTags?: Prisma.TodoTagUncheckedCreateNestedManyWithoutUserInput
   todoItems?: Prisma.UserTodoUncheckedCreateNestedManyWithoutUserInput
+  googleAccounts?: Prisma.GoogleAccountUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutTodoFoldersInput = {
@@ -571,6 +598,7 @@ export type UserUpdateWithoutTodoFoldersInput = {
   apps?: Prisma.UserAppUpdateManyWithoutUserNestedInput
   todoTags?: Prisma.TodoTagUpdateManyWithoutUserNestedInput
   todoItems?: Prisma.UserTodoUpdateManyWithoutUserNestedInput
+  googleAccounts?: Prisma.GoogleAccountUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutTodoFoldersInput = {
@@ -584,6 +612,7 @@ export type UserUncheckedUpdateWithoutTodoFoldersInput = {
   apps?: Prisma.UserAppUncheckedUpdateManyWithoutUserNestedInput
   todoTags?: Prisma.TodoTagUncheckedUpdateManyWithoutUserNestedInput
   todoItems?: Prisma.UserTodoUncheckedUpdateManyWithoutUserNestedInput
+  googleAccounts?: Prisma.GoogleAccountUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutTodoTagsInput = {
@@ -597,6 +626,7 @@ export type UserCreateWithoutTodoTagsInput = {
   apps?: Prisma.UserAppCreateNestedManyWithoutUserInput
   todoFolders?: Prisma.TodoFolderCreateNestedManyWithoutUserInput
   todoItems?: Prisma.UserTodoCreateNestedManyWithoutUserInput
+  googleAccounts?: Prisma.GoogleAccountCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutTodoTagsInput = {
@@ -610,6 +640,7 @@ export type UserUncheckedCreateWithoutTodoTagsInput = {
   apps?: Prisma.UserAppUncheckedCreateNestedManyWithoutUserInput
   todoFolders?: Prisma.TodoFolderUncheckedCreateNestedManyWithoutUserInput
   todoItems?: Prisma.UserTodoUncheckedCreateNestedManyWithoutUserInput
+  googleAccounts?: Prisma.GoogleAccountUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutTodoTagsInput = {
@@ -639,6 +670,7 @@ export type UserUpdateWithoutTodoTagsInput = {
   apps?: Prisma.UserAppUpdateManyWithoutUserNestedInput
   todoFolders?: Prisma.TodoFolderUpdateManyWithoutUserNestedInput
   todoItems?: Prisma.UserTodoUpdateManyWithoutUserNestedInput
+  googleAccounts?: Prisma.GoogleAccountUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutTodoTagsInput = {
@@ -652,6 +684,7 @@ export type UserUncheckedUpdateWithoutTodoTagsInput = {
   apps?: Prisma.UserAppUncheckedUpdateManyWithoutUserNestedInput
   todoFolders?: Prisma.TodoFolderUncheckedUpdateManyWithoutUserNestedInput
   todoItems?: Prisma.UserTodoUncheckedUpdateManyWithoutUserNestedInput
+  googleAccounts?: Prisma.GoogleAccountUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutTodoItemsInput = {
@@ -665,6 +698,7 @@ export type UserCreateWithoutTodoItemsInput = {
   apps?: Prisma.UserAppCreateNestedManyWithoutUserInput
   todoFolders?: Prisma.TodoFolderCreateNestedManyWithoutUserInput
   todoTags?: Prisma.TodoTagCreateNestedManyWithoutUserInput
+  googleAccounts?: Prisma.GoogleAccountCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutTodoItemsInput = {
@@ -678,6 +712,7 @@ export type UserUncheckedCreateWithoutTodoItemsInput = {
   apps?: Prisma.UserAppUncheckedCreateNestedManyWithoutUserInput
   todoFolders?: Prisma.TodoFolderUncheckedCreateNestedManyWithoutUserInput
   todoTags?: Prisma.TodoTagUncheckedCreateNestedManyWithoutUserInput
+  googleAccounts?: Prisma.GoogleAccountUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutTodoItemsInput = {
@@ -707,6 +742,7 @@ export type UserUpdateWithoutTodoItemsInput = {
   apps?: Prisma.UserAppUpdateManyWithoutUserNestedInput
   todoFolders?: Prisma.TodoFolderUpdateManyWithoutUserNestedInput
   todoTags?: Prisma.TodoTagUpdateManyWithoutUserNestedInput
+  googleAccounts?: Prisma.GoogleAccountUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutTodoItemsInput = {
@@ -720,6 +756,79 @@ export type UserUncheckedUpdateWithoutTodoItemsInput = {
   apps?: Prisma.UserAppUncheckedUpdateManyWithoutUserNestedInput
   todoFolders?: Prisma.TodoFolderUncheckedUpdateManyWithoutUserNestedInput
   todoTags?: Prisma.TodoTagUncheckedUpdateManyWithoutUserNestedInput
+  googleAccounts?: Prisma.GoogleAccountUncheckedUpdateManyWithoutUserNestedInput
+}
+
+export type UserCreateWithoutGoogleAccountsInput = {
+  id?: string
+  email: string
+  name: string
+  password: string
+  avatar?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  apps?: Prisma.UserAppCreateNestedManyWithoutUserInput
+  todoFolders?: Prisma.TodoFolderCreateNestedManyWithoutUserInput
+  todoTags?: Prisma.TodoTagCreateNestedManyWithoutUserInput
+  todoItems?: Prisma.UserTodoCreateNestedManyWithoutUserInput
+}
+
+export type UserUncheckedCreateWithoutGoogleAccountsInput = {
+  id?: string
+  email: string
+  name: string
+  password: string
+  avatar?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  apps?: Prisma.UserAppUncheckedCreateNestedManyWithoutUserInput
+  todoFolders?: Prisma.TodoFolderUncheckedCreateNestedManyWithoutUserInput
+  todoTags?: Prisma.TodoTagUncheckedCreateNestedManyWithoutUserInput
+  todoItems?: Prisma.UserTodoUncheckedCreateNestedManyWithoutUserInput
+}
+
+export type UserCreateOrConnectWithoutGoogleAccountsInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutGoogleAccountsInput, Prisma.UserUncheckedCreateWithoutGoogleAccountsInput>
+}
+
+export type UserUpsertWithoutGoogleAccountsInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutGoogleAccountsInput, Prisma.UserUncheckedUpdateWithoutGoogleAccountsInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutGoogleAccountsInput, Prisma.UserUncheckedCreateWithoutGoogleAccountsInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutGoogleAccountsInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutGoogleAccountsInput, Prisma.UserUncheckedUpdateWithoutGoogleAccountsInput>
+}
+
+export type UserUpdateWithoutGoogleAccountsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  password?: Prisma.StringFieldUpdateOperationsInput | string
+  avatar?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  apps?: Prisma.UserAppUpdateManyWithoutUserNestedInput
+  todoFolders?: Prisma.TodoFolderUpdateManyWithoutUserNestedInput
+  todoTags?: Prisma.TodoTagUpdateManyWithoutUserNestedInput
+  todoItems?: Prisma.UserTodoUpdateManyWithoutUserNestedInput
+}
+
+export type UserUncheckedUpdateWithoutGoogleAccountsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  password?: Prisma.StringFieldUpdateOperationsInput | string
+  avatar?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  apps?: Prisma.UserAppUncheckedUpdateManyWithoutUserNestedInput
+  todoFolders?: Prisma.TodoFolderUncheckedUpdateManyWithoutUserNestedInput
+  todoTags?: Prisma.TodoTagUncheckedUpdateManyWithoutUserNestedInput
+  todoItems?: Prisma.UserTodoUncheckedUpdateManyWithoutUserNestedInput
 }
 
 
@@ -732,6 +841,7 @@ export type UserCountOutputType = {
   todoFolders: number
   todoTags: number
   todoItems: number
+  googleAccounts: number
 }
 
 export type UserCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -739,6 +849,7 @@ export type UserCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.I
   todoFolders?: boolean | UserCountOutputTypeCountTodoFoldersArgs
   todoTags?: boolean | UserCountOutputTypeCountTodoTagsArgs
   todoItems?: boolean | UserCountOutputTypeCountTodoItemsArgs
+  googleAccounts?: boolean | UserCountOutputTypeCountGoogleAccountsArgs
 }
 
 /**
@@ -779,6 +890,13 @@ export type UserCountOutputTypeCountTodoItemsArgs<ExtArgs extends runtime.Types.
   where?: Prisma.UserTodoWhereInput
 }
 
+/**
+ * UserCountOutputType without action
+ */
+export type UserCountOutputTypeCountGoogleAccountsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.GoogleAccountWhereInput
+}
+
 
 export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -792,6 +910,7 @@ export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   todoFolders?: boolean | Prisma.User$todoFoldersArgs<ExtArgs>
   todoTags?: boolean | Prisma.User$todoTagsArgs<ExtArgs>
   todoItems?: boolean | Prisma.User$todoItemsArgs<ExtArgs>
+  googleAccounts?: boolean | Prisma.User$googleAccountsArgs<ExtArgs>
   _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["user"]>
 
@@ -831,6 +950,7 @@ export type UserInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   todoFolders?: boolean | Prisma.User$todoFoldersArgs<ExtArgs>
   todoTags?: boolean | Prisma.User$todoTagsArgs<ExtArgs>
   todoItems?: boolean | Prisma.User$todoItemsArgs<ExtArgs>
+  googleAccounts?: boolean | Prisma.User$googleAccountsArgs<ExtArgs>
   _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type UserIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
@@ -843,6 +963,7 @@ export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     todoFolders: Prisma.$TodoFolderPayload<ExtArgs>[]
     todoTags: Prisma.$TodoTagPayload<ExtArgs>[]
     todoItems: Prisma.$UserTodoPayload<ExtArgs>[]
+    googleAccounts: Prisma.$GoogleAccountPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -1250,6 +1371,7 @@ export interface Prisma__UserClient<T, Null = never, ExtArgs extends runtime.Typ
   todoFolders<T extends Prisma.User$todoFoldersArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$todoFoldersArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$TodoFolderPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   todoTags<T extends Prisma.User$todoTagsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$todoTagsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$TodoTagPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   todoItems<T extends Prisma.User$todoItemsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$todoItemsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$UserTodoPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  googleAccounts<T extends Prisma.User$googleAccountsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$googleAccountsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$GoogleAccountPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1767,6 +1889,30 @@ export type User$todoItemsArgs<ExtArgs extends runtime.Types.Extensions.Internal
   take?: number
   skip?: number
   distinct?: Prisma.UserTodoScalarFieldEnum | Prisma.UserTodoScalarFieldEnum[]
+}
+
+/**
+ * User.googleAccounts
+ */
+export type User$googleAccountsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the GoogleAccount
+   */
+  select?: Prisma.GoogleAccountSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the GoogleAccount
+   */
+  omit?: Prisma.GoogleAccountOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.GoogleAccountInclude<ExtArgs> | null
+  where?: Prisma.GoogleAccountWhereInput
+  orderBy?: Prisma.GoogleAccountOrderByWithRelationInput | Prisma.GoogleAccountOrderByWithRelationInput[]
+  cursor?: Prisma.GoogleAccountWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.GoogleAccountScalarFieldEnum | Prisma.GoogleAccountScalarFieldEnum[]
 }
 
 /**

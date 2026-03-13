@@ -72,19 +72,19 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { computed } from 'vue'
 import { Mailbox, LayoutGrid, Image, Cpu, FileDiff, Settings, ListTodo } from 'lucide-vue-next'
 import AuthModal from '@/components/common/auth/AuthModal.vue'
 import ProfilePopup from '@/components/views/ProfileView/ProfilePopup.vue';
 import MusicPopup from '@/components/views/MusicView/MusicPopup.vue';
 import { useTodoStore } from '@/stores/todo.pinia'
+import { useEmailStore } from '@/stores/email.pinia'
 
 const props = defineProps<{
   tab: string
 }>()
 
 const emit = defineEmits(['update:tab'])
-const unreadCount = ref(3)
 const isDev = import.meta.env.DEV
 
 // Получаем количество активных задач
@@ -92,6 +92,10 @@ const todoStore = useTodoStore()
 const activeTodoCount = computed(() => 
   todoStore.todos?.filter(t => !t.completed).length || 0
 )
+
+// Получаем количество непрочитанных писем
+const emailStore = useEmailStore()
+const unreadCount = computed(() => emailStore.unreadCount)
 
 const setTab = (tab: string) => emit('update:tab', tab)
 </script>

@@ -22,10 +22,15 @@ YourSpace is a modern, all-in-one desktop application built with Electron and Vu
 - Smart notifications with sound alerts (24h, 5h, 1h, 30m, 15m before deadlines)
 - Filter tasks by status (All/Active/Completed)
 
-### 📧 Email Integration
-- Quick access to email services
-- Unread count badges for instant notifications
-- Seamless integration with popular email providers
+### 📧 Email Aggregator
+- Connect multiple Google accounts via OAuth 2.0
+- Unified inbox view for all connected accounts
+- Real-time email synchronization (every 5 minutes)
+- Search across all emails with instant results
+- Filter by account, read/unread status
+- Mark emails as read/unread with one click
+- Secure token encryption (AES-256-GCM)
+- Background sync with automatic token refresh
 
 ### 🎵 Music Controls
 - "Now Playing" widget for current track
@@ -65,6 +70,83 @@ YourSpace is a modern, all-in-one desktop application built with Electron and Vu
 | **Styling** | SCSS with custom theme system |
 | **State Management** | Vue Composition API with custom stores |
 | **Build Tools** | Vite for fast development and builds |
+
+---
+
+## ⚙️ Setup Instructions
+
+### Google OAuth Configuration (for Email Aggregator)
+
+To use the Email Aggregator feature, you need to set up Google OAuth credentials:
+
+1. **Create a Google Cloud Project**
+   - Go to [Google Cloud Console](https://console.cloud.google.com/)
+   - Create a new project or select an existing one
+   - Note your project name for reference
+
+2. **Enable Gmail API**
+   - In the Google Cloud Console, navigate to "APIs & Services" > "Library"
+   - Search for "Gmail API"
+   - Click "Enable"
+
+3. **Configure OAuth Consent Screen**
+   - Go to "APIs & Services" > "OAuth consent screen"
+   - Choose "External" user type (or "Internal" if using Google Workspace)
+   - Fill in the required fields:
+     - App name: "YourSpace"
+     - User support email: your email
+     - Developer contact: your email
+   - Add scopes:
+     - `https://www.googleapis.com/auth/gmail.readonly`
+     - `https://www.googleapis.com/auth/gmail.modify`
+   - Add test users (your email addresses that will use the app)
+   - Save and continue
+
+4. **Create OAuth 2.0 Credentials**
+   - Go to "APIs & Services" > "Credentials"
+   - Click "Create Credentials" > "OAuth client ID"
+   - Choose **"Desktop app"** as application type
+   - Name it "YourSpace Desktop"
+   - **Important**: Add authorized redirect URI: `http://localhost:3000`
+   - Click "Create"
+   - Copy the Client ID and Client Secret
+
+5. **Update Environment Variables**
+   - Open your `.env` file in the project root
+   - Replace the placeholder values:
+     ```env
+     GOOGLE_CLIENT_ID="your_actual_client_id_here"
+     GOOGLE_CLIENT_SECRET="your_actual_client_secret_here"
+     ```
+   - Save the file
+
+6. **Restart the Application**
+   - Close YourSpace completely
+   - Restart the application
+   - The Email Aggregator feature should now work
+
+### Environment Variables
+
+Make sure your `.env` file contains all required variables:
+
+```env
+# Database
+DATABASE_URL="your_database_url"
+
+# Authentication
+JWT_SECRET="your_jwt_secret"
+
+# OAuth Encryption (generate with: openssl rand -hex 32)
+OAUTH_ENCRYPTION_KEY="your_encryption_key"
+
+# Google OAuth
+GOOGLE_CLIENT_ID="your_google_client_id"
+GOOGLE_CLIENT_SECRET="your_google_client_secret"
+
+# Optional
+NODE_ENV="development"
+LOG_LEVEL="info"
+```
 
 ---
 

@@ -88,10 +88,10 @@ onMounted(async () => {
 
     setTimeout(async () => {
       await checkPatches()
+      // Start deadline checking after window is expanded
+      deadlineNotifications.startChecking()
     }, 200)
   }, 500)
-
-  deadlineNotifications.startChecking()
 
   window.electronAPI?.window.onAppClosing(async () => {
     const token = localStorage.getItem('token')

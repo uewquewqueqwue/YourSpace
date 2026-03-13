@@ -31,6 +31,6 @@ export function setupWindowHandlers(win: BrowserWindow | null) {
   })
 
   ipcMain.on('window-close', () => {
-    win?.hide()
+    win?.close()
   })
 }

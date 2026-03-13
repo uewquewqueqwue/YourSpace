@@ -28,6 +28,16 @@ import type {
 } from "./todo"
 import type { AppVersion } from './versions'
 import type { MediaAPI } from './media'
+import type {
+  ConnectAccountResponse,
+  CallbackResponse,
+  ListAccountsResponse,
+  DisconnectAccountResponse,
+  ListEmailsResponse,
+  MarkReadResponse,
+  SearchEmailsResponse,
+  TriggerSyncResponse
+} from './email'
 
 export interface DBApi {
   login: (email: string, password: string) => Promise<LoginResponse>
@@ -97,6 +107,65 @@ export interface ToDoAPI {
   }
 }
 
+export interface EmailAPI {
+  accounts: {
+    connect: (token: string) => Promise<ConnectAccountResponse>
+    callback: (code: string, state: string) => Promise<CallbackResponse>
+    list: (token: string) => Promise<ListAccountsResponse>
+    disconnect: (token: string, accountId: string) => Promise<DisconnectAccountResponse>
+  }
+  
+  sync: {
+    trigger: (token: string) => Promise<TriggerSyncResponse>
+  }
+  
+  list: (token: string, options?: { accountId?: string; isRead?: boolean; limit?: number; offset?: number }) => Promise<ListEmailsResponse>
+  markRead: (token: string, emailId: string, isRead: boolean) => Promise<MarkReadResponse>
+  search: (token: string, query: string, options?: { accountId?: string; limit?: number }) => Promise<SearchEmailsResponse>
+  unreadCount: (token: string) => Promise<{ success: boolean; count: number }>
+}
+
+export interface SystemAPI {
+  getStats: () => Promise<{
+    success: boolean
+    stats?: {
+      cpu: { usage: number; cores: number }
+      memory: { total: number; used: number; free: number; usagePercent: number }
+      disk: { total: number; used: number; free: number; usagePercent: number; mount: string }
+      network: { rx: number; tx: number }
+      os: { platform: string; distro: string; release: string; arch: string; hostname: string }
+      uptime: number
+    }
+    error?: string
+  }>
+  getCpuInfo: () => Promise<{
+    success: boolean
+    cpu?: {
+      manufacturer: string
+      brand: string
+      speed: number
+      cores: number
+      physicalCores: number
+      processors: number
+      currentLoad: number
+      cpus: Array<{ load: number }>
+    }
+    error?: string
+  }>
+  getProcesses: () => Promise<{
+    success: boolean
+    processes?: Array<{
+      pid: number
+      name: string
+      cpu: number
+      mem: number
+      memVsz: number
+      memRss: number
+    }>
+    total?: number
+    error?: string
+  }>
+}
 
 export interface ElectronAPI {
   window: WindowAPI
@@ -111,9 +180,15 @@ export interface ElectronAPI {
 
   todos: ToDoAPI
 
+  email: EmailAPI
+
+  system: SystemAPI
+
   dialog: {
     showOpenDialog: (options: any) => Promise<any>
   }
+
+  openExternal: (url: string) => Promise<void>
 
   relaunchApp: () => void
 }

@@ -16,7 +16,7 @@ export function useDeadlineNotifications() {
     return audioContext
   }
 
-  const playBeep = (frequency: number, duration: number, type: OscillatorType = 'sine') => {
+  const playBeep = (frequency: number, duration: number, type: OscillatorType = 'sine', volume: number = 0.15) => {
     try {
       const context = initAudioContext()
       
@@ -33,10 +33,12 @@ export function useDeadlineNotifications() {
       oscillator.frequency.value = frequency
       oscillator.type = type
       
-      gainNode.gain.setValueAtTime(0.1, context.currentTime)
-      gainNode.gain.exponentialRampToValueAtTime(0.01, context.currentTime + duration)
+      // Smooth envelope for pleasant sound
+      gainNode.gain.setValueAtTime(0, context.currentTime)
+      gainNode.gain.linearRampToValueAtTime(volume, context.currentTime + 0.01)
+      gainNode.gain.exponentialRampToValueAtTime(0.001, context.currentTime + duration)
       
-      oscillator.start()
+      oscillator.start(context.currentTime)
       oscillator.stop(context.currentTime + duration)
     } catch (error) {
       console.warn('Audio play failed:', error)
@@ -46,16 +48,20 @@ export function useDeadlineNotifications() {
   const playSound = (type: 'deadline' | 'urgent' | 'overdue') => {
     switch(type) {
       case 'deadline':
-        playBeep(523.25, 0.3)
-        setTimeout(() => playBeep(523.25, 0.3), 300)
+        // Pleasant notification: C5 -> E5 (major third)
+        playBeep(523.25, 0.15, 'sine', 0.12)
+        setTimeout(() => playBeep(659.25, 0.2, 'sine', 0.1), 150)
         break
       case 'urgent':
-        playBeep(659.25, 0.2, 'square')
-        setTimeout(() => playBeep(659.25, 0.2, 'square'), 250)
-        setTimeout(() => playBeep(659.25, 0.2, 'square'), 500)
+        // Gentle urgency: G5 -> C6 (perfect fourth)
+        playBeep(783.99, 0.12, 'sine', 0.15)
+        setTimeout(() => playBeep(1046.50, 0.15, 'sine', 0.12), 120)
+        setTimeout(() => playBeep(1046.50, 0.18, 'sine', 0.1), 270)
         break
       case 'overdue':
-        playBeep(440, 0.5, 'sawtooth')
+        // Soft reminder: A4 -> C5 (minor third)
+        playBeep(440, 0.2, 'sine', 0.12)
+        setTimeout(() => playBeep(523.25, 0.25, 'sine', 0.1), 200)
         break
     }
   }
@@ -123,7 +129,8 @@ export function useDeadlineNotifications() {
   const startChecking = () => {
     checkDeadlines()
     if (!interval) {
-      interval = setInterval(checkDeadlines, 60 * 1000)
+      // Check every 5 minutes instead of 1 minute to reduce memory usage
+      interval = setInterval(checkDeadlines, 5 * 60 * 1000)
     }
   }
 
@@ -131,6 +138,11 @@ export function useDeadlineNotifications() {
     if (interval) {
       clearInterval(interval)
       interval = null
+    }
+    // Clean up audio context
+    if (audioContext) {
+      audioContext.close().catch(() => {})
+      audioContext = null
     }
   }
 

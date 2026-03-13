@@ -1,32 +1,77 @@
 <script setup lang="ts">
-defineProps<{
-  from: string
-  subject: string
-  preview: string
-  to_which: string
-  time: string
-  read?: boolean
-  important?: boolean
-  avatar?: string
-}>()
+import type { EmailDTO } from '@/types/email'
+
+interface Props {
+  email: EmailDTO
+  index?: number
+  rightPanel: boolean
+}
+
+interface Emits {
+  (e: 'toggle-read', emailId: string): void
+}
+
+defineProps<Props>()
+const emit = defineEmits<Emits>()
+
+const formatTime = (timestamp: Date): string => {
+  const now = new Date()
+  const diff = now.getTime() - timestamp.getTime()
+  const hours = Math.floor(diff / (1000 * 60 * 60))
+  const days = Math.floor(diff / (1000 * 60 * 60 * 24))
+
+  if (hours < 1) {
+    const minutes = Math.floor(diff / (1000 * 60))
+    return `${minutes}m ago`
+  } else if (hours < 24) {
+    return `${hours}h ago`
+  } else if (days < 7) {
+    return `${days}d ago`
+  } else {
+    return timestamp.toLocaleDateString()
+  }
+}
+
+const getSenderName = (sender: string): string => {
+  // Extract name from "Name <email@example.com>" format
+  const match = sender.match(/^(.+?)\s*</)
+  return match ? match[1].trim() : sender
+}
+
+const getSenderInitial = (sender: string): string => {
+  const name = getSenderName(sender)
+  return name.charAt(0).toUpperCase()
+}
+
+const handleClick = (email: EmailDTO) => {
+  emit('toggle-read', email.id)
+}
 </script>
 
 <template>
-  <div class="email-card" :class="{ read, important }">
-    <div class="indicator" v-if="!read"></div>
+  <div 
+    class="email-card" 
+    :class="{ read: email.isRead }"
+    @click="handleClick(email)"
+  >
+    <div class="email-number" v-if="index !== undefined && !rightPanel">
+      {{ index + 1 }}
+    </div>
+    
+    <div class="indicator" v-if="!email.isRead"></div>
     
     <div class="avatar">
-      <span>{{ avatar || from.charAt(0).toUpperCase() }}</span>
+      <span>{{ getSenderInitial(email.sender) }}</span>
     </div>
     
     <div class="content">
       <div class="header">
-        <span class="from">{{ from }}</span>
-        <span class="time">{{ time }}</span>
+        <span class="from">{{ getSenderName(email.sender) }}</span>
+        <span class="time">{{ formatTime(email.timestamp) }}</span>
       </div>
-      <div class="subject">{{ subject }}</div>
-      <div class="preview">{{ preview }}</div>
-      <div class="to-which">{{ to_which }}</div>
+      <div class="subject">{{ email.subject }}</div>
+      <div class="preview">{{ email.preview }}</div>
+      <div class="to-which">To: {{ email.recipient }}</div>
     </div>
   </div>
 </template>
@@ -56,11 +101,22 @@ defineProps<{
   &.read {
     opacity: 0.6;
   }
+}
 
-  &.important {
-    @include themify() {
-      border-left: 3px solid themed('brand-primary');
-    }
+.email-number {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  font-weight: 600;
+  flex-shrink: 0;
+  
+  @include themify() {
+    // background: themed('text-secondary');
+    color: themed('text-secondary');
   }
 }
 

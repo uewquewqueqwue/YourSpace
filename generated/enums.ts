@@ -28,3 +28,12 @@ export const ToDoPriority = {
 } as const
 
 export type ToDoPriority = (typeof ToDoPriority)[keyof typeof ToDoPriority]
+
+
+export const SyncStatus = {
+  IDLE: 'IDLE',
+  SYNCING: 'SYNCING',
+  ERROR: 'ERROR'
+} as const
+
+export type SyncStatus = (typeof SyncStatus)[keyof typeof SyncStatus]

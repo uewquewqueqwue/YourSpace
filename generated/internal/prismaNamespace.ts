@@ -392,7 +392,9 @@ export const ModelName = {
   TodoFolder: 'TodoFolder',
   TodoTag: 'TodoTag',
   UserTodo: 'UserTodo',
-  UserTodoTag: 'UserTodoTag'
+  UserTodoTag: 'UserTodoTag',
+  GoogleAccount: 'GoogleAccount',
+  Email: 'Email'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -408,7 +410,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "user" | "appCatalog" | "userApp" | "appVersion" | "patchNote" | "todoFolder" | "todoTag" | "userTodo" | "userTodoTag"
+    modelProps: "user" | "appCatalog" | "userApp" | "appVersion" | "patchNote" | "todoFolder" | "todoTag" | "userTodo" | "userTodoTag" | "googleAccount" | "email"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -1078,6 +1080,154 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    GoogleAccount: {
+      payload: Prisma.$GoogleAccountPayload<ExtArgs>
+      fields: Prisma.GoogleAccountFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.GoogleAccountFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$GoogleAccountPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.GoogleAccountFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$GoogleAccountPayload>
+        }
+        findFirst: {
+          args: Prisma.GoogleAccountFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$GoogleAccountPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.GoogleAccountFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$GoogleAccountPayload>
+        }
+        findMany: {
+          args: Prisma.GoogleAccountFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$GoogleAccountPayload>[]
+        }
+        create: {
+          args: Prisma.GoogleAccountCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$GoogleAccountPayload>
+        }
+        createMany: {
+          args: Prisma.GoogleAccountCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.GoogleAccountCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$GoogleAccountPayload>[]
+        }
+        delete: {
+          args: Prisma.GoogleAccountDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$GoogleAccountPayload>
+        }
+        update: {
+          args: Prisma.GoogleAccountUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$GoogleAccountPayload>
+        }
+        deleteMany: {
+          args: Prisma.GoogleAccountDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.GoogleAccountUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.GoogleAccountUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$GoogleAccountPayload>[]
+        }
+        upsert: {
+          args: Prisma.GoogleAccountUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$GoogleAccountPayload>
+        }
+        aggregate: {
+          args: Prisma.GoogleAccountAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateGoogleAccount>
+        }
+        groupBy: {
+          args: Prisma.GoogleAccountGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.GoogleAccountGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.GoogleAccountCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.GoogleAccountCountAggregateOutputType> | number
+        }
+      }
+    }
+    Email: {
+      payload: Prisma.$EmailPayload<ExtArgs>
+      fields: Prisma.EmailFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.EmailFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$EmailPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.EmailFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$EmailPayload>
+        }
+        findFirst: {
+          args: Prisma.EmailFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$EmailPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.EmailFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$EmailPayload>
+        }
+        findMany: {
+          args: Prisma.EmailFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$EmailPayload>[]
+        }
+        create: {
+          args: Prisma.EmailCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$EmailPayload>
+        }
+        createMany: {
+          args: Prisma.EmailCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.EmailCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$EmailPayload>[]
+        }
+        delete: {
+          args: Prisma.EmailDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$EmailPayload>
+        }
+        update: {
+          args: Prisma.EmailUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$EmailPayload>
+        }
+        deleteMany: {
+          args: Prisma.EmailDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.EmailUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.EmailUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$EmailPayload>[]
+        }
+        upsert: {
+          args: Prisma.EmailUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$EmailPayload>
+        }
+        aggregate: {
+          args: Prisma.EmailAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateEmail>
+        }
+        groupBy: {
+          args: Prisma.EmailGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.EmailGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.EmailCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.EmailCountAggregateOutputType> | number
+        }
+      }
+    }
   }
 } & {
   other: {
@@ -1244,6 +1394,40 @@ export const UserTodoTagScalarFieldEnum = {
 export type UserTodoTagScalarFieldEnum = (typeof UserTodoTagScalarFieldEnum)[keyof typeof UserTodoTagScalarFieldEnum]
 
 
+export const GoogleAccountScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  email: 'email',
+  accessToken: 'accessToken',
+  refreshToken: 'refreshToken',
+  tokenExpiry: 'tokenExpiry',
+  lastSyncAt: 'lastSyncAt',
+  syncStatus: 'syncStatus',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type GoogleAccountScalarFieldEnum = (typeof GoogleAccountScalarFieldEnum)[keyof typeof GoogleAccountScalarFieldEnum]
+
+
+export const EmailScalarFieldEnum = {
+  id: 'id',
+  accountId: 'accountId',
+  gmailId: 'gmailId',
+  threadId: 'threadId',
+  subject: 'subject',
+  sender: 'sender',
+  recipient: 'recipient',
+  preview: 'preview',
+  isRead: 'isRead',
+  timestamp: 'timestamp',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type EmailScalarFieldEnum = (typeof EmailScalarFieldEnum)[keyof typeof EmailScalarFieldEnum]
+
+
 export const SortOrder = {
   asc: 'asc',
   desc: 'desc'
@@ -1348,6 +1532,20 @@ export type EnumToDoPriorityFieldRefInput<$PrismaModel> = FieldRefInputType<$Pri
  * Reference to a field of type 'ToDoPriority[]'
  */
 export type ListEnumToDoPriorityFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'ToDoPriority[]'>
+    
+
+
+/**
+ * Reference to a field of type 'SyncStatus'
+ */
+export type EnumSyncStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'SyncStatus'>
+    
+
+
+/**
+ * Reference to a field of type 'SyncStatus[]'
+ */
+export type ListEnumSyncStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'SyncStatus[]'>
     
 
 
@@ -1468,6 +1666,8 @@ export type GlobalOmitConfig = {
   todoTag?: Prisma.TodoTagOmit
   userTodo?: Prisma.UserTodoOmit
   userTodoTag?: Prisma.UserTodoTagOmit
+  googleAccount?: Prisma.GoogleAccountOmit
+  email?: Prisma.EmailOmit
 }
 
 /* Types for Logging */

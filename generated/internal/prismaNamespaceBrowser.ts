@@ -59,7 +59,9 @@ export const ModelName = {
   TodoFolder: 'TodoFolder',
   TodoTag: 'TodoTag',
   UserTodo: 'UserTodo',
-  UserTodoTag: 'UserTodoTag'
+  UserTodoTag: 'UserTodoTag',
+  GoogleAccount: 'GoogleAccount',
+  Email: 'Email'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -203,6 +205,40 @@ export const UserTodoTagScalarFieldEnum = {
 } as const
 
 export type UserTodoTagScalarFieldEnum = (typeof UserTodoTagScalarFieldEnum)[keyof typeof UserTodoTagScalarFieldEnum]
+
+
+export const GoogleAccountScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  email: 'email',
+  accessToken: 'accessToken',
+  refreshToken: 'refreshToken',
+  tokenExpiry: 'tokenExpiry',
+  lastSyncAt: 'lastSyncAt',
+  syncStatus: 'syncStatus',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type GoogleAccountScalarFieldEnum = (typeof GoogleAccountScalarFieldEnum)[keyof typeof GoogleAccountScalarFieldEnum]
+
+
+export const EmailScalarFieldEnum = {
+  id: 'id',
+  accountId: 'accountId',
+  gmailId: 'gmailId',
+  threadId: 'threadId',
+  subject: 'subject',
+  sender: 'sender',
+  recipient: 'recipient',
+  preview: 'preview',
+  isRead: 'isRead',
+  timestamp: 'timestamp',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type EmailScalarFieldEnum = (typeof EmailScalarFieldEnum)[keyof typeof EmailScalarFieldEnum]
 
 
 export const SortOrder = {
